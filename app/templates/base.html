@@ -12,44 +12,31 @@
 <!--navigation bar-->
 <!--all page share this base-->
 <body>
-  <nav class="navbar navbar-expand-sm navbar-light" style="background-color: #7FFFD4; font-size: 20px;">
-   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-     <span class="navbar-toggler-icon"></span>
-   </button>
-   <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <nav class="navbar navbar-expand-sm navbar-light bg-light">
+      <a class="navbar-brand" href="#">Scooters!</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
 
-
-       <ul class="navbar-nav mr-auto">
-         <li class="nav-item"><a class="nav-link disabled" href="#">BookStation</a></li>
-         <li class="nav-item"><a class="nav-link" href="{{ url_for('views.index') }}">Home</a></li>
-
-         {% if current_user.is_authenticated %}
-         <li class="nav-item"><a class="nav-link" href="{{ url_for('views.reading_record') }}">Record</a></li>
-         <li class="nav-item"><a class="nav-link" href="{{ url_for('views.bookmark') }}">Bookmark</a></li>
-         {% endif %}
-       </ul>
-
-
-       <ul class="navbar-nav ml-auto">
-
-         {% if current_user.is_authenticated %}
-         <li class="nav-item"><a class="nav-link" href="{{ url_for('views.book_record') }}">Bookshelf</a></li>
-         <li class="nav-item"><a class="nav-link" href="{{ url_for('views.profile') }}">Profile</a></li>
-         {% endif %}
-
-         {% if not current_user.is_authenticated %}
-         <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
-         <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.signup') }}">Sign up</a></li>
-         {% endif %}
-
-         {% if current_user.is_authenticated %}
-         <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.logout') }}">Logout</a></li>
-         {% endif %}
-
-       </ul>
-
-    </div>
-  </nav>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item"><a class="nav-link" href="/home">View All Reviews <span class="sr-only">(current)</span></a></li>
+          {% if current_user.is_logged_in %}
+            
+            {% if current_user.isManager == True %}
+              <li class="nav-item"><a class="nav-link" href="#">aaaaaaaaa</a></li>
+            {% else if current_user.isManager == False %}
+              <li class="nav-item"><a class="nav-link" href="#">bbbbbbbbb</a></li>
+          {% else %}
+          <li class="nav-item"><a class="nav-link" href="#">Create A Review</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Your Reviews</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Change Password</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
+          {% endif %}
+        </ul>
+      </div>
+    </nav>
+ 
 
   <!--main content of the page-->
   <div class="block_content">
