@@ -1,6 +1,7 @@
 from app import db
 from email.policy import default
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from werkzeug.security import generate_password_hash, check_password_hash
 
 class Hiring_place(db.Model):
     place_id =db.Column(db.Integer, primary_key=True)
@@ -31,7 +32,7 @@ class Employee(db.Model):
     name = db.Column(db.String(50), nullable = False)
     surname = db.Column(db.Integer, nullable = True)
     email_address = db.Column(db.String(50), nullable = False, unique = True)
-    role = db.Column(db.String(50), nullable = False, default='employee')
+    isManager = db.Column(db.Boolean, default=False)
     national_insurance_number=db.Column(db.String(50), nullable = False, unique = True)
 
 class Guest_user(db.Model):
