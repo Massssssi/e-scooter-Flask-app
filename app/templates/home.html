@@ -1,26 +1,6 @@
 <!-- This is the homepage for the website. From here you can log-in or register -->
 
-{% extends "base.html" %}
-{% block content %}
+<h1>Welcome to our currently unamed e-scooter site</h1>
 
-  <h1>Login</h1>
-  <form action="" method="post" name="create">
-      {{ form.hidden_tag() }}
-      <p type="password">
-          Username: {{ form.username(class_='form-control') }}<br>
-          {% for error in form.username.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-          {% endfor %}<br>
-
-          Password: {{ form.password(cols='80',class_='form-control') }}<br>
-          {% for error in form.password.errors %}
-            <span style="color: red;">[{{ error }}]</span>
-          {% endfor %}<br>
-
-      </p>
-      <p><input type="submit" class="btn btn-default" value="Log-in"></p>
-  </form>
-
-  <i>If you don't have an account then sign-up <a href='/signup'>here</a></i>
-
-{% endblock %}
+<p>Click <a href="/">here</a> to register</p>
+<p>Click <a href="/login">here</a> to log-in</p>
