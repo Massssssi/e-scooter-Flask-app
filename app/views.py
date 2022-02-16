@@ -9,7 +9,7 @@ from .forms import LoginForm
 def main():
    return render_template("home.html")
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'])
 def user_login():
     if current_user.is_authenticated:
        #Finds out what account type current user is and redirects them to the correct page,
