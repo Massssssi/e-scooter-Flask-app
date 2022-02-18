@@ -4,6 +4,7 @@ from flask_login import current_user, login_user, login_required, logout_user
 from .models import Hiring_place, Scooter, Hire_session, Employee, Guest_user, User, Card_Payment, Feedback
 from .forms import LoginForm, RegisterForm
 from flask_admin.contrib.sqla import ModelView
+from werkzeug.security import generate_password_hash
 
 # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Hiring_place, db.session))
@@ -89,7 +90,7 @@ def register():
             app.logger.info('Email: %s fail to create account again', form.email.data)
             flash("This email had already sign up.")
         else:
-            p = User(username=form.name.data, email=form.email.data,
+            p = User(email=form.email.data,
             password=generate_password_hash(form.password.data, method='sha256'),
             phone=form.phone.data)
             db.session.add(p)
