@@ -2,7 +2,7 @@ from app import app, admin, db
 from flask import render_template, flash, request, redirect, session
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Hiring_place, Scooter, Hire_session, Employee, Guest_user, User, Card_Payment, Feedback
-from .forms import LoginForm
+from .forms import LoginForm, RegisterForm
 from flask_admin.contrib.sqla import ModelView
 
 # Adds the ability to view all tables in Flask Admin
@@ -79,3 +79,26 @@ def user_login():
     return render_template('login.html',
                            title='Login page',
                            form=form)
+
+@app.route('/register', methods=['GET','POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            app.logger.info('Email: %s fail to create account again', form.email.data)
+            flash("This email had already sign up.")
+        else:
+            p = User(username=form.name.data, email=form.email.data,
+            password=generate_password_hash(form.password.data, method='sha256'),
+            phone=form.phone.data)
+            db.session.add(p)
+            db.session.commit()
+            return redirect("/login")
+    return render_template('register.html', title='Register', form=form)
+
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")

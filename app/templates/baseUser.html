@@ -14,15 +14,16 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          <li class="nav-item"><a class="nav-link" href="/user">User homepage <span class="sr-only">(current)</span></a></li>
           {% if current_user.is_logged_in %}
+          <li class="nav-item"><a class="nav-link" href="/user">User homepage <span class="sr-only">(current)</span></a></li>
           <li class="nav-item"><a class="nav-link" href="#">Book a scooter</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Manage a scooter</a></li>
           <li class="nav-item"><a class="nav-link" href="#">Change details</a></li>
-             <li class="nav-item"><a class="nav-link" href="#">Help</a></li>
-              <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
+          <li class="nav-item"><a class="nav-link" href="#">Help</a></li>
+          <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
           {% else %}
-          <li class="nav-item"><a class="nav-link" href="#">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+          <li class="nav-item"><a class="nav-link" href="/register">Register</a></li>
           {% endif %}
         </ul>
       </div>
