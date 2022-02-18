@@ -1,7 +1,8 @@
 from app import app
-from flask import render_template, flash
+from flask import render_template, flash, request
 from .forms import scooterForm
 from app import db, models
+
 
 @app.route('/')
 def main():
@@ -10,18 +11,18 @@ def main():
 @app.route('/AddingScooter', methods = ['GET', 'POST'])
 def AddScooter():
     form  = scooterForm()
-    dictionary = {"1. Trinity Centre": 1, "2. Train station": 2, "3. Merrion centre": 3, "4. LRI hospital": 4,
-                "5. UoL Edge sports centre": 5}
-    if form.validate_on_submit():
-        flash('Succesfully received from data. %s and %s'%(form.disponibility.data, form.location.data))
-        for d in dictionary.keys():
-            if form.location.data ==d:
-                x = dictionary[d]
-                flash('%s'%(x))
-                break
+    form.location.choices = [(location.place_id, location.name) for location in models.Hiring_place.query.all()]
 
-        S = models.Scooter(status = form.disponibility.data, location_id = int(x))
+    if form.validate_on_submit():
+        flash('Succesfully received from data. %s and %s'%(form.status.data, form.location.data))
+
+        scooter = models.Scooter(status=form.status.data, location_id=form.location.data)
         
+        try:
+            db.session.add(scooter)
+            db.session.commit()
+        except:
+            flash('ERROR WHILE UPDATING THE SCOOTER TABLE')
 
 
     return render_template('ScooterManagement.html', title = 'Add Scooter', form = form,)

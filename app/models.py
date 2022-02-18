@@ -4,6 +4,7 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, log
 
 class Hiring_place(db.Model):
     place_id =db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), nullable = False)
     address = db.Column(db.String(50), nullable = False)
     max_capacity = db.Column(db.Integer, default = 50)
     scooter_availability = db.Column(db.Integer, nullable = True)

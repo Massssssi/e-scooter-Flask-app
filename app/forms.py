@@ -1,8 +1,8 @@
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import SelectField, BooleanField
 from wtforms.validators import DataRequired
+from wtforms_sqlalchemy.fields import QuerySelectField
 
-class scooterForm(Form):
-    disponibility = BooleanField('disponibility')
-    location = SelectField('location', choices = ['1. Trinity Centre', '2. Train station', '3. Merrion centre', '4. LRI hospital',
-                '5. UoL Edge sports centre'], validators = [DataRequired()])
+class scooterForm(FlaskForm):
+    status = BooleanField('status')
+    location = SelectField('location', choices = [], validators = [DataRequired()])
