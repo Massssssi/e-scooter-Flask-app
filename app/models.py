@@ -56,17 +56,17 @@ class User(UserMixin, db.Model):
     feedback = db.relationship('Feedback', backref='user')
     hire_session = db.relationship('Hire_session', backref='user', uselist=False)
 
-    def __repr__(self):
-        return '{}{}{}{}'.format(self.user_id, self.email, self.password, self.phone)
+    """def __repr__(self):
+        return '{}{}{}{}'.format(self.id, self.email, self.password, self.phone)
 
     def get_id(self):
-        return self.user_id
+        return self.id
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password, password)
+        return check_password_hash(self.password, password)"""
 
 
 class Card_Payment(db.Model):
