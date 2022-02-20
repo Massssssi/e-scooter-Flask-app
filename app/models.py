@@ -1,4 +1,4 @@
-from app import db
+from app import db, login_manager
 from email.policy import default
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -8,7 +8,7 @@ class Hiring_place(db.Model):
     place_id = db.Column(db.Integer, primary_key=True)
     address = db.Column(db.String(50), nullable=False)
     max_capacity = db.Column(db.Integer, default=50)
-    scooter_availability = db.Column(db.Integer, nullable=True)
+    no_of_scooters = db.Column(db.Integer, nullable=True)
     scooters = db.relationship('Scooter', backref='hiring_place')
 
 
@@ -41,7 +41,6 @@ class Employee(db.Model):
 
 class Guest_user(db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     phone = db.Column(db.String(50), unique=True, nullable=False)
     sessions = db.relationship('Hire_session', backref='guest_user')
@@ -50,13 +49,24 @@ class Guest_user(db.Model):
 # the parent of card_payment and feedback
 class User(UserMixin, db.Model):
     user_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     phone = db.Column(db.String(50), unique=True, nullable=False)
     cards = db.relationship('Card_Payment', backref='user')
     feedback = db.relationship('Feedback', backref='user')
     hire_session = db.relationship('Hire_session', backref='user', uselist=False)
+
+    def __repr__(self):
+        return '{}{}{}{}'.format(self.user_id, self.email, self.password, self.phone)
+
+    def get_id(self):
+        return self.user_id
+
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 
 
 class Card_Payment(db.Model):
@@ -75,3 +85,7 @@ class Feedback(db.Model):
     priority = db.Column(db.Integer, default=3)
     feedback_text = db.Column(db.String(5000), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
+
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(int(id))

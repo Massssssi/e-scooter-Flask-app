@@ -19,8 +19,4 @@ login_manager.init_app(app)
 #Adds flask admin
 admin = Admin(app,template_mode='bootstrap3')
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(int(user_id))
-
 from app import views,models

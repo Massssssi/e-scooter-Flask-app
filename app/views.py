@@ -1,5 +1,5 @@
 from app import app, admin, db
-from flask import render_template, flash, request, redirect, session
+from flask import render_template, flash, request, redirect, session, url_for
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Hiring_place, Scooter, Hire_session, Employee, Guest_user, User, Card_Payment, Feedback
 from .forms import LoginForm, RegisterForm
@@ -25,20 +25,21 @@ def main():
 @app.route('/login', methods=['GET', 'POST'])
 def user_login():
     if current_user.is_authenticated:
+
         # Finds out what account type current user is and redirects them to the correct page,
         # (purely for error checking)
 
         flash("User is already logged in. Please log out of your current account first", "Error")
-        findCurrUser = User.query.filter_by(employee_id=current_user.employee_id).first()
+        findCurrUser = User.query.filter_by(user_id=current_user.user_id).first()
         if findCurrUser is not None:
-            return redirect("/user")
+            return render_template('user.html',title='User page')
 
         else:
-            findCurrEmployee = Employee.query.filter_by(user_id=current_user.user_id).first()
+            findCurrEmployee = Employee.query.filter_by(employee_id=current_user.employee_id).first()
             if findCurrEmployee.isManager == True:
-                return redirect("/manager")
+                return render_template('manager.html',title='Manager page')
             else:
-                return redirect("/employee")
+                return render_template('employee.html',title='Employee page')
 
     form = LoginForm()
     if request.method == 'POST':
@@ -48,9 +49,10 @@ def user_login():
             managerAccount = 0  # Checks if employee is a manager, increments if they are
 
             findUser = User.query.filter_by(email=form.email.data).first()
+            flash(findUser.check_password(form.password.data))
 
             if not findUser.check_password(form.password.data):
-                flash("Invalid username or password", "Error")
+                flash("Invalid username or password (user)", "Error")
                 return redirect('/login')
 
             elif findUser is None:
@@ -68,14 +70,14 @@ def user_login():
                 login_user(findEmployee, remember=form.rememberMe.data)
 
                 if managerAccount == 1:
-                    return redirect("/manager")
+                    return render_template('manager.html',title='Manager page')
 
                 else:
-                    return redirect("/employee")
+                    return render_template('employee.html',title='Employee page')
 
             else:
                 login_user(findUser, remember=form.rememberMe.data)
-                return redirect("/user")
+                return render_template('user.html',title='User page')
 
     return render_template('login.html',
                            title='Login page',
