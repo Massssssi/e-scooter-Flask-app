@@ -48,11 +48,7 @@ class Guest_user(db.Model):
 
 # the parent of card_payment and feedback
 class User(UserMixin, db.Model):
-<<<<<<< HEAD
     id = db.Column(db.Integer, primary_key=True)
-=======
-    user_id = db.Column(db.Integer, primary_key=True)
->>>>>>> 614f8df4debabff418cd1917f18b04777a985bd8
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     phone = db.Column(db.String(50), unique=True, nullable=False)
@@ -88,12 +84,4 @@ class Feedback(db.Model):
     scooter_id = db.Column(db.Integer, unique=True, nullable=False)
     priority = db.Column(db.Integer, default=3)
     feedback_text = db.Column(db.String(5000), nullable=False)
-<<<<<<< HEAD
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-=======
-    user_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), nullable=False)
-
-@login_manager.user_loader
-def load_user(id):
-    return User.query.get(int(id))
->>>>>>> 614f8df4debabff418cd1917f18b04777a985bd8
