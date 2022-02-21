@@ -109,3 +109,13 @@ def logout():
 @login_required
 def user():
     return render_template('user.html', title='Home', user=current_user)
+
+@app.route('/user/booking')
+@login_required
+def userScooterBooking():
+    return render_template('userScooterBooking.html', title='Home', user=current_user)
+
+@app.route('/user/manage')
+@login_required
+def userScooterManagement():
+    return render_template('userScooterManagement.html', title='Home', user=current_user)

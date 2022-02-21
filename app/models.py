@@ -31,10 +31,11 @@ class Hire_session(db.Model):
 
 
 class Employee(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(50), nullable=False)
-    surname = db.Column(db.Integer, nullable=True)
-    email_address = db.Column(db.String(50), nullable=False, unique=True)
+    employee_id = db.Column(db.Integer, primary_key=True)
+    forename = db.Column(db.String(50), nullable=False)
+    surname = db.Column(db.String(50), nullable=True)
+    email = db.Column(db.String(50), nullable=False, unique=True)
+    password = db.Column(db.String(80), nullable=False)
     isManager = db.Column(db.Boolean, default=False)
     national_insurance_number = db.Column(db.String(50), nullable=False, unique=True)
 
