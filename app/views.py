@@ -28,7 +28,7 @@ def user_login():
     if current_user.is_authenticated:
         # Finds out what account type current user is and redirects them to the correct page,
         # (purely for error checking)
-        flash("User is already logged in. Please log out of your current account first", "Error")
+
         if current_user.account_type == 0:
             return redirect("/user")
         elif current_user.account_type == 1:
@@ -67,7 +67,9 @@ def register():
         else:
             p = User(email=form.email.data,
                      password=generate_password_hash(form.password.data, method='sha256'),
-                     phone=form.phone.data)
+                     phone=form.phone.data,
+                     forename=form.forename.data,
+                     surname=form.surname.data)
             db.session.add(p)
             db.session.commit()
             return redirect("/login")
@@ -100,6 +102,11 @@ def userScooterManagement():
 
 
 @app.route('/employee')
-#@login_required
+@login_required
 def employee():
     return render_template('employee.html', title='Employee Home', user=current_user)
+
+@app.route('/manager')
+@login_required
+def manager():
+    return render_template('manager.html', title='Manager Home', user=current_user)

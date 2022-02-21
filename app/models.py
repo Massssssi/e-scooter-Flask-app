@@ -54,10 +54,10 @@ class User(UserMixin, db.Model):
     forename = db.Column(db.String(50), nullable=False)
     surname = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(80), nullable=False)
+    password = db.Column(db.String(256), nullable=False)
     phone = db.Column(db.String(50), unique=True, nullable=False)
     account_type = db.Column(db.Integer, nullable=False, default=0)  # 0 for user, 1 for employee, 2 for manager
-    national_insurance_number = db.Column(db.String(9), unique=True)
+    national_insurance_number = db.Column(db.String(9), unique=True) # only for employees
     card = db.relationship('Card', backref='user')
     feedback = db.relationship('Feedback', backref='user')
     session = db.relationship('Session', backref='user', uselist=False)
@@ -75,9 +75,9 @@ class User(UserMixin, db.Model):
 class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     holder = db.Column(db.String(80), nullable=False)
-    card_number = db.Column(db.Integer, unique=True, nullable=False)
+    card_number = db.Column(db.String(16), unique=True, nullable=False)
     expiry_date = db.Column(db.DateTime, nullable=False)
-    cvv = db.Column(db.Integer, nullable=False)
+    cvv = db.Column(db.String(3), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
 

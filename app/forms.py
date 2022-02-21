@@ -12,7 +12,9 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    #username = StringField('username', validators=[DataRequired("Please enter a username")])
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
+
     email = StringField('email', validators=[DataRequired("Please enter an email address")])
-    phone = StringField('phone', validators=[DataRequired("Please enter phone number")])
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
     password = PasswordField('password', validators=[DataRequired("Please enter your password")])
