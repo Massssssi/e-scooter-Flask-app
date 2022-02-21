@@ -13,11 +13,14 @@ db = SQLAlchemy(app)
 #Handles all migrations
 migrate = Migrate(app, db)
 login_manager = LoginManager()
-login_manager.login_view = 'auth.login'
+login_manager.login_view = 'user_login'
 login_manager.init_app(app)
+
+#Adds flask admin
+admin = Admin(app,template_mode='bootstrap3')
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return models.User.query.get(int(user_id))
 
 from app import views,models
