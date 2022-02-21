@@ -6,6 +6,7 @@ from .forms import LoginForm, RegisterForm
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
 # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Location, db.session))
 admin.add_view(ModelView(Scooter, db.session))
@@ -43,6 +44,7 @@ def user_login():
     """
 
     form = LoginForm()
+
     if request.method == 'POST':
         if form.validate_on_submit():
             foundUser = 1  # Will be decremented if user account cannot be found (if no
@@ -92,8 +94,13 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
+
+        my_number = phonenumbers.parse("+447986123456", "GB")
+
         if user:
             flash("This email had already sign up.")
+        elif not phonenumbers.is_valid_number(my_number):
+            flash("That phone number is invalid")
         else:
             p = User(email=form.email.data,
             password=generate_password_hash(form.password.data, method='sha256'),
