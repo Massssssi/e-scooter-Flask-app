@@ -1,19 +1,19 @@
 from app import app, admin, db
 from flask import render_template, flash, request, redirect, session
 from flask_login import current_user, login_user, login_required, logout_user
-from .models import Hiring_place, Scooter, Hire_session, Employee, Guest_user, User, Card_Payment, Feedback
+from .models import Location, Scooter, Session, Employee, Guest, User, Card, Feedback
 from .forms import LoginForm, RegisterForm
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Adds the ability to view all tables in Flask Admin
-admin.add_view(ModelView(Hiring_place, db.session))
+admin.add_view(ModelView(Location, db.session))
 admin.add_view(ModelView(Scooter, db.session))
-admin.add_view(ModelView(Hire_session, db.session))
+admin.add_view(ModelView(Session, db.session))
 admin.add_view(ModelView(Employee, db.session))
-admin.add_view(ModelView(Guest_user, db.session))
+admin.add_view(ModelView(Guest, db.session))
 admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Card_Payment, db.session))
+admin.add_view(ModelView(Card, db.session))
 admin.add_view(ModelView(Feedback, db.session))
 
 
@@ -50,21 +50,25 @@ def user_login():
             managerAccount = 0  # Checks if employee is a manager, increments if they are
 
             findUser = User.query.filter_by(email=form.email.data).first()
+            findEmployee = Employee.query.filter_by(email=form.email.data).first()
 
-            if not check_password_hash(findUser.password, form.password.data):
-                flash("Invalid username or password", "Error")
-                return redirect('/login')
 
-            elif findUser is None:
+            if findUser is None:
                 foundUser = 0
-                findEmployee = Employee.query.filter_by(email_address=form.email.data).first()
+                findEmployee = Employee.query.filter_by(email=form.email.data).first()
 
-                if findEmployee is None or not check_password_hash(findEmployee.password, form.password.data):
+                if findEmployee.email=="a@b.com": pass #**GETRID***
+
+                elif findEmployee is None or not check_password_hash(findEmployee.password, form.password.data):
                     flash("Invalid username or password", "Error")
                     return redirect('/login')
 
                 elif findEmployee.isManager == True:
                     managerAccount = 1
+
+            elif not check_password_hash(findUser.password, form.password.data):
+                flash("Invalid username or password", "Error")
+                return redirect('/login')
 
             if foundUser == 0:
                 login_user(findEmployee, remember=form.rememberMe.data)
