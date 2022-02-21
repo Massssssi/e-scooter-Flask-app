@@ -51,7 +51,7 @@ def user_login():
 
             findUser = User.query.filter_by(email=form.email.data).first()
 
-            if not findUser or not check_password_hash(findUser.password, form.password.data):
+            if not check_password_hash(findUser.password, form.password.data):
                 flash("Invalid username or password", "Error")
                 return redirect('/login')
 
