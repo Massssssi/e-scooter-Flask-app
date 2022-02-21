@@ -8,7 +8,7 @@ class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     address = db.Column(db.String(50), nullable=False)
     # max capacity isn't in the spec so we don't need it
-    no_of_scooters = db.Column(db.Integer, nullable=True, default = 0) # Amount of scooters at location
+    no_of_scooters = db.Column(db.Integer, nullable=True, default=0)  # Amount of scooters at location
     scooters = db.relationship('Scooter', backref='location')
 
 
@@ -23,22 +23,22 @@ class Scooter(db.Model):
 
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    cost = db.Column(db.Float, nullable=True) # stores the final cost of the session
+    cost = db.Column(db.Float, nullable=True)  # stores the final cost of the session
     start_date = db.Column(db.DateTime, nullable=False)
-    session_length = db.Column(db.Integer, nullable=False) #stored in hours, therefore must be an integer
+    session_length = db.Column(db.Integer, nullable=False)  # stored in hours, therefore must be an integer
     scooter_id = db.Column(db.Integer, db.ForeignKey('scooter.id'), nullable=False)
     guest_id = db.Column(db.Integer, db.ForeignKey('guest.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
-class Employee(UserMixin, db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    forename = db.Column(db.String(50), nullable=False)
-    surname = db.Column(db.String(50), nullable=True)
-    email = db.Column(db.String(50), nullable=False, unique=True)
-    password = db.Column(db.String(80), nullable=False)
-    is_manager = db.Column(db.Boolean, default=False)
-    national_insurance_number = db.Column(db.String(9), nullable=False, unique=True) # all NI numbers are of length 9
+#class Employee(UserMixin, db.Model):
+    #id = db.Column(db.Integer, primary_key=True)
+    #forename = db.Column(db.String(50), nullable=False)
+    #surname = db.Column(db.String(50), nullable=True)
+    #email = db.Column(db.String(50), nullable=False, unique=True)
+    #password = db.Column(db.String(80), nullable=False)
+    #is_manager = db.Column(db.Boolean, default=False)
+    #national_insurance_number = db.Column(db.String(9), nullable=False, unique=True)  # all NI numbers are of length 9
 
 
 class Guest(db.Model):
@@ -51,15 +51,16 @@ class Guest(db.Model):
 # the parent of card_payment and feedback
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    forename = db.Column(db.String(50), nullable=False)
+    surname = db.Column(db.String(50), nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(80), nullable=False)
     phone = db.Column(db.String(50), unique=True, nullable=False)
+    account_type = db.Column(db.Integer, nullable=False, default=0)  # 0 for user, 1 for employee, 2 for manager
+    national_insurance_number = db.Column(db.String(9), unique=True)
     card = db.relationship('Card', backref='user')
     feedback = db.relationship('Feedback', backref='user')
     session = db.relationship('Session', backref='user', uselist=False)
-
-    """def __repr__(self):
-        return '{}{}{}{}'.format(self.id, self.email, self.password, self.phone)
 
     def get_id(self):
         return self.id
@@ -68,7 +69,7 @@ class User(UserMixin, db.Model):
         self.password = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password, password)"""
+        return check_password_hash(self.password, password)
 
 
 class Card(db.Model):
@@ -85,7 +86,7 @@ class Feedback(db.Model):
     # which scooter has the problem
     # has to be linked properly to a scooter
     # can be null in case the user is giving feedback about things non-scooter related
-    scooter_id = db.Column(db.Integer, db.ForeignKey('scooter.id'),nullable=True)
+    scooter_id = db.Column(db.Integer, db.ForeignKey('scooter.id'), nullable=True)
 
     priority = db.Column(db.Integer, default=3)
     feedback_text = db.Column(db.String(5000), nullable=False)

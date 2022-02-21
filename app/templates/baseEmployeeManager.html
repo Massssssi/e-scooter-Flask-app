@@ -13,7 +13,7 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-            {% if current_user.isManager == False %}
+            {% if current_user.account_type == 2 %}
                 <li class="nav-item"><a class="nav-link" href="#">Manager homepage <span class="sr-only">(current)</span></a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Change details</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Feedback management</a></li>
