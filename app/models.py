@@ -7,15 +7,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     address = db.Column(db.String(50), nullable=False)
-    # max_capacity = db.Column(db.Integer, default=50)
+    # max capacity isn't in the spec so we don't need it
     no_of_scooters = db.Column(db.Integer, nullable=True, default = 0) # Amount of scooters at location
-    scooters = db.relationship('Scooter', backref='location') # this is redundant
+    scooters = db.relationship('Scooter', backref='location')
 
 
 class Scooter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     availability = db.Column(db.Boolean, default=True)
-    # real_time_location = db.Column(db.Integer, nullable=True)
+    # real time location isn't necessary and without an actual GPS we have no way of doing it
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
     session_id = db.relationship('Session', backref='scooter', uselist=False)
     feedback = db.relationship('Feedback', backref='scooter', uselist=False)
@@ -38,7 +38,7 @@ class Employee(UserMixin, db.Model):
     email = db.Column(db.String(50), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
     is_manager = db.Column(db.Boolean, default=False)
-    national_insurance_number = db.Column(db.String(9), nullable=False, unique=True)
+    national_insurance_number = db.Column(db.String(9), nullable=False, unique=True) # all NI numbers are of length 9
 
 
 class Guest(db.Model):
@@ -74,7 +74,7 @@ class User(UserMixin, db.Model):
 class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     holder = db.Column(db.String(80), nullable=False)
-    card_number = db.Column(db.String(20), unique=True, nullable=False)
+    card_number = db.Column(db.Integer, unique=True, nullable=False)
     expiry_date = db.Column(db.DateTime, nullable=False)
     cvv = db.Column(db.Integer, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
