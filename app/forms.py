@@ -1,8 +1,14 @@
 from flask_wtf import FlaskForm
+from wtforms import SelectField, BooleanField
+from wtforms.validators import DataRequired
+from wtforms_sqlalchemy.fields import QuerySelectField
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, ValidationError
-
 from wtforms.validators import DataRequired, EqualTo, Length, NumberRange, InputRequired
 from .models import Hiring_place, Scooter, Hire_session, Employee, Guest_user, User, Card_Payment, Feedback
+
+class scooterForm(FlaskForm):
+    status = BooleanField('status')
+    location = SelectField('location', choices = [], validators = [DataRequired()])
 
 
 class LoginForm(FlaskForm):

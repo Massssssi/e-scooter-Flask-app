@@ -11,7 +11,6 @@ class Hiring_place(db.Model):
     no_of_scooters = db.Column(db.Integer, nullable=True)
     scooters = db.relationship('Scooter', backref='hiring_place')
 
-
 class Scooter(db.Model):
     scooter_id = db.Column(db.Integer, primary_key=True)
     status = db.Column(db.Boolean, default=True)

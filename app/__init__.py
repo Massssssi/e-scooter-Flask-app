@@ -7,6 +7,7 @@ import os
 import logging
 from flask_wtf.csrf import CSRFProtect
 
+
 app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
@@ -22,5 +23,4 @@ admin = Admin(app,template_mode='bootstrap3')
 @login_manager.user_loader
 def load_user(user_id):
     return models.User.query.get(int(user_id))
-
 from app import views,models

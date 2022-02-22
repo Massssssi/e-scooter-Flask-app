@@ -1,12 +1,13 @@
-from app import app, admin, db
+from app import app, admin, db, models
 from flask import render_template, flash, request, redirect, session
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Hiring_place, Scooter, Hire_session, Employee, Guest_user, User, Card_Payment, Feedback
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, scooterForm
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Adds the ability to view all tables in Flask Admin
+
 admin.add_view(ModelView(Hiring_place, db.session))
 admin.add_view(ModelView(Scooter, db.session))
 admin.add_view(ModelView(Hire_session, db.session))
@@ -17,9 +18,26 @@ admin.add_view(ModelView(Card_Payment, db.session))
 admin.add_view(ModelView(Feedback, db.session))
 
 
+
 @app.route('/')
 def main():
     return render_template("home.html")
+
+@app.route('/AddingScooter', methods = ['GET', 'POST'])
+def AddScooter():
+    form  = scooterForm()
+    form.location.choices = [(location.place_id, location.address) for location in models.Hiring_place.query.all()]
+    if form.validate_on_submit():
+        flash('Succesfully received from data. %s and %s'%(form.status.data, form.location.data))
+
+        scooter = models.Scooter(status=form.status.data, location_id=form.location.data)
+
+        try:
+            db.session.add(scooter)
+            db.session.commit()
+        except:
+            flash('ERROR WHILE UPDATING THE SCOOTER TABLE')
+    return render_template('ScooterManagement.html', title = 'Add Scooter', form = form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
