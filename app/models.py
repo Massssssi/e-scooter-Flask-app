@@ -31,15 +31,6 @@ class Session(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
 
-#class Employee(UserMixin, db.Model):
-    #id = db.Column(db.Integer, primary_key=True)
-    #forename = db.Column(db.String(50), nullable=False)
-    #surname = db.Column(db.String(50), nullable=True)
-    #email = db.Column(db.String(50), nullable=False, unique=True)
-    #password = db.Column(db.String(80), nullable=False)
-    #is_manager = db.Column(db.Boolean, default=False)
-    #national_insurance_number = db.Column(db.String(9), nullable=False, unique=True)  # all NI numbers are of length 9
-
 
 class Guest(db.Model):
     id = db.Column(db.Integer, primary_key=True)

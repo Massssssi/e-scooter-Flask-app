@@ -1,8 +1,8 @@
-from app import app, admin, db
+from app import app, admin, db, models
 from flask import render_template, flash, request, redirect, session
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, scooterForm
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -20,6 +20,22 @@ admin.add_view(ModelView(Feedback, db.session))
 @app.route('/')
 def main():
     return render_template("home.html")
+
+@app.route('/addingScooter', methods = ['GET', 'POST'])
+def AddScooter():
+    form  = scooterForm()
+    form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
+    if form.validate_on_submit():
+        flash('Succesfully received from data. %s and %s'%(form.availability.data, form.location.data))
+
+        scooter = models.Scooter(availability=form.availability.data, location_id=form.location.data)
+
+        try:
+            db.session.add(scooter)
+            db.session.commit()
+        except:
+            flash('ERROR WHILE UPDATING THE SCOOTER TABLE')
+    return render_template('scooterManagement.html', title = 'Add Scooter', form = form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -75,13 +91,11 @@ def register():
             return redirect("/login")
     return render_template('register.html', title='Register', form=form)
 
-
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
     return redirect("/")
-
 
 @app.route('/user')
 @login_required
