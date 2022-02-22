@@ -1,0 +1,6 @@
+#ignore cache files
+__pycache__/
+
+#ignore db and migrations
+app.db
+migrations/
