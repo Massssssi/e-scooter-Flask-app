@@ -67,7 +67,7 @@ class Card(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     holder = db.Column(db.String(80), nullable=False)
     card_number = db.Column(db.String(16), unique=True, nullable=False)
-    expiry_date = db.Column(db.DateTime, nullable=False)
+    expiry_date = db.Column(db.Date, nullable=False)
     cvv = db.Column(db.String(3), nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
 
