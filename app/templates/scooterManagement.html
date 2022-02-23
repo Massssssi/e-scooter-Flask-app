@@ -1,0 +1,25 @@
+{% extends "manager.html" %}
+ {% block content %}
+  {% with messages = get_flashed_messages() %}
+   {% if messages %}
+    <ul>
+     {% for message in messages %}
+       <li>{{ message }} </li>
+     {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+<h1>Add Scooter</h1>
+<form action="" method="post" name="scooterManagement">
+    {{ form.hidden_tag() }}
+    <p>
+       {{ form.status }}<br>
+
+    </p>
+    <p>{{ form.location }}</p>
+    {% for error in form.location.errors %}
+     <span style="color: red";>[{{error}}]</span>
+    {% endfor %}<br>
+    <p><input type="submit" value="Submit"></p>
+</form>
+{% endblock %}
