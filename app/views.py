@@ -1,107 +1,79 @@
 from app import app, admin, db, models
 from flask import render_template, flash, request, redirect, session
 from flask_login import current_user, login_user, login_required, logout_user
-from .models import Hiring_place, Scooter, Hire_session, Employee, Guest_user, User, Card_Payment, Feedback
+from .models import Location, Scooter, Session, Guest, User, Card, Feedback
 from .forms import LoginForm, RegisterForm, scooterForm
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # Adds the ability to view all tables in Flask Admin
-
-admin.add_view(ModelView(Hiring_place, db.session))
+admin.add_view(ModelView(Location, db.session))
 admin.add_view(ModelView(Scooter, db.session))
-admin.add_view(ModelView(Hire_session, db.session))
-admin.add_view(ModelView(Employee, db.session))
-admin.add_view(ModelView(Guest_user, db.session))
+admin.add_view(ModelView(Session, db.session))
+#admin.add_view(ModelView(Employee, db.session))
+admin.add_view(ModelView(Guest, db.session))
 admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Card_Payment, db.session))
+admin.add_view(ModelView(Card, db.session))
 admin.add_view(ModelView(Feedback, db.session))
-
 
 
 @app.route('/')
 def main():
     return render_template("home.html")
 
-@app.route('/AddingScooter', methods = ['GET', 'POST'])
+@app.route('/addingScooter', methods = ['GET', 'POST'])
 def AddScooter():
     form  = scooterForm()
-    form.location.choices = [(location.place_id, location.address) for location in models.Hiring_place.query.all()]
+    form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
     if form.validate_on_submit():
-        flash('Succesfully received from data. %s and %s'%(form.status.data, form.location.data))
+        flash('Succesfully received from data. %s and %s'%(form.availability.data, form.location.data))
 
-        scooter = models.Scooter(status=form.status.data, location_id=form.location.data)
+        scooter = models.Scooter(availability=form.availability.data, location_id=form.location.data)
 
         try:
             db.session.add(scooter)
             db.session.commit()
         except:
             flash('ERROR WHILE UPDATING THE SCOOTER TABLE')
-    return render_template('ScooterManagement.html', title = 'Add Scooter', form = form)
+    return render_template('scooterManagement.html', title = 'Add Scooter', form = form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def user_login():
-    """
+
     if current_user.is_authenticated:
         # Finds out what account type current user is and redirects them to the correct page,
         # (purely for error checking)
 
-        flash("User is already logged in. Please log out of your current account first", "Error")
-        findCurrUser = User.query.filter_by(id=current_user.id).first()
-        if findCurrUser is not None:
+        if current_user.account_type == 0:
             return redirect("/user")
-
+        elif current_user.account_type == 1:
+            return redirect("/employee")
         else:
-            findCurrEmployee = Employee.query.filter_by(employee_id=current_user.employee_id).first()
-            if findCurrEmployee.isManager == True:
-                return redirect("/manager")
-            else:
-                return redirect("/employee")
-    """
+            return redirect("/manager")
 
     form = LoginForm()
     if request.method == 'POST':
         if form.validate_on_submit():
-            foundUser = 1  # Will be decremented if user account cannot be found (if no
-            # users are found it will be automatically redirected)
-            managerAccount = 0  # Checks if employee is a manager, increments if they are
-
-            findUser = User.query.filter_by(email=form.email.data).first()
-
-            if not check_password_hash(findUser.password, form.password.data):
-                flash("Invalid username or password", "Error")
+            find_user = User.query.filter_by(email=form.email.data).first()
+            if find_user is None or not find_user.check_password(form.password.data):
+                flash("Invalid email or password", "Error")
                 return redirect('/login')
 
-            elif findUser is None:
-                foundUser = 0
-                findEmployee = Employee.query.filter_by(email_address=form.email.data).first()
-
-                if findEmployee is None or not check_password_hash(findEmployee.password, form.password.data):
-                    flash("Invalid username or password", "Error")
-                    return redirect('/login')
-
-                elif findEmployee.isManager == True:
-                    managerAccount = 1
-
-            if foundUser == 0:
-                login_user(findEmployee, remember=form.rememberMe.data)
-
-                if managerAccount == 1:
-                    return redirect("/manager")
-
-                else:
-                    return redirect("/employee")
-
-            else:
-                login_user(findUser, remember=form.rememberMe.data)
+            login_user(find_user, remember=form.rememberMe.data)
+            if find_user.account_type == 0:
                 return redirect("/user")
+            elif find_user.account_type == 1:
+                return redirect("/employee")
+            else:
+                return redirect("/manager")
 
     return render_template('login.html',
                            title='Login page',
                            form=form)
 
-@app.route('/register', methods=['GET','POST'])
+
+@app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
@@ -110,8 +82,10 @@ def register():
             flash("This email had already sign up.")
         else:
             p = User(email=form.email.data,
-            password=generate_password_hash(form.password.data, method='sha256'),
-            phone=form.phone.data)
+                     password=generate_password_hash(form.password.data, method='sha256'),
+                     phone=form.phone.data,
+                     forename=form.forename.data,
+                     surname=form.surname.data)
             db.session.add(p)
             db.session.commit()
             return redirect("/login")
@@ -127,3 +101,26 @@ def logout():
 @login_required
 def user():
     return render_template('user.html', title='Home', user=current_user)
+
+
+@app.route('/user/booking')
+@login_required
+def userScooterBooking():
+    return render_template('userScooterBooking.html', title='Home', user=current_user)
+
+
+@app.route('/user/manage')
+@login_required
+def userScooterManagement():
+    return render_template('userScooterManagement.html', title='Home', user=current_user)
+
+
+@app.route('/employee')
+@login_required
+def employee():
+    return render_template('employee.html', title='Employee Home', user=current_user)
+
+@app.route('/manager')
+@login_required
+def manager():
+    return render_template('manager.html', title='Manager Home', user=current_user)

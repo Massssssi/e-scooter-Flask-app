@@ -1,14 +1,17 @@
 from flask_wtf import FlaskForm
-from wtforms import SelectField, BooleanField
-from wtforms.validators import DataRequired
-from wtforms_sqlalchemy.fields import QuerySelectField
-from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, ValidationError
+from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, ValidationError, SelectField
+
 from wtforms.validators import DataRequired, EqualTo, Length, NumberRange, InputRequired
-from .models import Hiring_place, Scooter, Hire_session, Employee, Guest_user, User, Card_Payment, Feedback
+from .models import Location, Scooter, Session, Guest, User, Card, Feedback
+
+# from wtforms import SelectField, BooleanField
+# from wtforms.validators import DataRequired
+# from wtforms_sqlalchemy.fields import QuerySelectField
 
 class scooterForm(FlaskForm):
-    status = BooleanField('status')
+    availability = BooleanField('availability')
     location = SelectField('location', choices = [], validators = [DataRequired()])
+
 
 
 class LoginForm(FlaskForm):
@@ -18,7 +21,9 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    #username = StringField('username', validators=[DataRequired("Please enter a username")])
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
+
     email = StringField('email', validators=[DataRequired("Please enter an email address")])
-    phone = StringField('phone', validators=[DataRequired("Please enter phone number")])
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
     password = PasswordField('password', validators=[DataRequired("Please enter your password")])
