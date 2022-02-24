@@ -24,6 +24,16 @@
     <span class="warning">[{{ error }}]</span>
     {% endfor %}<br>
 
+    Forename: {{ form.forename(class_='form-control') }}
+    {% for error in form.forename.errors %}
+    <span class="warning">[{{ error }}]</span>
+    {% endfor %}<br>
+
+    Surname: {{ form.surname(class_='form-control') }}
+    {% for error in form.surname.errors %}
+    <span class="warning">[{{ error }}]</span>
+    {% endfor %}<br>
+
     <input type="submit" class="button" value="Submit">
 </form>
 

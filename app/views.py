@@ -86,6 +86,7 @@ def register():
                      phone=form.phone.data,
                      forename=form.forename.data,
                      surname=form.surname.data)
+
             db.session.add(p)
             db.session.commit()
             return redirect("/login")
