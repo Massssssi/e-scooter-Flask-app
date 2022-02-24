@@ -1,0 +1,55 @@
+<!-- This is where the user make the payment -->
+
+{% extends "baseUser.html" %}
+
+{% block content %}
+{% with messages = get_flashed_messages() %}
+   {% if messages %}
+    <ul>
+     {% for message in messages %}
+       <li>{{ message }} </li>
+     {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<h1>Payment</h1>
+
+<form method="post", action="/payment">
+  {{ form.hidden_tag() }}
+  {% for field, errors in form.errors.items() %}
+ <small class="form-text text-muted ">
+     {{ ', '.join(errors) }}
+ </small>
+{% endfor %}
+
+    Card Holder: {{ form.card_holder(class_='form-control', type = 'card_holder') }}
+    {% for error in form.card_holder.errors %}
+    <span class="warning">[{{ error }}]</span>
+    {% endfor %}<br>
+
+
+    Card Number: {{ form.card_number(class_='form-control') }}
+    {% for error in form.card_holder.errors %}
+    <span class="warning">[{{ error }}]</span>
+    {% endfor %}<br>
+
+    Expiry Date: {{ form.card_expiry_date(class_='form-control') }}
+    {% for error in form.card_expiry_date.errors %}
+    <span class="warning">[{{ error }}]</span>
+    {% endfor %}<br>
+
+    CVV: {{ form.card_cvv(class_='form-control') }}
+    {% for error in form.card_cvv.errors %}
+    <span class="warning">[{{ error }}]</span>
+    {% endfor %}<br>
+
+    <div style="height: 20px; width: 20px;">{{ form.save_card(class_='form-control') }}</div><br>
+    <p>Save details</p>
+
+
+
+    <input type="submit" class="button" value="Confirm Payment">
+</form>
+
+{% endblock %}
