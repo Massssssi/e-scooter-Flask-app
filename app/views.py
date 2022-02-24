@@ -1,20 +1,21 @@
-from app import app, admin, db, models
+from app import app, db, models, mail
 from flask import render_template, flash, request, redirect, session, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback
 from .forms import LoginForm, RegisterForm, scooterForm, BookScooterForm, CardForm
-from flask_admin.contrib.sqla import ModelView
+from flask_mail import Message
+#from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Adds the ability to view all tables in Flask Admin
-admin.add_view(ModelView(Location, db.session))
-admin.add_view(ModelView(Scooter, db.session))
-admin.add_view(ModelView(Session, db.session))
-#admin.add_view(ModelView(Employee, db.session))
-admin.add_view(ModelView(Guest, db.session))
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Card, db.session))
-admin.add_view(ModelView(Feedback, db.session))
+# # Adds the ability to view all tables in Flask Admin
+# admin.add_view(ModelView(Location, db.session))
+# admin.add_view(ModelView(Scooter, db.session))
+# admin.add_view(ModelView(Session, db.session))
+# #admin.add_view(ModelView(Employee, db.session))
+# admin.add_view(ModelView(Guest, db.session))
+# admin.add_view(ModelView(User, db.session))
+# admin.add_view(ModelView(Card, db.session))
+# admin.add_view(ModelView(Feedback, db.session))
 
 
 @app.route('/')
@@ -173,10 +174,16 @@ def payment():
         cvv = form.card_cvv.data,
         user_id = current_user.id)
 
+        #Sending the confirmation email to the user
+        Subject = 'Confermation Email | please do not reply'
+        msg = Message(Subject, sender = 'bennabet.abderrahmane213@gmail.com', recipients = [current_user.email])
+        msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
+        mail.send(msg)
+
 
         flash('Succesfully received from data. %s and %s and %s'%(card.card_number, card.cvv, card.expiry_date))
+        flash('The confirmation email has been send successfully')
         if form.save_card:
-            flash("hello")
             db.session.add(card)
             db.session.commit()
 
