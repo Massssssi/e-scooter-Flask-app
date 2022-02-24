@@ -2,7 +2,7 @@ from app import app, admin, db, models
 from flask import render_template, flash, request, redirect, session, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback
-from .forms import LoginForm, RegisterForm, scooterForm, BookScooterForm
+from .forms import LoginForm, RegisterForm, scooterForm, BookScooterForm, CardForm
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -134,11 +134,11 @@ def bookScooter():
     if form.validate_on_submit():
         p = models.Location.query.filter_by(address = form.location_id.data[2]).first()
         form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(p.location_id).all()]
-    
+
 
     if request.method == 'POST':
         scooter = Scooter.query.filter_by(id = form.scooter.data).first()
-        return '<h1>Location: {}, Scooter {}</h1>'.format(form.location_id.data, scooter.location_id)
+        return redirect("/payment")
 
     return render_template('userScooterBooking.html', user=current_user, form = form)
 
@@ -156,3 +156,29 @@ def scooter(location_id):
         scooterArray.append(scooterObj)
 
     return jsonify({'scooters' : scooterArray})
+
+@app.route('/payment', methods=['GET', 'POST'])
+@login_required
+def payment():
+
+    form = CardForm()
+    
+    #for card in Card_Payment.query.all():
+        #flash("%s %s %s %s %s"%(card.card_holder, card.card_number, card.card_expiry_date, card.card_cvv, card.user_id))
+
+    if form.validate_on_submit():
+        card = Card(holder = form.card_holder.data,
+        card_number = form.card_number.data,
+        expiry_date = form.card_expiry_date.data,
+        cvv = form.card_cvv.data,
+        user_id = current_user.id)
+
+
+        flash('Succesfully received from data. %s and %s and %s'%(card.card_number, card.cvv, card.expiry_date))
+        if form.save_card:
+            flash("hello")
+            db.session.add(card)
+            db.session.commit()
+
+
+    return render_template('payment.html', title = 'Payment', form = form)
