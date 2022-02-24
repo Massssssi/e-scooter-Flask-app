@@ -27,3 +27,8 @@ class RegisterForm(FlaskForm):
     email = StringField('email', validators=[DataRequired("Please enter an email address")])
     phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
     password = PasswordField('password', validators=[DataRequired("Please enter your password")])
+
+class BookScooterForm(FlaskForm):
+    location_id  = SelectField('location_id', choices=[])
+    scooter = SelectField('scooter', choices=[])
+
