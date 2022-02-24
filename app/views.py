@@ -1,8 +1,8 @@
 from app import app, admin, db, models
-from flask import render_template, flash, request, redirect, session
+from flask import render_template, flash, request, redirect, session, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback
-from .forms import LoginForm, RegisterForm, scooterForm
+from .forms import LoginForm, RegisterForm, scooterForm, BookScooterForm
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -125,3 +125,34 @@ def employee():
 @login_required
 def manager():
     return render_template('manager.html', title='Manager Home', user=current_user)
+
+@app.route('/bookScooter', methods=['GET', 'POST'])
+@login_required
+def bookScooter():
+    form = BookScooterForm()
+    form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
+    if form.validate_on_submit():
+        p = models.Location.query.filter_by(address = form.location_id.data[2]).first()
+        form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(p.location_id).all()]
+    
+
+    if request.method == 'POST':
+        scooter = Scooter.query.filter_by(id = form.scooter.data).first()
+        return '<h1>Location: {}, Scooter {}</h1>'.format(form.location_id.data, scooter.location_id)
+
+    return render_template('userScooterBooking.html', user=current_user, form = form)
+
+
+@app.route('/scooter/<location_id>')
+def scooter(location_id):
+    scooters = Scooter.query.filter_by(location_id=location_id).all()
+
+    scooterArray = []
+
+    for scooter in scooters:
+        scooterObj={}
+        scooterObj['id'] = scooter.id
+        scooterObj['location_id'] = scooter.location_id
+        scooterArray.append(scooterObj)
+
+    return jsonify({'scooters' : scooterArray})
