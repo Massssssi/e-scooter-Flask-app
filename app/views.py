@@ -30,9 +30,11 @@ def AddScooter():
         flash('Succesfully received from data. %s and %s'%(form.availability.data, form.location.data))
 
         scooter = models.Scooter(availability=form.availability.data, location_id=form.location.data)
+        location = Location.query.get(form.location.data)
 
         try:
             db.session.add(scooter)
+            location.no_of_scooters+=1
             db.session.commit()
         except:
             flash('ERROR WHILE UPDATING THE SCOOTER TABLE')
