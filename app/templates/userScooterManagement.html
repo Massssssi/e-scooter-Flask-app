@@ -14,14 +14,7 @@
        <p>Session Length: {{ s.session_length}}</p>
        <p>Scooter ID: {{ s.scooter_id}}</p>
        <p>End date: {{s.end_date }}</p>
-       <p>duration: {{s.end_date - s.start_date}}
      </div>
-     <form action="{{url_for('cancel')}}" name = "statusform" method="post">
-      <input type="hidden" name="cancel" value="{{ s.id }}"/>
-      <br />
-      <input type="submit" class="deletebutton" value="Cancel Booking" name="cancelButton"/>
-    </form>
-    <hr class="solid">
      <hr>
     {% endfor %}
 
