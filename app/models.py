@@ -51,7 +51,7 @@ class User(UserMixin, db.Model):
     national_insurance_number = db.Column(db.String(9), unique=True) # only for employees
     card = db.relationship('Card', backref='user')
     feedback = db.relationship('Feedback', backref='user')
-    session = db.relationship('Session', backref='user', uselist=False)
+    session = db.relationship('Session', backref='user')
 
     def get_id(self):
         return self.id

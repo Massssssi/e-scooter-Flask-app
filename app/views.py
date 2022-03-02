@@ -11,7 +11,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 admin.add_view(ModelView(Location, db.session))
 admin.add_view(ModelView(Scooter, db.session))
 admin.add_view(ModelView(Session, db.session))
-# admin.add_view(ModelView(Employee, db.session)) got rid of
 admin.add_view(ModelView(Guest, db.session))
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Card, db.session))
@@ -113,10 +112,16 @@ def userScooterBooking():
     return render_template('userScooterBooking.html', title='Home', user=current_user)
 
 
-@app.route('/user/manage')
+@app.route('/user/manage', methods=['GET'])
 @login_required
 def userScooterManagement():
-    return render_template('userScooterManagement.html', title='Home', user=current_user)
+    user=User.query.get(current_user.id)
+    sessions=[]
+
+    for session in user.session:
+
+        sessions.append(session)
+    return render_template('userScooterManagement.html', title='Home', user=current_user, sessions=sessions)
 
 
 @app.route('/employee')
