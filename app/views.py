@@ -1,21 +1,21 @@
-from app import app, db, models, mail
+from app import app, db, models, mail, admin
 from flask import render_template, flash, request, redirect, session, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback
 from .forms import LoginForm, RegisterForm, scooterForm, BookScooterForm, CardForm
 from flask_mail import Message
-#from flask_admin.contrib.sqla import ModelView
+from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 
 # # Adds the ability to view all tables in Flask Admin
-# admin.add_view(ModelView(Location, db.session))
-# admin.add_view(ModelView(Scooter, db.session))
-# admin.add_view(ModelView(Session, db.session))
-# #admin.add_view(ModelView(Employee, db.session))
-# admin.add_view(ModelView(Guest, db.session))
-# admin.add_view(ModelView(User, db.session))
-# admin.add_view(ModelView(Card, db.session))
-# admin.add_view(ModelView(Feedback, db.session))
+admin.add_view(ModelView(Location, db.session))
+admin.add_view(ModelView(Scooter, db.session))
+admin.add_view(ModelView(Session, db.session))
+# admin.add_view(ModelView(Employee, db.session)) got rid of
+admin.add_view(ModelView(Guest, db.session))
+admin.add_view(ModelView(User, db.session))
+admin.add_view(ModelView(Card, db.session))
+admin.add_view(ModelView(Feedback, db.session))
 
 
 @app.route('/')
@@ -163,7 +163,7 @@ def scooter(location_id):
 def payment():
 
     form = CardForm()
-    
+
     #for card in Card_Payment.query.all():
         #flash("%s %s %s %s %s"%(card.card_holder, card.card_number, card.card_expiry_date, card.card_cvv, card.user_id))
 
