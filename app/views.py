@@ -113,7 +113,7 @@ def userScooterBooking():
     return render_template('userScooterBooking.html', title='Home', user=current_user)
 
 
-@app.route('/user/manage', methods=['GET'])
+@app.route('/user/manage', methods=['GET','POST'])
 @login_required
 def userScooterManagement():
     user=User.query.get(current_user.id)
@@ -122,10 +122,23 @@ def userScooterManagement():
     for session in user.session:
 
         sessions.append(session)
-        # session.append(session.start_date + timedelta(hours=session.session_length))
-        # additional_info.append(session.start_date + timedelta(hours=session.session_length))
+
     return render_template('userScooterManagement.html', title='Home', user=current_user, sessions=sessions)
 
+@app.route('/cancel', methods=['POST'])
+@login_required
+def cancel():
+    # print("*****")
+    session = Session.query.filter_by(
+        id=request.form['cancel']).first_or_404()
+    db.session.delete(session)
+    db.session.commit()
+    return redirect("/user/manage")
+    # return render_template('user.html', title='Home', user=current_user)
+    # return redirect("/user/manage")
+    # #return render_template("userreviews.html",
+    #                        title="Your reviews",
+    #                        reviews= AlbumReview.query.filter_by(reviewer_id=current_user.user_id))
 
 @app.route('/employee')
 @login_required
