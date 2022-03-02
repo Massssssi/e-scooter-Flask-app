@@ -126,6 +126,21 @@ def userScooterManagement():
         # additional_info.append(session.start_date + timedelta(hours=session.session_length))
     return render_template('userScooterManagement.html', title='Home', user=current_user, sessions=sessions)
 
+@app.route('/cancel', methods=['POST'])
+@login_required
+def cancel():
+    # print("*****")
+    session = Session.query.filter_by(
+        id=request.form['cancel']).first_or_404()
+    db.session.delete(session)
+    db.session.commit()
+    return redirect("/user/manage")
+    # return render_template('user.html', title='Home', user=current_user)
+    # return redirect("/user/manage")
+    # #return render_template("userreviews.html",
+    #                        title="Your reviews",
+    #   
+
 
 @app.route('/employee')
 @login_required
