@@ -6,6 +6,7 @@ from .forms import LoginForm, RegisterForm, scooterForm, BookScooterForm, CardFo
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime, timedelta
 
 # # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Location, db.session))
@@ -121,6 +122,8 @@ def userScooterManagement():
     for session in user.session:
 
         sessions.append(session)
+        # session.append(session.start_date + timedelta(hours=session.session_length))
+        # additional_info.append(session.start_date + timedelta(hours=session.session_length))
     return render_template('userScooterManagement.html', title='Home', user=current_user, sessions=sessions)
 
 

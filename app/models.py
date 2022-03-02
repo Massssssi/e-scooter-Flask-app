@@ -25,7 +25,8 @@ class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cost = db.Column(db.Float, nullable=True)  # stores the final cost of the session
     start_date = db.Column(db.DateTime, nullable=False)
-    session_length = db.Column(db.Integer, nullable=False)  # stored in hours, therefore must be an integer
+    end_date = db.Column(db.DateTime, nullable=False) # needed to help display the end date
+    # the duration can be worked out by end-date - start date
     scooter_id = db.Column(db.Integer, db.ForeignKey('scooter.id'), nullable=False)
     guest_id = db.Column(db.Integer, db.ForeignKey('guest.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

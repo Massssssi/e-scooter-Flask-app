@@ -7,12 +7,13 @@
   <div class="block_content">
     {% block content %}
 
-    {% for s in sessions %}
+    {% for s in sessions%}
      <div>
        <h4>Date Started: {{ s.start_date }}</h4>
        <p>Cost: {{ s.cost}}</p>
        <p>Session Length: {{ s.session_length}}</p>
        <p>Scooter ID: {{ s.scooter_id}}</p>
+       <p>End date: {{s.end_date }}</p>
      </div>
      <hr>
     {% endfor %}
