@@ -15,10 +15,14 @@ class Location(db.Model):
 class Scooter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     availability = db.Column(db.Boolean, default=True)
-    # real time location isn't necessary and without an actual GPS we have no way of doing it
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
     session_id = db.relationship('Session', backref='scooter', uselist=False)
     feedback = db.relationship('Feedback', backref='scooter', uselist=False)
+
+
+class ScooterCost(db.Model):  # A table that only stores the cost of all scooters, as they are all identical
+    id = db.Column(db.Integer, primary_key=True)
+    hourly_cost = db.Column(db.Float, nullable=False, default=10.00)
 
 
 class Session(db.Model):
@@ -29,7 +33,6 @@ class Session(db.Model):
     scooter_id = db.Column(db.Integer, db.ForeignKey('scooter.id'), nullable=False)
     guest_id = db.Column(db.Integer, db.ForeignKey('guest.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
 
 
 class Guest(db.Model):
@@ -48,7 +51,7 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(256), nullable=False)
     phone = db.Column(db.String(50), unique=True, nullable=False)
     account_type = db.Column(db.Integer, nullable=False, default=0)  # 0 for user, 1 for employee, 2 for manager
-    national_insurance_number = db.Column(db.String(9), unique=True) # only for employees
+    national_insurance_number = db.Column(db.String(9), unique=True)  # only for employees
     card = db.relationship('Card', backref='user')
     feedback = db.relationship('Feedback', backref='user')
     session = db.relationship('Session', backref='user', uselist=False)
