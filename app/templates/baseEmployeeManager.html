@@ -14,15 +14,16 @@
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             {% if current_user.isManager == False %}
-                <li class="nav-item"><a class="nav-link" href="#">Manager homepage <span class="sr-only">(current)</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Employee homepage <span class="sr-only">(current)</span></a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Change details</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Feedback management</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Book unregistered users</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
             {% else %}
-                <li class="nav-item"><a class="nav-link" href="#">Employee homepage <span class="sr-only">(current)</span></a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Manager homepage <span class="sr-only">(current)</span></a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Change details</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Edit employee</a></li>
+                <li class="nav-item"><a class="nav-link" href="/configureScooters">Configure Scooters</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Income reports</a></li>
                 <li class="nav-item"><a class="nav-link" href="#">Logout</a></li>
             {% endif %}
