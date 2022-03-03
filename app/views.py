@@ -22,7 +22,15 @@ admin.add_view(ModelView(Feedback, db.session))
 
 @app.route('/')
 def main():
+    if current_user.is_authenticated: # redirects users to the appropriate homepages if they're already logged in
+        if current_user.account_type == 0:
+            return redirect("/user")
+        elif current_user.account_type == 1:
+            return redirect("/employee")
+        else:
+            return redirect("/manager")
     return render_template("home.html")
+
 
 
 @app.route('/addingScooter', methods=['GET', 'POST'])
@@ -143,7 +151,7 @@ def cancel():
     # return redirect("/user/manage")
     # #return render_template("userreviews.html",
     #                        title="Your reviews",
-    #   
+    #
 
 
 @app.route('/employee')

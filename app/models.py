@@ -19,15 +19,17 @@ class Scooter(db.Model):
     session_id = db.relationship('Session', backref='scooter', uselist=False)
     feedback = db.relationship('Feedback', backref='scooter', uselist=False)
 
+
 class ScooterCost(db.Model):  # A table that only stores the cost of all scooters, as they are all identical
     id = db.Column(db.Integer, primary_key=True)
     hourly_cost = db.Column(db.Float, nullable=False, default=10.00)
+
 
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cost = db.Column(db.Float, nullable=True)  # stores the final cost of the session
     start_date = db.Column(db.DateTime, nullable=False)
-    end_date = db.Column(db.DateTime, nullable=False) # needed to help display the end date
+    end_date = db.Column(db.DateTime, nullable=False)  # needed to help display the end date
     # the duration can be worked out by end-date - start date
     scooter_id = db.Column(db.Integer, db.ForeignKey('scooter.id'), nullable=False)
     guest_id = db.Column(db.Integer, db.ForeignKey('guest.id'))
