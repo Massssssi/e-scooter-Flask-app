@@ -25,6 +25,10 @@ class ScooterCost(db.Model):  # A table that only stores the cost of all scooter
     hourly_cost = db.Column(db.Float, nullable=False, default=10.00)
 
 
+class ScooterCost(db.Model):  # A table that only stores the cost of all scooters, as they are all identical
+    id = db.Column(db.Integer, primary_key=True)
+    hourly_cost = db.Column(db.Float, nullable=False, default=10.00)
+
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cost = db.Column(db.Float, nullable=True)  # stores the final cost of the session
