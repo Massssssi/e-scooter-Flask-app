@@ -143,7 +143,7 @@ def cancel():
     # return redirect("/user/manage")
     # #return render_template("userreviews.html",
     #                        title="Your reviews",
-    #   
+    #
 
 
 @app.route('/employee')
@@ -226,8 +226,9 @@ def configureScooters():
     if request.method == 'POST':
         if form.validate_on_submit():
             scooter = Scooter.query.filter_by(id=form.id.data).first()
-            print(scooter)
             scooter_cost = ScooterCost.query.first()
+            if scooter_cost is None: # if no cost declared in the database
+                scooter_cost = ScooterCost()
             scooter.id = form.id.data
             scooter.availability = form.availability.data
             scooter_cost.hourly_cost = form.cost.data
