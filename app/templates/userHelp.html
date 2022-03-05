@@ -1,7 +1,32 @@
 <!-- This is where the customer can complain/give feedback -->
-<h1>Hello world</h1>
+
 
 {% extends "baseUser.html" %}
   <div class="block_content">
-    {% block content %}{% endblock %}
+    {% block content %}
+    {% with messages = get_flashed_messages() %}
+   {% if messages %}
+    <ul>
+     {% for message in messages %}
+       <li>{{ message }} </li>
+     {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
+<h1>Help</h1>
+<form method="post", action="/help">
+  {{ form.hidden_tag() }}
+  {% for field, errors in form.errors.items() %}
+  {% endfor %}
+  Scooter number : {{form.scooter_id(class_='form-control-label')}}
+  Feedback text : {{form.feedback_text(class_='form-control-label')}}
+  test
+  Priority : {{form.priority(class_='form-control-label')}}
+
+  <input type="submit" class="button" value="Send Feedback">
+
+</form>
+
+{% endblock %}
   </div>

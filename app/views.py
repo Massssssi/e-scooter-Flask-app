@@ -1,8 +1,8 @@
 from app import app, db, models, mail, admin
 from flask import render_template, flash, request, redirect, session, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
-from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
-from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm
+from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost, Feedback
+from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, userHelpForm
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -247,3 +247,26 @@ def configureScooters():
     return render_template('configureScooters.html',
                            title='Configure Scooters',
                            form=form)
+                           
+@app.route('/help', methods=['GET', 'POST'])
+@login_required
+def help():
+    form = userHelpForm()
+    if request.method == 'POST':
+        if form.validate_on_submit:
+            scooter = Scooter.query.filter_by(id = form.scooter_id.data).first()
+            #Checking if the scooter id exists
+            if scooter:
+                userFeedback = Feedback(scooter_id = form.scooter_id.data,
+                                        feedback_text = form.feedback_text.data,
+                                        priority = form.priority.data,
+                                        user = current_user)
+                db.session.add(userFeedback)
+                db.session.commit()
+                flash('User feedback has been recieved succesfully ')
+                return redirect("/help")
+            else :
+                flash('Scooter number %s could not be found ' % (form.scooter_id.data))
+                return redirect("/help")
+
+    return render_template('userHelp.html', form = form)

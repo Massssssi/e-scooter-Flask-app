@@ -51,3 +51,8 @@ class CardForm(FlaskForm):
     card_cvv = StringField('cvv', validators=[DataRequired("Please enter card cvv"),
                                               Length(min=3, max=4, message="Not a valid cvv")])
     save_card = BooleanField('saveCard')  # Asking the user to save his card details.
+
+class userHelpForm(FlaskForm):
+    scooter_id = StringField('Scooter number')
+    feedback_text = TextAreaField('Feedback text')
+    priority = SelectField('priority', choices=[(1, "High priority") , (2, "Medium priority"), (3 , "Low priority")])
