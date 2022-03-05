@@ -246,3 +246,18 @@ def configureScooters():
     return render_template('configureScooters.html',
                            title='Configure Scooters',
                            form=form)
+
+
+@app.route('/ScooterList', methods=['GET', 'POST'])
+@login_required
+def ScooterList():
+    scooters = Scooter.query.all()
+    locations = Location.query.all()
+    scooterArray =[]
+    locationArray = []
+    for scooter in scooters:
+        scooterArray.append(scooter)
+    for location in locations:
+        locationArray.append(location)
+
+    return render_template('scooterList.html', title = 'List of scooters', ListS= scooterArray, ListL = locationArray)
