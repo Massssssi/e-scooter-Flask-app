@@ -19,10 +19,9 @@ admin.add_view(ModelView(Card, db.session))
 admin.add_view(ModelView(Feedback, db.session))
 
 
-
 @app.route('/')
 def main():
-    if current_user.is_authenticated: # redirects users to the appropriate homepages if they're already logged in
+    if current_user.is_authenticated:  # redirects users to the appropriate homepages if they're already logged in
         if current_user.account_type == 0:
             return redirect("/user")
         elif current_user.account_type == 1:
@@ -30,7 +29,6 @@ def main():
         else:
             return redirect("/manager")
     return render_template("home.html")
-
 
 
 @app.route('/addingScooter', methods=['GET', 'POST'])
@@ -128,15 +126,15 @@ def userScooterBooking():
 @app.route('/user/manage', methods=['GET'])
 @login_required
 def userScooterManagement():
-    user=User.query.get(current_user.id)
-    sessions=[]
+    user = User.query.get(current_user.id)
+    sessions = []
 
     for session in user.session:
-
         sessions.append(session)
         # session.append(session.start_date + timedelta(hours=session.session_length))
         # additional_info.append(session.start_date + timedelta(hours=session.session_length))
     return render_template('userScooterManagement.html', title='Home', user=current_user, sessions=sessions)
+
 
 @app.route('/cancel', methods=['POST'])
 @login_required
@@ -235,11 +233,12 @@ def configureScooters():
         if form.validate_on_submit():
             scooter = Scooter.query.filter_by(id=form.id.data).first()
             scooter_cost = ScooterCost.query.first()
-            if scooter_cost is None: # if no cost declared in the database
+            if scooter_cost is None:  # if no cost declared in the database
                 scooter_cost = ScooterCost()
+            if form.cost.data is not None:
+                scooter_cost.hourly_cost = form.cost.data
             scooter.id = form.id.data
             scooter.availability = form.availability.data
-            scooter_cost.hourly_cost = form.cost.data
             scooter.location_id = form.location.data
             db.session.add(scooter)
             db.session.add(scooter_cost)

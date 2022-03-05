@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, \
     ValidationError, SelectField, FloatField
-from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, ValidationError, SelectField, FloatField
+from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, \
+    ValidationError, SelectField, FloatField
 
 from wtforms.validators import DataRequired, EqualTo, Length, NumberRange, InputRequired
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
@@ -11,10 +12,22 @@ from .models import Location, Scooter, Session, Guest, User, Card, Feedback, Sco
 # from wtforms.validators import DataRequired
 # from wtforms_sqlalchemy.fields import QuerySelectField
 
+def default_cost():
+    scooter_cost = ScooterCost.query.first()
+    s = ""
+    for element in str(scooter_cost.hourly_cost):
+        if element == "[" or element == "]":
+            pass
+        else:
+            s += element
+    print(s)
+    return float(s)
+
+
 class ConfigureScooterForm(FlaskForm):
     id = SelectField('location', choices=[scooter.id for scooter in Scooter.query.all()])
     availability = BooleanField('availability')
-    cost = FloatField('cost')
+    cost = FloatField('cost', default=default_cost(), validators=[DataRequired("Please enter a cost for this scooter")])
     location = SelectField('location', choices=[(location.id, location.address) for location in Location.query.all()])
 
 
@@ -32,7 +45,6 @@ class LoginForm(FlaskForm):
 class RegisterForm(FlaskForm):
     forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
     surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
-
     email = StringField('email', validators=[DataRequired("Please enter an email address")])
     phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
     password = PasswordField('password', validators=[DataRequired("Please enter your password")])
