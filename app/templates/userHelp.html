@@ -4,27 +4,68 @@
 {% extends "baseUser.html" %}
   <div class="block_content">
     {% block content %}
-    {% with messages = get_flashed_messages() %}
-   {% if messages %}
-    <ul>
-     {% for message in messages %}
-       <li>{{ message }} </li>
-     {% endfor %}
-    </ul>
-  {% endif %}
-{% endwith %}
+    <!-- {% with messages = get_flashed_messages() %}
+      {% if messages %}
+          <ul>
+          {% for message in messages %}
+            <li>{{ message }} </li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+    {% endwith %} -->
 
-<h1>Help</h1>
 <form method="post", action="/help">
   {{ form.hidden_tag() }}
   {% for field, errors in form.errors.items() %}
   {% endfor %}
-  Scooter number : {{form.scooter_id(class_='form-control-label')}}
-  Feedback text : {{form.feedback_text(class_='form-control-label')}}
-  test
-  Priority : {{form.priority(class_='form-control-label')}}
+  <fieldset class="form-group">
+    <legend> <bold>Help</bold></legend>
+      <div class="form-group mx-sm-5 mb-2">
+        <label> Scooter number  </label>
+        {{ form.scooter_id(class_ = "form-control form-control-sm")}}
+      </div>
 
-  <input type="submit" class="button" value="Send Feedback">
+      <div class="form-group  mx-sm-5 mb-2">
+        <label> Feedback Text  </label>
+        {{ form.feedback_text(class_ = "form-control form-control-lg", rows = "3")}}
+      </div>
+
+      <div class="form-group  mx-sm-5 mb-2 ">
+       <label> Feedback Priority </label>
+        {{form.priority(class_='form-control')}}
+      </div>
+
+
+  </fieldset>
+  
+
+  <!-- <div class="form-group">
+    <label> Feedback</label>
+    <textarea type="text" class = "form-control" placeholder="Feel free to write what you did not like" name  = "feedback_text"
+    rows="5" ></textarea>
+  </div>
+
+  <div class="form-group">
+    <label> Priority</label>
+    <select type="text" class = "form-control" placeholder="Type your scooter number" name  = "scooter_id" >
+      <option>1</option>
+      <option>2</option>
+      <option>3</option>
+    </select>
+  </div> -->
+
+ 
+  <!-- Scooter number : {{form.scooter_id(class_='form-control-label')}} <br>
+  Feedback text : {{form.feedback_text(class_='form-control-label')}} <br>
+  Priority : {{form.priority(class_='form-control-label')}}<br>  -->
+
+  <button type="submit" class="btn btn-primary mb-2">Confirm identity</button>
+
+  {% if error_message %}
+  <div class="alert alert-primary" role="alert">
+    {{error_message}}
+  </div>
+  {% endif%}
 
 </form>
 
