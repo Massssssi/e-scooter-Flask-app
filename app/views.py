@@ -273,3 +273,12 @@ def help():
                 return render_template('/userHelp.html',form = form, error_message = message)
 
     return render_template('userHelp.html', form = form)
+
+
+@app.route('/admin/userFeedback', methods=['GET', 'POST'])
+@login_required
+def helpUser():
+    feedback = Feedback.query.all()
+    if feedback:
+        return render_template("employeeFeedbackManagement.html", feedback = feedback)
+    render_template("employeeFeedbackManagement.html")
