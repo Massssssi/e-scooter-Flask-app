@@ -7,6 +7,7 @@ from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
+import operator
 
 # # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Location, db.session))
@@ -172,6 +173,7 @@ def incomeReports():
     form = DateForm()
     data = []
     result = []
+    freq = {}
     if form.validate_on_submit():
         date1 = datetime(form.date.data.year, form.date.data.month, form.date.data.day)
         date2 = date1 + timedelta(days=7)
@@ -195,10 +197,8 @@ def incomeReports():
                 income += sess.cost
             a = [len(d), income]
             result.append(a)
-        rank = {"One hour":result[0][0], "Four hour":result[1][0], "One day":result[2][0], "One Week":result[2][0]}
-        freq = sorted(rank.items(), key=lambda x:x[1], reverse=True)
-        print(freq)
-        flash(freq)
+        rank = {"One hour":result[0][0], "Four hour":result[1][0], "One day":result[2][0], "One Week":result[3][0]}
+        freq = sorted(rank.items(), key=operator.itemgetter(1), reverse=True)
     return render_template('managerIncomeReports.html', title='Income Report', form=form, result=result, freq=freq)
 
 
