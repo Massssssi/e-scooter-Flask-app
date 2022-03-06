@@ -167,17 +167,44 @@ def manager():
 @app.route('/bookScooter', methods=['GET', 'POST'])
 @login_required
 def bookScooter():
+    n=0
+    cost=0
     form = BookScooterForm()
     form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
+
     if form.validate_on_submit():
-        p = models.Location.query.filter_by(address=form.location_id.data[2]).first()
-        form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(p.location_id).all()]
+        p = models.Location.query.filter_by(id= form.location_id.data).first()
+        form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(id=p.id).all()]
+
+        a = form.hire_period.data
+        if(a=="One hour"):
+            cost=1*10
+            n=1
+        elif(a=="four hours"):
+            cost=4*10
+            n=4
+        elif(a=="One day"):
+            cost=24*10
+            n=24
+        elif(a=="one week"):
+            cost=168*10
+            n=168
+
+        given_time = form.start_date.data
+        final_time = given_time + timedelta(hours=n)
+        a = Session(cost=cost,
+                    start_date=form.start_date.data,
+                    scooter_id=current_user.id,
+                    guest_id=current_user.id,
+                    end_date=final_time)
+        db.session.add(a)
+        db.session.commit()
 
     if request.method == 'POST':
-        scooter = Scooter.query.filter_by(id=form.scooter.data).first()
-        return redirect("/payment")
+       return redirect("/payment")
 
-    return render_template('userScooterBooking.html', user=current_user, form=form)
+    return render_template('userScooterBooking.html', user=current_user, form = form)
+
 
 
 @app.route('/scooter/<location_id>')

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, \
-    ValidationError, SelectField, FloatField
+    ValidationError, SelectField, FloatField,DateTimeField
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, \
     ValidationError, SelectField, FloatField
 
@@ -51,8 +51,10 @@ class RegisterForm(FlaskForm):
 
 
 class BookScooterForm(FlaskForm):
-    location_id = SelectField('location_id', choices=[])
-    scooter = SelectField('scooter', choices=[])
+    location_id  = SelectField('location_id', choices=[], validators = [DataRequired()])
+    scooter = SelectField('scooter', choices=["1","2"], validators = [DataRequired()])
+    hire_period = SelectField('hire_period', choices=["One hour","four hours","One day", "one week"])
+    start_date =DateTimeField('datetime', format='%Y-%m-%d %H:%M:%S')
 
 
 class CardForm(FlaskForm):
