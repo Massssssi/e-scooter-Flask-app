@@ -2,7 +2,7 @@ from app import app, db, models, mail, admin
 from flask import render_template, flash, request, redirect, session, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
-from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm
+from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, DateForm
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -164,6 +164,42 @@ def employee():
 @login_required
 def manager():
     return render_template('manager.html', title='Manager Home', user=current_user)
+
+
+@app.route('/incomeReports', methods=['GET', 'POST'])
+@login_required
+def incomeReports():
+    form = DateForm()
+    data = []
+    result = []
+    if form.validate_on_submit():
+        date1 = datetime(form.date.data.year, form.date.data.month, form.date.data.day)
+        date2 = date1 + timedelta(days=7)
+        record = Session.query.all()
+        for i in range(4):
+            a = []
+            data.append(a)
+        for s in record:
+            if s.start_date > date1 and s.start_date < date2:
+                if s.end_date == s.start_date + timedelta(hours=1):
+                    data[0].append(s)
+                elif s.end_date == s.start_date + timedelta(hours=4):
+                    data[1].append(s)
+                elif s.end_date == s.start_date + timedelta(days=1):
+                    data[2].append(s)
+                elif s.end_date == s.start_date + timedelta(days=7):
+                    data[3].append(s)
+        for d in data:
+            income = 0
+            for sess in d:
+                income += sess.cost
+            a = [len(d), income]
+            result.append(a)
+        rank = {"One hour":result[0][0], "Four hour":result[1][0], "One day":result[2][0], "One Week":result[2][0]}
+        freq = sorted(rank.items(), key=lambda x:x[1], reverse=True)
+        print(freq)
+        flash(freq)
+    return render_template('managerIncomeReports.html', title='Income Report', form=form, result=result, freq=freq)
 
 
 @app.route('/bookScooter', methods=['GET', 'POST'])

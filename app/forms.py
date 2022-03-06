@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, \
     ValidationError, SelectField, FloatField
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, ValidationError, SelectField, FloatField
-
+from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, EqualTo, Length, NumberRange, InputRequired
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 
@@ -51,3 +51,6 @@ class CardForm(FlaskForm):
     card_cvv = StringField('cvv', validators=[DataRequired("Please enter card cvv"),
                                               Length(min=3, max=4, message="Not a valid cvv")])
     save_card = BooleanField('saveCard')  # Asking the user to save his card details.
+
+class DateForm(FlaskForm):
+    date = DateField('date', format='%Y-%m-%d', validators = [DataRequired("Please enter a date.")])
