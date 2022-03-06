@@ -139,17 +139,32 @@ def userScooterManagement():
 @app.route('/cancel', methods=['POST'])
 @login_required
 def cancel():
-    # print("*****")
+
     session = Session.query.filter_by(
         id=request.form['cancel']).first_or_404()
     db.session.delete(session)
     db.session.commit()
     return redirect("/user/manage")
-    # return render_template('user.html', title='Home', user=current_user)
-    # return redirect("/user/manage")
-    # #return render_template("userreviews.html",
-    #                        title="Your reviews",
-    #
+
+@app.route('/returnScooter', methods=['POST'])
+@login_required
+def returnScooter():
+
+    # session = Session.query.filter_by(
+    #     id=request.form['cancel']).first_or_404()
+    # db.session.delete(session)
+    # db.session.commit()
+    return redirect("/user/manage")
+
+@app.route('/extend', methods=['POST'])
+@login_required
+def extend():
+
+    # session = Session.query.filter_by(
+    #     id=request.form['cancel']).first_or_404()
+    # db.session.delete(session)
+    # db.session.commit()
+    return redirect("/user/manage")
 
 
 @app.route('/employee')
@@ -167,28 +182,28 @@ def manager():
 @app.route('/bookScooter', methods=['GET', 'POST'])
 @login_required
 def bookScooter():
-    n=0
-    cost=0
+    n = 0
+    cost = 0
     form = BookScooterForm()
     form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
 
     if form.validate_on_submit():
-        p = models.Location.query.filter_by(id= form.location_id.data).first()
+        p = models.Location.query.filter_by(id=form.location_id.data).first()
         form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(id=p.id).all()]
 
         a = form.hire_period.data
-        if(a=="One hour"):
-            cost=1*10
-            n=1
-        elif(a=="four hours"):
-            cost=4*10
-            n=4
-        elif(a=="One day"):
-            cost=24*10
-            n=24
-        elif(a=="one week"):
-            cost=168*10
-            n=168
+        if (a == "One hour"):
+            cost = 1 * 10
+            n = 1
+        elif (a == "four hours"):
+            cost = 4 * 10
+            n = 4
+        elif (a == "One day"):
+            cost = 24 * 10
+            n = 24
+        elif (a == "one week"):
+            cost = 168 * 10
+            n = 168
 
         given_time = form.start_date.data
         final_time = given_time + timedelta(hours=n)
@@ -201,10 +216,9 @@ def bookScooter():
         db.session.commit()
 
     if request.method == 'POST':
-       return redirect("/payment")
+        return redirect("/payment")
 
-    return render_template('userScooterBooking.html', user=current_user, form = form)
-
+    return render_template('userScooterBooking.html', user=current_user, form=form)
 
 
 @app.route('/scooter/<location_id>')
@@ -280,11 +294,11 @@ def configureScooters():
 def ScooterList():
     scooters = Scooter.query.all()
     locations = Location.query.all()
-    scooterArray =[]
+    scooterArray = []
     locationArray = []
     for scooter in scooters:
         scooterArray.append(scooter)
     for location in locations:
         locationArray.append(location)
 
-    return render_template('scooterList.html', title = 'List of scooters', ListS= scooterArray, ListL = locationArray)
+    return render_template('scooterList.html', title='List of scooters', ListS=scooterArray, ListL=locationArray)

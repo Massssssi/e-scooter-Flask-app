@@ -1,29 +1,43 @@
 <!-- This is where users can see which scooters they have rented out and where they can return active scooters -->
 <!-- We get this info from the sessions table -->
 
-<h1>Hello world</h1>
-
 {% extends "baseUser.html" %}
   <div class="block_content">
     {% block content %}
 
-    {% for s in sessions%}
-     <div>
-       <h4>Date Started: {{ s.start_date }}</h4>
-       <p>Cost: {{ s.cost}}</p>
-       <p>Session Length: {{ s.session_length}}</p>
-       <p>Scooter ID: {{ s.scooter_id}}</p>
-       <p>End date: {{s.end_date }}</p>
-       <p>duration: {{s.end_date - s.start_date}}
-     </div>
-     <form action="{{url_for('cancel')}}" name = "statusform" method="post">
-      <input type="hidden" name="cancel" value="{{ s.id }}"/>
-      <br />
-      <input type="submit" class="deletebutton" value="Cancel Booking" name="cancelButton"/>
-    </form>
-    <hr class="solid">
+        {% if sessions|length !=0  %}
+            {% for s in sessions%}
+             <div>
+               <h4>Date Started: {{ s.start_date }}</h4>
+               <p>Cost: {{ s.cost}}</p>
+               <p>Session Length: {{ s.session_length}}</p>
+               <p>Scooter ID: {{ s.scooter_id}}</p>
+               <p>End date: {{s.end_date }}</p>
+               <p>duration: {{s.end_date - s.start_date}}
+             </div>
 
-    {% endfor %}
+             <form action="{{url_for('cancel')}}" name = "statusform" method="post">
+              <input type="hidden" name="cancel" value="{{ s.id }}"/>
+              <br />
+              <input type="submit" class="deletebutton" value="Cancel Booking" name="cancelButton"/>
+            </form>
+
+                <form action="{{url_for('returnScooter')}}" name = "statusform" method="post">
+              <input type="hidden" name="return" value="{{ s.id }}"/>
+              <br />
+              <input type="submit" class="deletebutton" value="Return Scooter" name="returnButton"/>
+            </form>
+
+                <form action="{{url_for('extend')}}" name = "statusform" method="post">
+              <input type="hidden" name="extend" value="{{ s.id }}"/>
+              <br />
+              <input type="submit" class="deletebutton" value="Extend Booking" name="extendButton"/>
+            </form>
+            <hr class="solid">
+            {% endfor %}
+        {% else %}
+            <h1>There are no sessions to show</h1>
+        {% endif %}
 
 
     {% endblock %}
