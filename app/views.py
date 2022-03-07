@@ -156,10 +156,9 @@ def returnScooter(session_id):
         session = Session.query.filter_by(id=session_id).first()  # the session we're referring to
         session.returned = True  # returned the scooter
         scooter = Scooter.query.filter_by(id=session.scooter_id).first()
-        print("ID is " , scooter.id)
-        print("Location 1 is ", scooter.location_id)
+
         scooter.location_id = form.location_id.data  # moves the scooter location
-        print("Location 2 is " , scooter.location_id)
+
         db.session.commit()
 
         return redirect(url_for('userScooterManagement'))
