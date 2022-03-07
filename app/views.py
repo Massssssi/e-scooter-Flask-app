@@ -166,14 +166,13 @@ def returnScooter(session_id):
     return render_template('returnScooter.html', user=current_user, form=form)
 
 
-@app.route('/extend', methods=['POST'])
+@app.route('/user/extendSession/<session_id>', methods=['POST'])
 @login_required
-def extend():
-    # session = Session.query.filter_by(
-    #     id=request.form['cancel']).first_or_404()
-    # db.session.delete(session)
-    # db.session.commit()
-    return redirect("/user/manage")
+def extend(session_id):
+    form = BookScooterForm() # acts like a booking
+    session = Session.query.filter_by(id=session_id).first()
+
+    return render_template('returnScooter.html', user=current_user, form=form)
 
 
 @app.route('/employee')
