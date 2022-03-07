@@ -1,8 +1,9 @@
 from app import app, db, models, mail, admin
-from flask import render_template, flash, request, redirect, session, jsonify
+from flask import render_template, flash, request, redirect, session, jsonify, url_for
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
-from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, ReturnScooterForm
+from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
+    ReturnScooterForm
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -138,31 +139,37 @@ def userScooterManagement():
 @app.route('/cancel', methods=['POST'])
 @login_required
 def cancel():
-
     session = Session.query.filter_by(
         id=request.form['cancel']).first_or_404()
     db.session.delete(session)
     db.session.commit()
     return redirect("/user/manage")
 
-@app.route('/returnScooter', methods=['POST'])
+
+@app.route('/user/returnScooter/<session_id>', methods=['POST'])
 @login_required
-def returnScooter():
+def returnScooter(session_id):
     form = ReturnScooterForm()
     form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
 
     if form.validate_on_submit():
-
+        session = Session.query.filter_by(id=session_id).first()  # the session we're referring to
+        session.returned = True  # returned the scooter
+        scooter = Scooter.query.filter_by(id=session.scooter_id).first()
+        print("ID is " , scooter.id)
+        print("Location 1 is ", scooter.location_id)
+        scooter.location_id = form.location_id.data  # moves the scooter location
+        print("Location 2 is " , scooter.location_id)
         db.session.commit()
 
-        return redirect('user/manage')
+        return redirect(url_for('userScooterManagement'))
 
     return render_template('returnScooter.html', user=current_user, form=form)
+
 
 @app.route('/extend', methods=['POST'])
 @login_required
 def extend():
-
     # session = Session.query.filter_by(
     #     id=request.form['cancel']).first_or_404()
     # db.session.delete(session)

@@ -22,7 +22,7 @@
               <input type="submit" class="deletebutton" value="Cancel Booking" name="cancelButton"/>
             </form>
 
-                <form action="{{url_for('returnScooter')}}" name = "statusform" method="post">
+                <form action="{{"returnScooter/" + s.id|string}}" name = "statusform" method="post">
               <input type="hidden" name="return" value="{{ s.id }}"/>
               <br />
               <input type="submit" class="deletebutton" value="Return Scooter" name="returnButton"/>

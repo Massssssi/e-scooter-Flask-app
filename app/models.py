@@ -31,7 +31,8 @@ class Session(db.Model):
     start_date = db.Column(db.DateTime, nullable=False)
     end_date = db.Column(db.DateTime, nullable=False)  # needed to help display the end date
     # the duration can be worked out by end-date - start date
-    returned = db.Column(db.Boolean)  # whether the person has returned the scooter at the end of the booking
+    returned = db.Column(db.Boolean, default=False)  # whether the person has returned the scooter at the end of the
+    # booking
     scooter_id = db.Column(db.Integer, db.ForeignKey('scooter.id'), nullable=False)
     guest_id = db.Column(db.Integer, db.ForeignKey('guest.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
