@@ -2,7 +2,7 @@ from app import app, db, models, mail, admin
 from flask import render_template, flash, request, redirect, session, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
-from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm
+from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, ReturnScooterForm
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -131,8 +131,7 @@ def userScooterManagement():
 
     for session in user.session:
         sessions.append(session)
-        # session.append(session.start_date + timedelta(hours=session.session_length))
-        # additional_info.append(session.start_date + timedelta(hours=session.session_length))
+
     return render_template('userScooterManagement.html', title='Home', user=current_user, sessions=sessions)
 
 
@@ -149,12 +148,16 @@ def cancel():
 @app.route('/returnScooter', methods=['POST'])
 @login_required
 def returnScooter():
+    form = ReturnScooterForm()
+    form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
 
-    # session = Session.query.filter_by(
-    #     id=request.form['cancel']).first_or_404()
-    # db.session.delete(session)
-    # db.session.commit()
-    return redirect("/user/manage")
+    if form.validate_on_submit():
+
+        db.session.commit()
+
+        return redirect('user/manage')
+
+    return render_template('returnScooter.html', user=current_user, form=form)
 
 @app.route('/extend', methods=['POST'])
 @login_required

@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, \
-    ValidationError, SelectField, FloatField,DateTimeField
+    ValidationError, SelectField, FloatField, DateTimeField
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, \
     ValidationError, SelectField, FloatField
 
@@ -51,10 +51,10 @@ class RegisterForm(FlaskForm):
 
 
 class BookScooterForm(FlaskForm):
-    location_id  = SelectField('location_id', choices=[], validators = [DataRequired()])
-    scooter = SelectField('scooter', choices=["1","2"], validators = [DataRequired()])
-    hire_period = SelectField('hire_period', choices=["One hour","four hours","One day", "one week"])
-    start_date =DateTimeField('datetime', format='%Y-%m-%d %H:%M:%S')
+    location_id = SelectField('location_id', choices=[], validators=[DataRequired()])
+    scooter = SelectField('scooter', choices=["1", "2"], validators=[DataRequired()])
+    hire_period = SelectField('hire_period', choices=["One hour", "four hours", "One day", "one week"])
+    start_date = DateTimeField('datetime', format='%Y-%m-%d %H:%M:%S')
 
 
 class CardForm(FlaskForm):
@@ -65,3 +65,6 @@ class CardForm(FlaskForm):
     card_cvv = StringField('cvv', validators=[DataRequired("Please enter card cvv"),
                                               Length(min=3, max=4, message="Not a valid cvv")])
     save_card = BooleanField('saveCard')  # Asking the user to save his card details.
+
+class ReturnScooterForm(FlaskForm):
+    location_id = SelectField('location_id', choices=[], validators=[DataRequired()])
