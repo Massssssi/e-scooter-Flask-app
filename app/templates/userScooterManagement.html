@@ -22,11 +22,13 @@
               <input type="submit" class="deletebutton" value="Cancel Booking" name="cancelButton"/>
             </form>
 
-                <form action="{{"returnScooter/" + s.id|string}}" name = "statusform" method="post">
-              <input type="hidden" name="return" value="{{ s.id }}"/>
-              <br />
-              <input type="submit" class="deletebutton" value="Return Scooter" name="returnButton"/>
-            </form>
+                {% if s.returned == False %}
+                    <form action="{{"returnScooter/" + s.id|string}}" name = "statusform" method="post">
+                  <input type="hidden" name="return" value="{{ s.id }}"/>
+                  <br />
+                  <input type="submit" class="deletebutton" value="Return Scooter" name="returnButton"/>
+                </form>
+                {% endif %}
 
                 <form action="{{url_for('extend')}}" name = "statusform" method="post">
               <input type="hidden" name="extend" value="{{ s.id }}"/>
