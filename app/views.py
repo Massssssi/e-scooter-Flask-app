@@ -1,8 +1,9 @@
 from app import app, db, models, mail, admin
-from flask import render_template, flash, request, redirect, session, jsonify
+from flask import render_template, flash, request, redirect, session, jsonify, url_for
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
-from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm
+from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
+    ReturnScooterForm, ExtendScooterForm
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -131,25 +132,68 @@ def userScooterManagement():
 
     for session in user.session:
         sessions.append(session)
-        # session.append(session.start_date + timedelta(hours=session.session_length))
-        # additional_info.append(session.start_date + timedelta(hours=session.session_length))
+
     return render_template('userScooterManagement.html', title='Home', user=current_user, sessions=sessions)
 
 
 @app.route('/cancel', methods=['POST'])
 @login_required
 def cancel():
-    # print("*****")
     session = Session.query.filter_by(
         id=request.form['cancel']).first_or_404()
     db.session.delete(session)
     db.session.commit()
     return redirect("/user/manage")
-    # return render_template('user.html', title='Home', user=current_user)
-    # return redirect("/user/manage")
-    # #return render_template("userreviews.html",
-    #                        title="Your reviews",
-    #
+
+
+@app.route('/user/returnScooter/<session_id>', methods=['POST'])
+@login_required
+def returnScooter(session_id):
+    form = ReturnScooterForm()
+    form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
+
+    if form.validate_on_submit():
+        session = Session.query.filter_by(id=session_id).first()  # the session we're referring to
+        session.returned = True  # returned the scooter
+        scooter = Scooter.query.filter_by(id=session.scooter_id).first()
+
+        scooter.location_id = form.location_id.data  # moves the scooter location
+
+        db.session.commit()
+
+        return redirect(url_for('userScooterManagement'))
+
+    return render_template('returnScooter.html', user=current_user, form=form)
+
+
+@app.route('/user/extendSession/<session_id>', methods=['POST'])
+@login_required
+def extend(session_id):
+    session = Session.query.filter_by(id=session_id).first()  # the session
+    scooter = Scooter.query.filter_by(id=session.scooter_id).first()  #
+    location = Location.query.filter_by(id=scooter.location_id).first()
+    hourly_rate = ScooterCost.query.first().hourly_cost  # only one value in this table
+
+    form = ExtendScooterForm()
+
+    key = {"One hour": timedelta(hours=1),
+           "Four hours": timedelta(hours=4),
+           "One day": timedelta(days=1),
+           "One week": timedelta(weeks=1)}
+
+    if form.validate_on_submit():
+        extension_length = key[form.hire_period.data]
+
+        session.end_date += key[form.hire_period.data]  # adds on the new period that they've paid for
+
+        # works out the amount of hours and then multiplies this by the current rate
+        session.cost += hourly_rate * (extension_length.days * 24 + extension_length.seconds // 3600)
+
+        db.session.commit()
+
+        return redirect(url_for('payment'))
+
+    return render_template('extendSession.html', user=current_user, form=form, cost=hourly_rate)
 
 
 @app.route('/employee')
@@ -167,28 +211,28 @@ def manager():
 @app.route('/bookScooter', methods=['GET', 'POST'])
 @login_required
 def bookScooter():
-    n=0
-    cost=0
+    n = 0
+    cost = 0
     form = BookScooterForm()
     form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
 
     if form.validate_on_submit():
-        p = models.Location.query.filter_by(id= form.location_id.data).first()
+        p = models.Location.query.filter_by(id=form.location_id.data).first()
         form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(id=p.id).all()]
 
         a = form.hire_period.data
-        if(a=="One hour"):
-            cost=1*10
-            n=1
-        elif(a=="four hours"):
-            cost=4*10
-            n=4
-        elif(a=="One day"):
-            cost=24*10
-            n=24
-        elif(a=="one week"):
-            cost=168*10
-            n=168
+        if (a == "One hour"):
+            cost = 1 * 10
+            n = 1
+        elif (a == "four hours"):
+            cost = 4 * 10
+            n = 4
+        elif (a == "One day"):
+            cost = 24 * 10
+            n = 24
+        elif (a == "one week"):
+            cost = 168 * 10
+            n = 168
 
         given_time = form.start_date.data
         final_time = given_time + timedelta(hours=n)
@@ -201,10 +245,9 @@ def bookScooter():
         db.session.commit()
 
     if request.method == 'POST':
-       return redirect("/payment")
+        return redirect("/payment")
 
-    return render_template('userScooterBooking.html', user=current_user, form = form)
-
+    return render_template('userScooterBooking.html', user=current_user, form=form)
 
 
 @app.route('/scooter/<location_id>')
@@ -299,11 +342,11 @@ def configureScooters():
 def ScooterList():
     scooters = Scooter.query.all()
     locations = Location.query.all()
-    scooterArray =[]
+    scooterArray = []
     locationArray = []
     for scooter in scooters:
         scooterArray.append(scooter)
     for location in locations:
         locationArray.append(location)
 
-    return render_template('scooterList.html', title = 'List of scooters', ListS= scooterArray, ListL = locationArray)
+    return render_template('scooterList.html', title='List of scooters', ListS=scooterArray, ListL=locationArray)

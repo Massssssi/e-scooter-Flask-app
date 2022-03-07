@@ -1,0 +1,15 @@
+{# This is where the user says which location to return their scooter to #}
+
+{% extends "baseUser.html" %}
+<div class="block_content">
+  {% block content %}
+  <form method = "POST">
+    {{form.csrf_token}}
+    {{form.location_id}}
+    {{form.scooter}}
+    {{form.hire_period}}
+    {{form.start_date}}
+    <input type="submit">
+</form>
+  {% endblock %}
+</div>
