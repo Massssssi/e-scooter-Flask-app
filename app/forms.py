@@ -9,10 +9,10 @@ from .models import Location, Scooter, Session, Guest, User, Card, Feedback, Sco
 
 
 # from wtforms import SelectField, BooleanField
-# from wtforms.validators import DataRequired
+# fromwtforms.validators import DataRequired
 # from wtforms_sqlalchemy.fields import QuerySelectField
 
-def default_cost():
+def default_cost(): # Removes square brackets from the price value it pulls from the ScooterCost table
     scooter_cost = ScooterCost.query.first()
     s = ""
     for element in str(scooter_cost.hourly_cost):
