@@ -7,33 +7,22 @@ from wtforms import StringField, IntegerField, DateField, TextAreaField, Boolean
 from wtforms.validators import DataRequired, EqualTo, Length, NumberRange, InputRequired
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 
-
 # from wtforms import SelectField, BooleanField
 # fromwtforms.validators import DataRequired
 # from wtforms_sqlalchemy.fields import QuerySelectField
 
-def default_cost(): # Removes square brackets from the price value it pulls from the ScooterCost table
-    scooter_cost = ScooterCost.query.first()
-    s = ""
-    for element in str(scooter_cost.hourly_cost):
-        if element == "[" or element == "]":
-            pass
-        else:
-            s += element
-    print(s)
-    return float(s)
-
 
 class ConfigureScooterForm(FlaskForm):
-    id = SelectField('location', choices=[scooter.id for scooter in Scooter.query.all()])
+
+    id = SelectField('location', choices=[])
     availability = BooleanField('availability')
-    cost = FloatField('cost', default=default_cost(), validators=[DataRequired("Please enter a cost for this scooter")])
-    location = SelectField('location', choices=[(location.id, location.address) for location in Location.query.all()])
+    cost = FloatField('cost', validators=[DataRequired("Please enter a cost for this scooter")])
+    location = SelectField('location', choices=[])
 
 
 class ScooterForm(FlaskForm):
     availability = BooleanField('availability')
-    location = SelectField('location', choices=[(location.id, location.address) for location in Location.query.all()],
+    location = SelectField('location', choices=[],
                            validators=[DataRequired()])
 
 
@@ -53,7 +42,7 @@ class RegisterForm(FlaskForm):
 
 class BookScooterForm(FlaskForm):
     location_id = SelectField('location_id', choices=[], validators=[DataRequired()])
-    scooter = SelectField('scooter', choices=[scooter.id for scooter in Scooter.query.all()],
+    scooter = SelectField('scooter', choices=[],
                           validators=[DataRequired()])
     hire_period = SelectField('hire_period', choices=["One hour", "four hours", "One day", "one week"])
     start_date = DateTimeField('datetime', format='%Y-%m-%d %H:%M:%S')

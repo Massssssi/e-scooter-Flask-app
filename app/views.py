@@ -254,22 +254,41 @@ def payment():
 
 @app.route('/configureScooters', methods=['GET', 'POST'])
 @login_required
+
 def configureScooters():
     form = ConfigureScooterForm()
+    form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
+    form.id.choices = [scooter.id for scooter in models.Scooter.query.all()]
+
+    scooter_cost = ScooterCost.query.first()
+
+    if scooter_cost is None:  # if no cost declared in the database
+        scooter_cost = ScooterCost()
+
+    s = ""
+    for element in str(scooter_cost.hourly_cost):
+        if element == "[" or element == "]":
+            pass
+        else:
+            s += element
+    form.cost.data = float(s)
+
     if request.method == 'POST':
         if form.validate_on_submit():
+
             scooter = Scooter.query.filter_by(id=form.id.data).first()
-            scooter_cost = ScooterCost.query.first()
-            if scooter_cost is None:  # if no cost declared in the database
-                scooter_cost = ScooterCost()
+
             if form.cost.data is not None:
                 scooter_cost.hourly_cost = form.cost.data
+
             scooter.id = form.id.data
             scooter.availability = form.availability.data
             scooter.location_id = form.location.data
+
             db.session.add(scooter)
             db.session.add(scooter_cost)
             db.session.commit()
+
     return render_template('configureScooters.html',
                            title='Configure Scooters',
                            form=form)
