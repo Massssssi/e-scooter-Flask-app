@@ -7,31 +7,23 @@ from wtforms import StringField, IntegerField, DateField, TextAreaField, Boolean
 from wtforms.validators import DataRequired, EqualTo, Length, NumberRange, InputRequired
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 
-
 # from wtforms import SelectField, BooleanField
-# from wtforms.validators import DataRequired
+# fromwtforms.validators import DataRequired
 # from wtforms_sqlalchemy.fields import QuerySelectField
-
-def default_cost():
-    scooter_cost = ScooterCost.query.first()
-    s = ""
-    for element in str(scooter_cost.hourly_cost):
-        if element != "[" and element != "]":
-            s += element
-
-    return float(s)
 
 
 class ConfigureScooterForm(FlaskForm):
-    id = SelectField('location', choices=[scooter.id for scooter in Scooter.query.all()])
+
+    id = SelectField('location', choices=[])
     availability = BooleanField('availability')
-    cost = FloatField('cost', default=default_cost(), validators=[DataRequired("Please enter a cost for this scooter")])
-    location = SelectField('location', choices=[(location.id, location.address) for location in Location.query.all()])
+    cost = FloatField('cost', validators=[DataRequired("Please enter a cost for this scooter")])
+    location = SelectField('location', choices=[])
 
 
 class ScooterForm(FlaskForm):
     availability = BooleanField('availability')
-    location = SelectField('location', choices=[], validators=[DataRequired()])
+    location = SelectField('location', choices=[],
+                           validators=[DataRequired()])
 
 
 class LoginForm(FlaskForm):
