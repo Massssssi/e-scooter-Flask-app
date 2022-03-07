@@ -172,11 +172,28 @@ def extend(session_id):
     session = Session.query.filter_by(id=session_id).first()  # the session
     scooter = Scooter.query.filter_by(id=session.scooter_id).first()  #
     location = Location.query.filter_by(id=scooter.location_id).first()
+    hourly_rate = ScooterCost.query.first().hourly_cost  # only one value in this table
 
     form = ExtendScooterForm()
 
-    cost = ScooterCost.query.first()  # only one value in this table
-    return render_template('extendSession.html', user=current_user, form=form, cost=cost)
+    key = {"One hour": timedelta(hours=1),
+           "Four hours": timedelta(hours=4),
+           "One day": timedelta(days=1),
+           "One week": timedelta(weeks=1)}
+
+    if form.validate_on_submit():
+        extension_length = key[form.hire_period.data]
+
+        session.end_date += key[form.hire_period.data]  # adds on the new period that they've paid for
+
+        # works out the amount of hours and then multiplies this by the current rate
+        session.cost += hourly_rate * (extension_length.days * 24 + extension_length.seconds // 3600)
+
+        db.session.commit()
+
+        return redirect(url_for('payment'))
+
+    return render_template('extendSession.html', user=current_user, form=form, cost=hourly_rate)
 
 
 @app.route('/employee')
