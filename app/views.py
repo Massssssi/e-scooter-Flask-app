@@ -3,7 +3,7 @@ from flask import render_template, flash, request, redirect, session, jsonify, u
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
-    ReturnScooterForm
+    ReturnScooterForm, ExtendScooterForm
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -169,10 +169,14 @@ def returnScooter(session_id):
 @app.route('/user/extendSession/<session_id>', methods=['POST'])
 @login_required
 def extend(session_id):
-    form = BookScooterForm() # acts like a booking
-    session = Session.query.filter_by(id=session_id).first()
+    session = Session.query.filter_by(id=session_id).first()  # the session
+    scooter = Scooter.query.filter_by(id=session.scooter_id).first()  #
+    location = Location.query.filter_by(id=scooter.location_id).first()
 
-    return render_template('returnScooter.html', user=current_user, form=form)
+    form = ExtendScooterForm()
+
+    cost = ScooterCost.query.first()  # only one value in this table
+    return render_template('extendSession.html', user=current_user, form=form, cost=cost)
 
 
 @app.route('/employee')

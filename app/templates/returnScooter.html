@@ -11,25 +11,5 @@
     {{form.start_date}}
     <input type="submit">
 </form>
-<script>
-  let place_select = document.getElementById('location_id');
-  let scooter_select = document.getElementById('scooter');
-
-  place_select.onchange = function() {
-    location_id = place_select.value;
-
-    fetch('/scooter/' + location_id).then(function(response) {
-
-      response.json().then(function(data){
-        let optionHTML= '';
-
-        for(let scooter of data.scooters){
-          optionHTML+= '<option value="' + scooter.location_id  + '">'+ scooter.id + '</option>';
-        }
-         scooter_select.innerHTML = optionHTML;
-      });
-    });
-  }
-</script>
   {% endblock %}
 </div>

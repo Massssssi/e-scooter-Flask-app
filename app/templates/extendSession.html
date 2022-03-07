@@ -2,34 +2,19 @@
 
 {% extends "baseUser.html" %}
 <div class="block_content">
+
   {% block content %}
+      <p>By how much do you wish to extend your session?</p>
+
   <form method = "POST">
     {{form.csrf_token}}
-    {{form.location_id}}
-    {{form.scooter}}
     {{form.hire_period}}
     {{form.start_date}}
     <input type="submit">
 </form>
-<script>
-  let place_select = document.getElementById('location_id');
-  let scooter_select = document.getElementById('scooter');
-
-  place_select.onchange = function() {
-    location_id = place_select.value;
-
-    fetch('/scooter/' + location_id).then(function(response) {
-
-      response.json().then(function(data){
-        let optionHTML= '';
-
-        for(let scooter of data.scooters){
-          optionHTML+= '<option value="' + scooter.location_id  + '">'+ scooter.id + '</option>';
-        }
-         scooter_select.innerHTML = optionHTML;
-      });
-    });
-  }
-</script>
+<p>Warning, our payment rate may have changed since you initially booked,
+    any extension will be done at out most up-to-date rate of £{{ cost.hourly_cost }} per hour</p>
   {% endblock %}
+
 </div>
+
