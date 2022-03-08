@@ -318,15 +318,13 @@ def payment():
 
 
     if form.validate_on_submit():
-        if typ == 0:
-            card = Card(holder=form.card_holder.data,
-                        card_number=form.card_number.data,
-                        expiry_date=form.card_expiry_date.data,
-                        cvv=form.card_cvv.data,
-                        user_id=current_user.id)
-            if form.save_card:
-                db.session.add(card)
-                db.session.commit()
+        card = Card(holder=form.card_holder.data,
+                    card_number=form.card_number.data,
+                    expiry_date=form.card_expiry_date.data,
+                    cvv=form.card_cvv.data,
+                    #innaporiate linking 
+                    #it was : user_id=current_user.id
+                    user = current_user)
 
         # Sending the confirmation email to the user
             Subject = 'Confermation Email | please do not reply'
