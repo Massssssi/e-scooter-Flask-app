@@ -6,31 +6,61 @@
     <table class="table table-striped">
       <thead>
         <tr>
+          <th scope="col">Scooter Id | General feedback</th>
           <th scope="col">User Id</th>
-          <th scope="col">Scooter Id</th>
           <th scope="col">Feedback</th>
           <th scope="col">Priority</th>
-          <th scope="col">Mark as</th>
+          <th scope="col">Status</th>
         </tr>
       </thead>
       <tbody>
         {% for i in feedback  %}
-      <tr>
-        <td>{{i.scooter_id}}</td>
-        <td>{{i.user_id}}</td>
-        <td>{{i.feedback_text}}</td>
-        <td>{{i.priority}}</td>
-  
-      </tr>
+          {% if i.scooter_id == None %}
+              {% if i.status == False%}
+                  <tr>
+                    <td>General Feedback</td>
+                    <td>{{i.user_id}}</td>
+                    <td>{{i.feedback_text}}</td>
+                    <td>{{i.priority}}</td>
+                    <td><a href="/complete/{{i.id}}" class="link-dark">Complete</a></td>
+              
+                  </tr>
+              {% else %}
+                    <tr>
+                    <td>General Feedback</td>
+                    <td>{{i.user_id}}</td>
+                    <td>{{i.feedback_text}}</td>
+                    <td>{{i.priority}}</td>
+                    <td>Completed</td>
+              
+                   </tr>
+              {% endif %}
+        {% else %}
+                  {% if i.status == False%}
+                      <tr>
+                        <td>{{i.scooter_id}}</td>
+                        <td>{{i.user_id}}</td>
+                        <td>{{i.feedback_text}}</td>
+                        <td>{{i.priority}}</td>
+                        <td><a href="/complete/{{i.id}}" class="link-dark">Complete</a></td>
+                      </tr>
+                  {% else %}
+                  <tr>
+                    <td>General Feedback</td>
+                    <td>{{i.user_id}}</td>
+                    <td>{{i.feedback_text}}</td>
+                    <td>{{i.priority}}</td>
+                    <td>Completed</td>
+              
+                  </tr>
+
+                  {% endif %}
+
+        {% endif %}
         {% endfor %}
   
         </tbody>
       </table>
-    
-    
-    
-    
-    
-    
+        
     {% endblock %}
   </div>

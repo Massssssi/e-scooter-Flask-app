@@ -71,3 +71,8 @@ class BookingGuestUserForm(FlaskForm):
 
 class ReturnScooterForm(FlaskForm):
     location_id = SelectField('location_id', choices=[], validators=[DataRequired()])
+
+class userHelpForm(FlaskForm):
+    scooter_id = StringField('Scooter number')
+    feedback_text = TextAreaField('Feedback text')
+    priority = SelectField('priority', choices=[(1, "High priority") , (2, "Medium priority"), (3 , "Low priority")])
