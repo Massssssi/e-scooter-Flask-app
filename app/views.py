@@ -4,7 +4,7 @@ from flask import render_template, flash, request, redirect, session, jsonify, u
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
-    ReturnScooterForm, ExtendScooterForm,selectLocationForm, BookingGuestUserForm
+    ReturnScooterForm, ExtendScooterForm,selectLocationForm, BookingGuestUserForm, userHelpForm
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -456,3 +456,56 @@ def selectLocationguest():
         return redirect(url_for( '.bookScooter',loc_id=loc_id, usid = usid, typ = typ))
 
     return render_template('selectLocation.html', user=current_user, form=form)
+
+@app.route('/help', methods=['GET', 'POST'])
+@login_required
+def help():
+    form = userHelpForm()
+    if request.method == 'POST':
+        if form.validate_on_submit:
+            if form.scooter_id.data:
+                scooter = Scooter.query.filter_by(id = form.scooter_id.data).first()
+                #Checking if the scooter id exists
+                if scooter:
+                    userFeedback = Feedback(scooter_id = form.scooter_id.data,
+                                            feedback_text = form.feedback_text.data,
+                                            priority = form.priority.data,
+                                            user = current_user)
+                    db.session.add(userFeedback)
+                    db.session.commit()
+                    flash('User feedback has been recieved succesfully ')
+                    return redirect("/help")
+                else :
+                    message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. ' 
+                    return render_template('/userHelp.html',form = form, error_message = message)
+           
+            else:
+                #this is for general feedback, not for a specific scooter
+                userFeedback = Feedback(  feedback_text = form.feedback_text.data,
+                                            priority = form.priority.data,
+                                            user = current_user)
+                db.session.add(userFeedback)
+                db.session.commit()
+                flash('User general feedback has been recieved succesfully ')
+                return redirect("/help")
+
+    return render_template('userHelp.html', form = form)
+
+#route for completed the feedback from the employee
+@app.route('/complete/<int:id>')
+def complete(id):
+    current_feedback = Feedback.query.filter_by(id = id).first()
+    print(current_feedback)
+    if current_feedback:
+        current_feedback.status = True
+        db.session.commit()
+        return redirect("/admin/userFeedback")
+
+
+@app.route('/admin/userFeedback', methods=['GET', 'POST'])
+@login_required
+def helpUser():
+    feedback = Feedback.query.all()
+    if feedback:
+        return render_template("employeeFeedbackManagement.html", feedback = feedback)
+    render_template("employeeFeedbackManagement.html")

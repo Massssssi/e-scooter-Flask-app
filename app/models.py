@@ -87,4 +87,6 @@ class Feedback(db.Model):
 
     priority = db.Column(db.Integer, default=3)
     feedback_text = db.Column(db.String(5000), nullable=False)
+    #true if the feedback is compeleted
+    status = db.Column(db.Boolean, default = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
