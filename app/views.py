@@ -410,7 +410,8 @@ def help():
                 flash('User feedback has been recieved succesfully ')
                 return redirect("/help")
             else :
-                flash('Scooter number %s could not be found ' % (form.scooter_id.data))
-                return redirect("/help")
+                #flash('Scooter number %s could not be found ' % (form.scooter_id.data))*
+                message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. ' 
+                return render_template('/userHelp.html',form = form, error_message = message)
 
     return render_template('userHelp.html', form = form)
