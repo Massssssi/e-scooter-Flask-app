@@ -24,6 +24,7 @@ class ScooterForm(FlaskForm):
     availability = BooleanField('availability')
     location = SelectField('location', choices=[],
                            validators=[DataRequired()])
+    num_Scooter = IntegerField('number of scooters', validators = [DataRequired("Please enter the number of scooters")])
 
 
 class LoginForm(FlaskForm):
@@ -63,6 +64,10 @@ class CardForm(FlaskForm):
                                               Length(min=3, max=4, message="Not a valid cvv")])
     save_card = BooleanField('saveCard')  # Asking the user to save his card details.
 
+class BookingGuestUserForm(FlaskForm):
+
+    email = StringField('email', validators=[DataRequired("Please enter an email address")])
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
 
 class ReturnScooterForm(FlaskForm):
     location_id = SelectField('location_id', choices=[], validators=[DataRequired()])
