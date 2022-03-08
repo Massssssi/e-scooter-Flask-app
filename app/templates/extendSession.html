@@ -13,7 +13,7 @@
     <input type="submit">
 </form>
 <p>Warning, our payment rate may have changed since you initially booked,
-    any extension will be done at out most up-to-date rate of £{{ cost.hourly_cost }} per hour</p>
+    any extension will be done at out most up-to-date rate of {{ "£{:,.2f}".format(hourly_cost) }} per hour</p>
   {% endblock %}
 
 </div>
