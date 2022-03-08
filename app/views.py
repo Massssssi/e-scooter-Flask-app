@@ -4,7 +4,7 @@ from flask import render_template, flash, request, redirect, session, jsonify, u
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
-    ReturnScooterForm, ExtendScooterForm,selectLocationForm
+    ReturnScooterForm, ExtendScooterForm,selectLocationForm, BookingGuestUserForm
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -41,12 +41,16 @@ def AddScooter():
     if form.validate_on_submit():
         flash('Succesfully received from data. %s and %s' % (form.availability.data, form.location.data))
 
-        scooter = models.Scooter(availability=form.availability.data, location_id=form.location.data)
+
         location = Location.query.get(form.location.data)
 
+
         try:
-            db.session.add(scooter)
-            location.no_of_scooters += 1
+            for i in range(0,int(form.num_Scooter.data)):
+                scooter = models.Scooter(availability=form.availability.data, location_id=form.location.data)
+                db.session.add(scooter)
+                location.no_of_scooters += 1
+
             db.session.commit()
         except:
             flash('ERROR WHILE UPDATING THE SCOOTER TABLE')
@@ -91,6 +95,7 @@ def user_login():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
+
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             flash("This email had already sign up.")
@@ -216,9 +221,17 @@ def selectLocation():
     form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
     if form.validate_on_submit():
         p=models.Location.query.filter_by(id=form.location_id.data).first()
+
+        usid = current_user.id
+        session['usid']=usid
+
         loc_id=json.dumps(p.id)
         session['loc_id']=loc_id
-        return redirect(url_for( '.bookScooter',loc_id=loc_id))
+
+        typ =0
+        session['typ'] = typ
+
+        return redirect(url_for( '.bookScooter',loc_id=loc_id, usid =usid, typ = typ))
 
     return render_template('selectLocation.html', user=current_user, form=form)
 
@@ -229,11 +242,20 @@ def bookScooter():
     n = 0
     cost = 0
     form = BookScooterForm()
+
     loc_id=request.args['loc_id']
     loc_id=session['loc_id']
+
+    usid=request.args['usid']
+    usid=session['usid']
+
+    typ=request.args['typ']
+    typ=session['typ']
+
     p = models.Location.query.filter_by(id=int(loc_id)).first()
     form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id).all()]
     print(p)
+    print(loc_id, usid, typ)
     if form.validate_on_submit():
         c=models.ScooterCost.query.filter_by(id=1).first()
 
@@ -253,16 +275,30 @@ def bookScooter():
 
         given_time = form.start_date.data
         final_time = given_time + timedelta(hours=n)
-        a = Session(cost=cost,
-                    start_date=form.start_date.data,
-                    scooter_id=form.scooter.data,
-                    user_id=current_user.id,
-                    end_date=final_time)
-        db.session.add(a)
+        if typ ==0:
+            a = Session(cost=cost,
+                        start_date=form.start_date.data,
+                        scooter_id=form.scooter.data,
+                        user_id=usid,
+                        end_date=final_time)
+            db.session.add(a)
+        elif typ ==1:
+            a = Session(cost=cost,
+                        start_date=form.start_date.data,
+                        scooter_id=form.scooter.data,
+                        guest_id=usid,
+                        end_date=final_time)
+            db.session.add(a)
         db.session.commit()
 
+        typ =typ
+        session['typ'] = typ
+
+        usid = usid
+        session['usid']=usid
+
     if request.method == 'POST':
-        return redirect("/payment")
+        return redirect(url_for('.payment',usid =usid, typ = typ))
 
     return render_template('userScooterBooking.html', user=current_user, form=form)
 
@@ -273,29 +309,47 @@ def bookScooter():
 @app.route('/payment', methods=['GET', 'POST'])
 @login_required
 def payment():
+    #typ=request.args['typ']
+    typ=session['typ']
+
+    #usid=request.args['usid']
+    usid=session['usid']
+
     form = CardForm()
 
-    # for card in Card_Payment.query.all():
-    # flash("%s %s %s %s %s"%(card.card_holder, card.card_number, card.card_expiry_date, card.card_cvv, card.user_id))
 
     if form.validate_on_submit():
-        card = Card(holder=form.card_holder.data,
-                    card_number=form.card_number.data,
-                    expiry_date=form.card_expiry_date.data,
-                    cvv=form.card_cvv.data,
-                    user_id=current_user.id)
+        if typ == 0:
+            card = Card(holder=form.card_holder.data,
+                        card_number=form.card_number.data,
+                        expiry_date=form.card_expiry_date.data,
+                        cvv=form.card_cvv.data,
+                        user_id=current_user.id)
+            if form.save_card:
+                db.session.add(card)
+                db.session.commit()
 
         # Sending the confirmation email to the user
-        Subject = 'Confermation Email | please do not reply'
-        msg = Message(Subject, sender='bennabet.abderrahmane213@gmail.com', recipients=[current_user.email])
-        msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
-        mail.send(msg)
+            Subject = 'Confermation Email | please do not reply'
+            msg = Message(Subject, sender='bennabet.abderrahmane213@gmail.com', recipients=[current_user.email])
+            msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
+            mail.send(msg)
 
-        flash('Succesfully received from data. %s and %s and %s' % (card.card_number, card.cvv, card.expiry_date))
-        flash('The confirmation email has been send successfully')
-        if form.save_card:
-            db.session.add(card)
-            db.session.commit()
+            flash('The confirmation email has been send successfully')
+        elif typ ==1:
+            g = models.Guest.query.filter_by(id= usid).first()
+            print(g)
+            Subject = 'Confermation Email | please do not reply'
+            msg = Message(Subject, sender='bennabet.abderrahmane213@gmail.com', recipients=[g.email])
+            msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
+            mail.send(msg)
+
+            flash('The confirmation email has been send successfully')
+        if typ ==0:
+            return redirect("/")
+        elif typ==1:
+            return redirect("/GuestUsers")
+
 
     return render_template('payment.html', title='Payment', form=form)
 
@@ -355,3 +409,50 @@ def ScooterList():
         locationArray.append(location)
 
     return render_template('scooterList.html', title='List of scooters', ListS=scooterArray, ListL=locationArray)
+
+@app.route('/GuestUsers', methods= ['GET', 'POST'])
+@login_required
+def BookingGuestUser():
+    form = BookingGuestUserForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        guest = Guest.query.filter_by(email = form.email.data).first()
+        if user:
+            flash("This email had already sign up by another user.")
+        elif guest:
+            flash("This email had already sign up by another guest.")
+        else:
+            p = models.Guest(email=form.email.data,
+                     phone=form.phone.data,
+                     )
+
+            db.session.add(p)
+            db.session.commit()
+            p =models.Guest.query.filter_by(email = form.email.data).first()
+            guest = p.id
+            session['guest'] = guest
+            return redirect(url_for('.selectLocationguest' ,guest = guest))
+    return render_template('GuestBooking.html', title = 'Guest Booking', form = form)
+
+@app.route('/selectlocationguest', methods=['GET', 'POST'])
+@login_required
+def selectLocationguest():
+    form = selectLocationForm()
+    form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
+    guest=request.args['guest']
+    guest=session['guest']
+    if form.validate_on_submit():
+        p=models.Location.query.filter_by(id=form.location_id.data).first()
+        print(guest)
+        usid = guest
+        session['usid']=usid
+
+        loc_id=p.id
+        session['loc_id']=loc_id
+
+        typ =1
+        session['typ'] = typ
+
+        return redirect(url_for( '.bookScooter',loc_id=loc_id, usid = usid, typ = typ))
+
+    return render_template('selectLocation.html', user=current_user, form=form)
