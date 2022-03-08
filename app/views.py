@@ -1,13 +1,15 @@
+from tkinter.tix import Select
 from app import app, db, models, mail, admin
-from flask import render_template, flash, request, redirect, session, jsonify, url_for
+from flask import render_template, flash, request, redirect, session, jsonify, url_for,session
 from flask_login import current_user, login_user, login_required, logout_user
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
-    ReturnScooterForm, ExtendScooterForm
+    ReturnScooterForm, ExtendScooterForm,selectLocationForm
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
+import json
 
 # # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Location, db.session))
@@ -207,6 +209,19 @@ def employee():
 def manager():
     return render_template('manager.html', title='Manager Home', user=current_user)
 
+@app.route('/selectlocation', methods=['GET', 'POST'])
+@login_required
+def selectLocation():
+    form = selectLocationForm()
+    form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
+    if form.validate_on_submit():
+        p=models.Location.query.filter_by(id=form.location_id.data).first()
+        loc_id=json.dumps(p.id)
+        session['loc_id']=loc_id
+        return redirect(url_for( '.bookScooter',loc_id=loc_id))
+
+    return render_template('selectLocation.html', user=current_user, form=form)
+
 
 @app.route('/bookScooter', methods=['GET', 'POST'])
 @login_required
@@ -214,32 +229,34 @@ def bookScooter():
     n = 0
     cost = 0
     form = BookScooterForm()
-    form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
-
+    loc_id=request.args['loc_id']
+    loc_id=session['loc_id']
+    p = models.Location.query.filter_by(id=int(loc_id)).first()
+    form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id).all()]
+    print(p)
     if form.validate_on_submit():
-        p = models.Location.query.filter_by(id=form.location_id.data).first()
-        form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(id=p.id).all()]
+        c=models.ScooterCost.query.filter_by(id=1).first()
 
         a = form.hire_period.data
         if (a == "One hour"):
-            cost = 1 * 10
+            cost = 1 * c.hourly_cost
             n = 1
         elif (a == "four hours"):
-            cost = 4 * 10
+            cost = 4 * c.hourly_cost
             n = 4
         elif (a == "One day"):
-            cost = 24 * 10
+            cost = 24 * c.hourly_cost
             n = 24
         elif (a == "one week"):
-            cost = 168 * 10
+            cost = 168 * c.hourly_cost
             n = 168
 
         given_time = form.start_date.data
         final_time = given_time + timedelta(hours=n)
         a = Session(cost=cost,
                     start_date=form.start_date.data,
-                    scooter_id=current_user.id,
-                    guest_id=current_user.id,
+                    scooter_id=form.scooter.data,
+                    user_id=current_user.id,
                     end_date=final_time)
         db.session.add(a)
         db.session.commit()
@@ -250,19 +267,7 @@ def bookScooter():
     return render_template('userScooterBooking.html', user=current_user, form=form)
 
 
-@app.route('/scooter/<location_id>')
-def scooter(location_id):
-    scooters = Scooter.query.filter_by(location_id=location_id).all()
 
-    scooterArray = []
-
-    for scooter in scooters:
-        scooterObj = {}
-        scooterObj['id'] = scooter.id
-        scooterObj['location_id'] = scooter.location_id
-        scooterArray.append(scooterObj)
-
-    return jsonify({'scooters': scooterArray})
 
 
 @app.route('/payment', methods=['GET', 'POST'])
