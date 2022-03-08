@@ -41,10 +41,13 @@ class RegisterForm(FlaskForm):
 
 
 class BookScooterForm(FlaskForm):
-    location_id = SelectField('location_id', choices=[], validators=[DataRequired()])
-    scooter = SelectField('scooter', choices=["1", "2"], validators=[DataRequired()])
+    scooter = SelectField('scooter', choices=[], validators=[DataRequired()])
     hire_period = SelectField('hire_period', choices=["One hour", "four hours", "One day", "one week"])
     start_date = DateTimeField('datetime', format='%Y-%m-%d %H:%M:%S')
+
+
+class selectLocationForm(FlaskForm):
+    location_id = SelectField('location_id', choices=[])
 
 
 class ExtendScooterForm(FlaskForm):
