@@ -409,13 +409,13 @@ def configureScooters():
 
     if scooter_cost is None:  # if no cost declared in the database
         scooter_cost = ScooterCost()
+        scooter_cost.hourly_cost = 10.00  # default not done until entity actually in the database
 
     s = ""
     for element in str(scooter_cost.hourly_cost):
-        if element == "[" or element == "]":
-            pass
-        else:
+        if element != "[" and element != "]":
             s += element
+
     form.cost.data = float(s)
 
     if request.method == 'POST':
