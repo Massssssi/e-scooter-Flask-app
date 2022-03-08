@@ -509,3 +509,12 @@ def helpUser():
     if feedback:
         return render_template("employeeFeedbackManagement.html", feedback = feedback)
     render_template("employeeFeedbackManagement.html")
+
+
+#Manger needs to see all high priority feedbacks  | backlog ID = 15
+@app.route('/manager/userFeedback', methods=['GET', 'POST'])
+@login_required
+def mangerHighPriority():
+    if Feedback.query.filter_by(priority = 1):
+        return render_template("employeeFeedbackManagement.html", feedback = Feedback.query.filter_by(priority = 1))
+    render_template("employeeFeedbackManagement.html")
