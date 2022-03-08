@@ -7,22 +7,29 @@
 
         {% if sessions|length !=0  %}
             {% for s in sessions%}
-             <div>
-               <h4>Date Started: {{ s.start_date }}</h4>
-               <p>Cost: {{ s.cost}}</p>
-               <p>Session Length: {{ s.session_length}}</p>
-               <p>Scooter ID: {{ s.scooter_id}}</p>
-               <p>End date: {{s.end_date }}</p>
-               <p>duration: {{s.end_date - s.start_date}}
-             </div>
+                 <div>
+                   <h4>Date Started: {{ s.start_date }}</h4>
+                   <p>Cost: {{ "£{:,.2f}".format(s.cost)}}</p>
+                   <p>Scooter ID: {{ s.scooter_id}}</p>
+                   <p>End date: {{s.end_date }}</p>
+                     <p>Duration: {{s.end_date - s.start_date}}</p>
+                 </div>
 
-            {% if s.returned == False %}
-             <form action="{{url_for('cancel')}}" name = "statusform" method="post">
-              <input type="hidden" name="cancel" value="{{ s.id }}"/>
-              <br />
-              <input type="submit" class="deletebutton" value="Cancel Booking" name="cancelButton"/>
-            </form>
+                {% if s.returned == False %}
 
+                    {% if s.start_date > time  %} {# Can't cancel a booking that has already started #}
+                         <form action="{{url_for('cancel')}}" name = "statusform" method="post">
+                          <input type="hidden" name="cancel" value="{{ s.id }}"/>
+                          <br />
+                          <input type="submit" class="deletebutton" value="Cancel Booking" name="cancelButton"/>
+                        </form>
+                    {% else %}
+                        <p>You can't cancel a session that's already began</p>
+                    {% endif %}
+
+                    {% if time > s.end_date %}
+                        <p>YOUR SCOOTER SHOULD HAVE BEEN BACK AGES AGO</p> {# this will be changed so that the session is red or something #}
+                    {% endif %}
 
                     <form action="{{"returnScooter/" + s.id|string}}" name = "statusform" method="post">
                   <input type="hidden" name="return" value="{{ s.id }}"/>
@@ -31,13 +38,13 @@
                 </form>
 
 
-                <form action="{{'extendSession/' + s.id|string}}" name = "statusform" method="post">
-              <input type="hidden" name="extend" value="{{ s.id }}"/>
-              <br />
-              <input type="submit" class="deletebutton" value="Extend Booking" name="extendButton"/>
-            </form>
-            {% endif %}
-            <hr class="solid">
+                    <form action="{{'extendSession/' + s.id|string}}" name = "statusform" method="post">
+                  <input type="hidden" name="extend" value="{{ s.id }}"/>
+                  <br />
+                  <input type="submit" class="deletebutton" value="Extend Booking" name="extendButton"/>
+                </form>
+                {% endif %}
+                <hr class="solid">
             {% endfor %}
         {% else %}
             <h1>There are no sessions to show</h1>
