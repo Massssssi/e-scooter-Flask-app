@@ -384,10 +384,9 @@ def configureScooters():
 
     s = ""
     for element in str(scooter_cost.hourly_cost):
-        if element == "[" or element == "]":
-            pass
-        else:
+        if element != "[" and element != "]":
             s += element
+
     form.cost.data = float(s)
 
     if request.method == 'POST':
