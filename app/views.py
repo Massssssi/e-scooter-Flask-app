@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash
 
 from app import app, db, models, mail, admin
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
-    ReturnScooterForm, ExtendScooterForm,selectLocationForm, BookingGuestUserForm, userHelpForm
+    ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -380,6 +380,7 @@ def configureScooters():
 
     if scooter_cost is None:  # if no cost declared in the database
         scooter_cost = ScooterCost()
+        scooter_cost.hourly_cost = 10.00  # default not done until entity actually in the database
 
     s = ""
     for element in str(scooter_cost.hourly_cost):
@@ -473,6 +474,7 @@ def selectLocationguest():
 
     return render_template('selectLocation.html', user=current_user, form=form)
 
+
 @app.route('/help', methods=['GET', 'POST'])
 @login_required
 def help():
@@ -480,37 +482,38 @@ def help():
     if request.method == 'POST':
         if form.validate_on_submit:
             if form.scooter_id.data:
-                scooter = Scooter.query.filter_by(id = form.scooter_id.data).first()
-                #Checking if the scooter id exists
+                scooter = Scooter.query.filter_by(id=form.scooter_id.data).first()
+                # Checking if the scooter id exists
                 if scooter:
-                    userFeedback = Feedback(scooter_id = form.scooter_id.data,
-                                            feedback_text = form.feedback_text.data,
-                                            priority = form.priority.data,
-                                            user = current_user)
+                    userFeedback = Feedback(scooter_id=form.scooter_id.data,
+                                            feedback_text=form.feedback_text.data,
+                                            priority=form.priority.data,
+                                            user=current_user)
                     db.session.add(userFeedback)
                     db.session.commit()
                     flash('User feedback has been recieved succesfully ')
                     return redirect("/help")
-                else :
+                else:
                     message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. '
-                    return render_template('/userHelp.html',form = form, error_message = message)
+                    return render_template('/userHelp.html', form=form, error_message=message)
 
             else:
-                #this is for general feedback, not for a specific scooter
-                userFeedback = Feedback(  feedback_text = form.feedback_text.data,
-                                            priority = form.priority.data,
-                                            user = current_user)
+                # this is for general feedback, not for a specific scooter
+                userFeedback = Feedback(feedback_text=form.feedback_text.data,
+                                        priority=form.priority.data,
+                                        user=current_user)
                 db.session.add(userFeedback)
                 db.session.commit()
                 flash('User general feedback has been recieved succesfully ')
                 return redirect("/help")
 
-    return render_template('userHelp.html', form = form)
+    return render_template('userHelp.html', form=form)
 
-#route for completed the feedback from the employee
+
+# route for completed the feedback from the employee
 @app.route('/complete/<int:id>')
 def complete(id):
-    current_feedback = Feedback.query.filter_by(id = id).first()
+    current_feedback = Feedback.query.filter_by(id=id).first()
     print(current_feedback)
     if current_feedback:
         current_feedback.status = True
@@ -523,5 +526,5 @@ def complete(id):
 def helpUser():
     feedback = Feedback.query.all()
     if feedback:
-        return render_template("employeeFeedbackManagement.html", feedback = feedback)
+        return render_template("employeeFeedbackManagement.html", feedback=feedback)
     render_template("employeeFeedbackManagement.html")
