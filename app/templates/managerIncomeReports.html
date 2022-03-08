@@ -1,8 +1,56 @@
 <!-- This is where the manager can see all of the information on company income etc. -->
 
-<h1>Passive income</h1>
-
 {% extends "baseEmployeeManager.html" %}
   <div class="block_content">
-    {% block content %}{% endblock %}
+    {% block content %}
+
+    <h1>Passive income</h1>
+
+    <form method="post", action="">
+      {{ form.hidden_tag() }}
+
+        Please select a start date: {{ form.date(class_='form-control') }}
+        {% for error in form.date.errors %}
+        <span class="warning">[{{ error }}]</span>
+        {% endfor %}<br>
+
+        <input type="submit" class="button" value="Submit">
+    </form>
+
+    {% if result %}
+    <table border="1">
+      <tr>
+        <td>Hire length</td>
+        <td>No. of session</td>
+        <td>Total income</td>
+      </tr>
+      <tr>
+        <td>One hour</td>
+        <td>{{ result[0][0] }}</td>
+        <td>{{ result[0][1] }}</td>
+      </tr>
+      <tr>
+        <td>Four hour</td>
+        <td>{{ result[1][0] }}</td>
+        <td>{{ result[1][1] }}</td>
+      </tr>
+      <tr>
+        <td>One day</td>
+        <td>{{ result[2][0] }}</td>
+        <td>{{ result[2][1] }}</td>
+      </tr>
+      <tr>
+        <td>One week</td>
+        <td>{{ result[3][0] }}</td>
+        <td>{{ result[3][1] }}</td>
+      </tr>
+    </table>
+
+    <p>Popular hire length ranking:</p>
+    {% for i in freq %}
+    <p>{{ i[0] }}</p>
+    {% endfor %}
+    {% endif %}
+
+    {% endblock %}
   </div>
