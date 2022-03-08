@@ -6,17 +6,16 @@ from flask import render_template, flash, request, redirect, url_for, session
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_mail import Message
-from werkzeug.security import generate_password_hash
-
-from app import app, db, models, mail, admin
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
-    ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm
+    ReturnScooterForm, ExtendScooterForm,selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm
 from flask_mail import Message
 from flask_admin.contrib.sqla import ModelView
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import datetime, timedelta
 import json
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
+from werkzeug.security import generate_password_hash, check_password_hash
+import operator
 
 # # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Location, db.session))
@@ -232,6 +231,41 @@ def employee():
 @login_required
 def manager():
     return render_template('manager.html', title='Manager Home', user=current_user)
+
+
+@app.route('/incomeReports', methods=['GET', 'POST'])
+@login_required
+def incomeReports():
+    form = DateForm()
+    data = []
+    result = []
+    freq = {}
+    if form.validate_on_submit():
+        date1 = datetime(form.date.data.year, form.date.data.month, form.date.data.day)
+        date2 = date1 + timedelta(days=7)
+        record = Session.query.all()
+        for i in range(4):
+            a = []
+            data.append(a)
+        for s in record:
+            if s.start_date > date1 and s.start_date < date2:
+                if s.end_date == s.start_date + timedelta(hours=1):
+                    data[0].append(s)
+                elif s.end_date == s.start_date + timedelta(hours=4):
+                    data[1].append(s)
+                elif s.end_date == s.start_date + timedelta(days=1):
+                    data[2].append(s)
+                elif s.end_date == s.start_date + timedelta(days=7):
+                    data[3].append(s)
+        for d in data:
+            income = 0
+            for sess in d:
+                income += sess.cost
+            a = [len(d), income]
+            result.append(a)
+        rank = {"One hour":result[0][0], "Four hour":result[1][0], "One day":result[2][0], "One Week":result[3][0]}
+        freq = sorted(rank.items(), key=operator.itemgetter(1), reverse=True)
+    return render_template('managerIncomeReports.html', title='Income Report', form=form, result=result, freq=freq)
 
 
 @app.route('/selectlocation', methods=['GET', 'POST'])
@@ -526,4 +560,13 @@ def helpUser():
     feedback = Feedback.query.all()
     if feedback:
         return render_template("employeeFeedbackManagement.html", feedback=feedback)
+    render_template("employeeFeedbackManagement.html")
+
+
+#Manger needs to see all high priority feedbacks  | backlog ID = 15
+@app.route('/manager/userFeedback', methods=['GET', 'POST'])
+@login_required
+def mangerHighPriority():
+    if Feedback.query.filter_by(priority = 1):
+        return render_template("employeeFeedbackManagement.html", feedback = Feedback.query.filter_by(priority = 1))
     render_template("employeeFeedbackManagement.html")

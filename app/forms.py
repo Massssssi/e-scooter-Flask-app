@@ -3,7 +3,7 @@ from wtforms import StringField, IntegerField, DateField, TextAreaField, Boolean
     ValidationError, SelectField, FloatField, DateTimeField
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, \
     ValidationError, SelectField, FloatField
-
+from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, EqualTo, Length, NumberRange, InputRequired
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 
@@ -71,3 +71,6 @@ class userHelpForm(FlaskForm):
     scooter_id = StringField('Scooter number')
     feedback_text = TextAreaField('Feedback text')
     priority = SelectField('priority', choices=[(1, "High priority") , (2, "Medium priority"), (3 , "Low priority")])
+
+class DateForm(FlaskForm):
+    date = DateField('date', format='%Y-%m-%d', validators = [DataRequired("Please enter a date.")])
