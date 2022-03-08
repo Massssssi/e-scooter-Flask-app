@@ -1,9 +1,36 @@
-<!-- This is where employees handle user feedback -->
 <!-- User feedback should be displayed and then be able to be escalated-->
-
-<h1>Hello world</h1>
 
 {% extends "baseEmployeeManager.html" %}
   <div class="block_content">
-    {% block content %}{% endblock %}
+    {% block content %}
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th scope="col">User Id</th>
+          <th scope="col">Scooter Id</th>
+          <th scope="col">Feedback</th>
+          <th scope="col">Priority</th>
+          <th scope="col">Mark as</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in feedback  %}
+      <tr>
+        <td>{{i.scooter_id}}</td>
+        <td>{{i.user_id}}</td>
+        <td>{{i.feedback_text}}</td>
+        <td>{{i.priority}}</td>
+  
+      </tr>
+        {% endfor %}
+  
+        </tbody>
+      </table>
+    
+    
+    
+    
+    
+    
+    {% endblock %}
   </div>

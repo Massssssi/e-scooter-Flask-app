@@ -456,3 +456,36 @@ def selectLocationguest():
         return redirect(url_for( '.bookScooter',loc_id=loc_id, usid = usid, typ = typ))
 
     return render_template('selectLocation.html', user=current_user, form=form)
+
+@app.route('/help', methods=['GET', 'POST'])
+@login_required
+def help():
+    form = userHelpForm()
+    if request.method == 'POST':
+        if form.validate_on_submit:
+            scooter = Scooter.query.filter_by(id = form.scooter_id.data).first()
+            #Checking if the scooter id exists
+            if scooter:
+                userFeedback = Feedback(scooter_id = form.scooter_id.data,
+                                        feedback_text = form.feedback_text.data,
+                                        priority = form.priority.data,
+                                        user = current_user)
+                db.session.add(userFeedback)
+                db.session.commit()
+                flash('User feedback has been recieved succesfully ')
+                return redirect("/help")
+            else :
+                #flash('Scooter number %s could not be found ' % (form.scooter_id.data))*
+                message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. ' 
+                return render_template('/userHelp.html',form = form, error_message = message)
+
+    return render_template('userHelp.html', form = form)
+
+
+@app.route('/admin/userFeedback', methods=['GET', 'POST'])
+@login_required
+def helpUser():
+    feedback = Feedback.query.all()
+    if feedback:
+        return render_template("employeeFeedbackManagement.html", feedback = feedback)
+    render_template("employeeFeedbackManagement.html")
