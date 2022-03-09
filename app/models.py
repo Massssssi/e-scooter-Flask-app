@@ -14,7 +14,7 @@ class Location(db.Model):
 
 class Scooter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    availability = db.Column(db.Boolean, default=True)
+    availability = db.Column(db.Boolean)
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
     session_id = db.relationship('Session', backref='scooter', uselist=False)
     feedback = db.relationship('Feedback', backref='scooter', uselist=False)

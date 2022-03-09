@@ -302,9 +302,10 @@ def bookScooter():
     typ = session['typ']
 
     p = models.Location.query.filter_by(id=int(loc_id)).first()
-    form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id).all()]
-    print(p)
-    print(loc_id, usid, typ)
+    m=models.Scooter.query.filter(Scooter.availability == True).first()
+    form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
+    print(m.availability)
+   
     if form.validate_on_submit():
         c = models.ScooterCost.query.filter_by(id=1).first()
 
