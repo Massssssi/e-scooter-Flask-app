@@ -241,7 +241,7 @@ def incomeReports():
         date1 = datetime(form.date.data.year, form.date.data.month, form.date.data.day)
         date2 = date1 + timedelta(days=7)
         record = Session.query.all()
-        for i in range(4):
+        for i in range(5):
             a = []
             data.append(a)
         for s in record:
@@ -254,6 +254,8 @@ def incomeReports():
                     data[2].append(s)
                 elif s.end_date == s.start_date + timedelta(days=7):
                     data[3].append(s)
+                else:
+                    data[4].append(s)
         for d in data:
             income = 0
             for sess in d:
