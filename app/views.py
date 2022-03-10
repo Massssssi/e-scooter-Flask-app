@@ -308,7 +308,7 @@ def bookScooter():
     if m:
         form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
         print(m.availability)
-   
+
     if form.validate_on_submit():
         c = models.ScooterCost.query.filter_by(id=1).first()
 
@@ -336,7 +336,7 @@ def bookScooter():
                         end_date=final_time)
             db.session.add(a)
 
-            
+
             scooter = models.Scooter.query.filter_by(id=form.scooter.data).first()
             if scooter:
                     scooter.availability = False
@@ -358,8 +358,11 @@ def bookScooter():
 
     if request.method == 'POST':
         return redirect(url_for('.payment', usid=usid, typ=typ))
+    if typ == 1:
+        return render_template('guestScooterBooking.html', user=current_user, form=form)
+    elif typ == 0:
+        return render_template('userScooterBooking.html', user=current_user, form=form)
 
-    return render_template('userScooterBooking.html', user=current_user, form=form)
 
 
 @app.route('/payment', methods=['GET', 'POST'])
@@ -380,7 +383,7 @@ def payment():
                         expiry_date=form.card_expiry_date.data,
                         cvv=form.card_cvv.data,
                         user_id=current_user.id)
-            if form.save_card:
+            if form.save_card == True:
                 db.session.add(card)
                 db.session.commit()
 
