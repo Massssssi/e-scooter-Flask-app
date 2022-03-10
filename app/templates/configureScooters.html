@@ -1,6 +1,6 @@
 <!-- This is where users can see which scooters they have rented out and where they can return active scooters -->
 
-{% extends "baseUser.html" %}
+{% extends "baseEmployeeManager.html" %}
   <div class="block_content">
  {% block content %}
   {% with messages = get_flashed_messages() %}
@@ -26,11 +26,6 @@
     <p>Availability</p>
     <p>{{ form.availability }}</p>
     {% for error in form.availability.errors %}
-       <span>[{{ error }}] </span>
-       {% endfor %}
-    <p>Hourly cost</p>
-    <p>{{ form.cost }}</p>
-    {% for error in form.cost.errors %}
        <span>[{{ error }}] </span>
        {% endfor %}
     <p>Location</p>

@@ -8,7 +8,8 @@ from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_mail import Message
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
-    ReturnScooterForm, ExtendScooterForm,selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm
+    ReturnScooterForm, ExtendScooterForm,selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
+    ConfigureScooterCostForm
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
 import operator
@@ -406,43 +407,53 @@ def payment():
 
     return render_template('payment.html', title='Payment', form=form)
 
+@app.route('/configureCost', methods=['GET', 'POST'])
+@login_required
+def configureScooterCost():
+    form = ConfigureScooterCostForm()
+    scooter_cost = ScooterCost.query.first()
+
+    if scooter_cost is None:  # if no cost declared in the database
+        scooter_cost = ScooterCost()
+        scooter_cost.hourly_cost = 10.00  # default not done until entity actually in the database
+        db.session.add(scooter_cost)
+        db.session.commit()
+
+    s = ""
+    for element in str(scooter_cost.hourly_cost):
+        if element != "[" and element != "]":
+            s += element
+
+    if request.method == 'GET':
+        form.cost.data = float(s)
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            scooter_cost.hourly_cost = form.cost.data
+            db.session.add(scooter_cost)
+            db.session.commit()
+
+    return render_template('configureCost.html',
+                           title='Configure Scooters',
+                           form=form)
 
 @app.route('/configureScooters', methods=['GET', 'POST'])
 @login_required
+
 def configureScooters():
     form = ConfigureScooterForm()
     form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
     form.id.choices = [scooter.id for scooter in models.Scooter.query.all()]
 
-    scooter_cost = ScooterCost.query.first()
-
-    if scooter_cost is None:  # if no cost declared in the database
-        scooter_cost = ScooterCost()
-
-    s = ""
-    for element in str(scooter_cost.hourly_cost):
-        if element == "[" or element == "]":
-            pass
-        else:
-            s += element
-    if request.method == 'GET':
-        form.cost.data = float(s)
-
-    elif request.method == 'POST':
+    if request.method == 'POST':
         if form.validate_on_submit():
-
             scooter = Scooter.query.filter_by(id=form.id.data).first()
-
-            if form.cost.data is not None:
-                scooter_cost.hourly_cost = form.cost.data
-                print("Cost is here, is", scooter_cost.hourly_cost)
 
             scooter.id = form.id.data
             scooter.availability = form.availability.data
             scooter.location_id = form.location.data
 
             db.session.add(scooter)
-            db.session.add(scooter_cost)
             db.session.commit()
 
     return render_template('configureScooters.html',
