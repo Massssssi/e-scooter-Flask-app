@@ -1,5 +1,3 @@
-from os import environ
-from flask import request
 import pytest
 from sqlalchemy import create_engine
 from app import app as _app, db as _db, models
@@ -7,21 +5,18 @@ from werkzeug.wrappers import Response, Request
 
 
 @pytest.fixture(scope='session')
-def app(request):
+def app():
 
-    env = Request(environ)
-    app = _app(environ=env, start_response="")
-
+    app = _app
     app.config['TESTING'] = True
     app.config['WTF_CSRF_ENABLED'] = False
     app.config['SECRET_KEY'] = 'Sofwtare-engineering-secret-key'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///memory'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    
-    return app
+    yield app
 
 
-@pytest.fixture()
+@pytest.fixture(scope='session')
 def client(app):
     return app.test_client()
 
@@ -39,7 +34,7 @@ def db(app):
         _db.drop_all
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def session(db):
     """Creates a new database session for a test."""
     # connect to the database
@@ -57,5 +52,15 @@ def session(db):
     yield session
 
     transaction.rollback()
-    connection.close()
-    session.remove()
+
+
+@pytest.fixture(scope='function')
+def create_user(session):
+    user = models.User(forename="test", surname="test", email="test@testing.com", phone="447",password="testing")
+    try:
+        session.add(user)
+        session.commit()
+    except:
+        "ERROR WHILE CREATING A USER"
+    return user
+        
