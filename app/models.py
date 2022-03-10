@@ -14,22 +14,28 @@ class Location(db.Model):
 
 class Scooter(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    availability = db.Column(db.Boolean, default=True)
-    # real time location isn't necessary and without an actual GPS we have no way of doing it
+    availability = db.Column(db.Boolean)
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'), nullable=False)
     session_id = db.relationship('Session', backref='scooter', uselist=False)
     feedback = db.relationship('Feedback', backref='scooter', uselist=False)
+
+
+class ScooterCost(db.Model):  # A table that only stores the cost of all scooters, as they are all identical
+    id = db.Column(db.Integer, primary_key=True)
+    hourly_cost = db.Column(db.Float, nullable=False, default=10.00)
 
 
 class Session(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     cost = db.Column(db.Float, nullable=True)  # stores the final cost of the session
     start_date = db.Column(db.DateTime, nullable=False)
-    session_length = db.Column(db.Integer, nullable=False)  # stored in hours, therefore must be an integer
+    end_date = db.Column(db.DateTime, nullable=False)  # needed to help display the end date
+    # the duration can be worked out by end-date - start date
+    returned = db.Column(db.Boolean, default=False)  # whether the person has returned the scooter at the end of the
+    # booking
     scooter_id = db.Column(db.Integer, db.ForeignKey('scooter.id'), nullable=False)
     guest_id = db.Column(db.Integer, db.ForeignKey('guest.id'))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-
 
 
 class Guest(db.Model):
@@ -48,10 +54,10 @@ class User(UserMixin, db.Model):
     password = db.Column(db.String(256), nullable=False)
     phone = db.Column(db.String(50), unique=True, nullable=False)
     account_type = db.Column(db.Integer, nullable=False, default=0)  # 0 for user, 1 for employee, 2 for manager
-    national_insurance_number = db.Column(db.String(9), unique=True) # only for employees
+    national_insurance_number = db.Column(db.String(9), unique=True)  # only for employees
     card = db.relationship('Card', backref='user')
     feedback = db.relationship('Feedback', backref='user')
-    session = db.relationship('Session', backref='user', uselist=False)
+    session = db.relationship('Session', backref='user')
 
     def get_id(self):
         return self.id
@@ -81,4 +87,6 @@ class Feedback(db.Model):
 
     priority = db.Column(db.Integer, default=3)
     feedback_text = db.Column(db.String(5000), nullable=False)
+    #true if the feedback is compeleted
+    status = db.Column(db.Boolean, default = False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

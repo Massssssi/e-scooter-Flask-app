@@ -1,0 +1,20 @@
+{# This is where the user says which location to return their scooter to #}
+
+{% extends "baseUser.html" %}
+<div class="block_content">
+
+  {% block content %}
+      <p>By how much do you wish to extend your session?</p>
+
+  <form method = "POST">
+    {{form.csrf_token}}
+    {{form.hire_period}}
+    {{form.start_date}}
+    <input type="submit">
+</form>
+<p>Warning, our payment rate may have changed since you initially booked,
+    any extension will be done at out most up-to-date rate of {{ "£{:,.2f}".format(hourly_cost) }} per hour</p>
+  {% endblock %}
+
+</div>
+

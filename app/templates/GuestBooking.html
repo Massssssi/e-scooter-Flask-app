@@ -1,0 +1,24 @@
+<!-- This is where the manager can see the list of scooters and their availability -->
+<h1>List of Scooters</h1>
+
+{% extends "baseEmployeeManager.html" %}
+  <div class="block_content">
+    {% block content %}
+    <h1>Guest Booking</h1>
+    <form action="" method="post" name="GuestBooking">
+        {{ form.hidden_tag() }}
+
+
+        Email: {{ form.email(class_='form-control', type = 'email') }}
+        {% for error in form.email.errors %}
+        <span class="warning">[{{ error }}]</span>
+        {% endfor %}<br>
+
+        Phone: {{ form.phone(class_='form-control') }}
+        {% for error in form.phone.errors %}
+        <span class="warning">[{{ error }}]</span>
+        {% endfor %}<br>
+        <p><input type="submit" value="Submit"></p>
+    </form>
+    {% endblock %}
+  </div>

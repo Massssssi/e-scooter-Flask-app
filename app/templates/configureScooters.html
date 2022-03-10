@@ -1,0 +1,39 @@
+<!-- This is where users can see which scooters they have rented out and where they can return active scooters -->
+
+{% extends "baseEmployeeManager.html" %}
+  <div class="block_content">
+ {% block content %}
+  {% with messages = get_flashed_messages() %}
+   {% if messages %}
+    <ul>
+     {% for message in messages %}
+       <li>{{ message }} </li>
+     {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+<div class="container">
+  <h4>Configure Scooters</h4>
+<form action="" method="post" name="configurescooter">
+    {{ form.hidden_tag() }}
+    <p>Scooter ID</p>
+    <p>
+       {{ form.id }}<br>
+       {% for error in form.id.errors %}
+       <span>[{{ error }}] </span>
+       {% endfor %}
+    </p>
+    <p>Availability</p>
+    <p>{{ form.availability }}</p>
+    {% for error in form.availability.errors %}
+       <span>[{{ error }}] </span>
+       {% endfor %}
+    <p>Location</p>
+    <p>{{ form.location }}</p>
+    {% for error in form.location.errors %}
+       <span>[{{ error }}] </span>
+       {% endfor %}
+    <p><input type="submit" class="btn btn-dark" value="Submit"></p>
+</form>
+{% endblock %}
+  </div>
