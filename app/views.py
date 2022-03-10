@@ -1,3 +1,4 @@
+from turtle import update
 from app import app, db, models, mail, admin
 import json
 from datetime import timedelta, datetime
@@ -303,8 +304,9 @@ def bookScooter():
 
     p = models.Location.query.filter_by(id=int(loc_id)).first()
     m=models.Scooter.query.filter(Scooter.availability == True).first()
-    form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
-    print(m.availability)
+    if m:
+        form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
+        print(m.availability)
    
     if form.validate_on_submit():
         c = models.ScooterCost.query.filter_by(id=1).first()
@@ -332,6 +334,12 @@ def bookScooter():
                         user_id=usid,
                         end_date=final_time)
             db.session.add(a)
+
+            
+            scooter = models.Scooter.query.filter_by(id=form.scooter.data).first()
+            if scooter:
+                    scooter.availability = False
+            db.session.commit()
         elif typ == 1:
             a = Session(cost=cost,
                         start_date=form.start_date.data,
