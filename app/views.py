@@ -418,22 +418,24 @@ def configureScooters():
 
     if scooter_cost is None:  # if no cost declared in the database
         scooter_cost = ScooterCost()
-        scooter_cost.hourly_cost = 10.00  # default not done until entity actually in the database
 
     s = ""
     for element in str(scooter_cost.hourly_cost):
-        if element != "[" and element != "]":
+        if element == "[" or element == "]":
+            pass
+        else:
             s += element
+    if request.method == 'GET':
+        form.cost.data = float(s)
 
-    form.cost.data = float(s)
-
-    if request.method == 'POST':
+    elif request.method == 'POST':
         if form.validate_on_submit():
 
             scooter = Scooter.query.filter_by(id=form.id.data).first()
 
             if form.cost.data is not None:
                 scooter_cost.hourly_cost = form.cost.data
+                print("Cost is here, is", scooter_cost.hourly_cost)
 
             scooter.id = form.id.data
             scooter.availability = form.availability.data
@@ -446,6 +448,7 @@ def configureScooters():
     return render_template('configureScooters.html',
                            title='Configure Scooters',
                            form=form)
+
 
 
 @app.route('/ScooterList', methods=['GET', 'POST'])
