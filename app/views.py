@@ -505,11 +505,17 @@ def selectLocationguest():
 
 @app.route('/help', methods=['GET', 'POST'])
 @login_required
-def help():
+def generalHelp():
+    return render_template("userHelpPage.html")
+
+
+@app.route('/userHelp/related-to-scooter', methods=['GET', 'POST'])
+@login_required
+def userhelpWithScooter():
     form = userHelpForm()
+    form.scooter_id.choices = [(userScooter.scooter_id) for userScooter in Session.query.filter_by(user_id = current_user.id)]
     if request.method == 'POST':
-        if form.validate_on_submit:
-            if form.scooter_id.data:
+        if form.validate_on_submit():
                 scooter = Scooter.query.filter_by(id = form.scooter_id.data).first()
                 #Checking if the scooter id exists
                 if scooter:
@@ -519,29 +525,34 @@ def help():
                                             user = current_user)
                     db.session.add(userFeedback)
                     db.session.commit()
-                    flash('User feedback has been recieved succesfully ')
-                    return redirect("/help")
+                    message = 'Your feedback has been send succesfully.\n Thank you  '
+                    return render_template('userHelpWithScooter.html',form = form, message = message)
                 else :
                     message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. '
-                    return render_template('/userHelp.html',form = form, error_message = message)
+                    return render_template('/userHelpWithScooter.html',form = form, error_message = message)
+    return render_template('userHelpWithScooter.html', form = form)
 
-            else:
-                #this is for general feedback, not for a specific scooter
-                userFeedback = Feedback(  feedback_text = form.feedback_text.data,
+@app.route('/userhelp/related-to-general', methods=['GET', 'POST'])
+@login_required
+def generalUserHelp():
+    form = userHelpForm()
+    if request.method == 'POST':
+        if form.validate_on_submit:
+            #scooter id 0 is for general feedback
+            userFeedback = Feedback(scooter_id = 0,
+                                            feedback_text = form.feedback_text.data,
                                             priority = form.priority.data,
                                             user = current_user)
-                db.session.add(userFeedback)
-                db.session.commit()
-                flash('User general feedback has been recieved succesfully ')
-                return redirect("/help")
-
-    return render_template('userHelp.html', form = form)
+            db.session.add(userFeedback)
+            db.session.commit()
+            message = 'Your General feedback has been send succesfully.\n Thank you '
+            return render_template('userGeneralHelp.html',form = form, message = message)
+    return render_template('userGeneralHelp.html', form = form)
 
 #route for completed the feedback from the employee
 @app.route('/complete/<int:id>')
 def complete(id):
     current_feedback = Feedback.query.filter_by(id = id).first()
-    print(current_feedback)
     if current_feedback:
         current_feedback.status = True
         db.session.commit()

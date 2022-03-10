@@ -5,17 +5,12 @@
   <div class="block_content">
     {% block content %}
 
-<form method="post", action="/help">
+<form method="post", action="">
   {{ form.hidden_tag() }}
   {% for field, errors in form.errors.items() %}
   {% endfor %}
   <fieldset class="form-group">
-    <legend> <bold>Help</bold></legend>
-      <div class="form-group mx-sm-5 mb-2">
-        <label> Scooter number  </label>
-        {{ form.scooter_id(class_ = "form-control form-control-sm")}}
-      </div>
-
+    <legend> <bold>General Help</bold></legend>
       <div class="form-group  mx-sm-5 mb-2">
         <label> Feedback Text  </label>
         {{ form.feedback_text(class_ = "form-control form-control-lg", rows = "3")}}
@@ -29,13 +24,13 @@
 
   </fieldset>
 
-  <button type="submit" class="btn btn-primary mb-2">Confirm identity</button>
+  <button type="submit" class="btn btn-primary mb-2">Confirm and Send</button>
 
-  {% if error_message %}
+  {% if message%}
   <div class="alert alert-primary" role="alert">
-    {{error_message}}
+    {{message}}
   </div>
-  {% endif%}
+{% endif %}
 
 </form>
 
