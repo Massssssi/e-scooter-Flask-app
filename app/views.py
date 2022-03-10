@@ -180,6 +180,7 @@ def returnScooter(session_id):
         scooter = Scooter.query.filter_by(id=session.scooter_id).first()
 
         scooter.location_id = form.location_id.data  # moves the scooter location
+        scooter.availability = True
 
         db.session.commit()
 
