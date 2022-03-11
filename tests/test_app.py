@@ -1,17 +1,5 @@
-import email
-from flask import request, url_for, session
 from flask_login import current_user, login_user
-import pytest
-from app import app, models, forms
-
-
-# test that the user page cannot be accessed before login
-# test redirect to the login page
-def test_view(client):
-    response = client.get('/user', follow_redirects=True)
-    assert response.status_code == 200
-    assert len(response.history) == 1
-    assert response.request.path == "/login"
+from app import models
 
 
 # test the user registration form and redirect to the login page
@@ -32,13 +20,14 @@ def test_register_user(client, session):
         assert session.query(models.User).filter_by(email='try@gmail.com').count() == 1
         assert res.request.path == '/login'
 
+
 # test the user login form and redirect to user's main page
 def test_login_user(client):
     with client:
         data = {
             'email':'try@gmail.com',
             'password':'123',
-            'remember me' : 'False'
+            'remember me' : True
         }
         url = '/login'
         res = client.post(url, data=data, follow_redirects=True)
@@ -58,3 +47,24 @@ def test_logout_user(client, create_user):
         assert res.status_code == 200
         assert current_user.is_authenticated == False
         assert res.request.path == '/'
+
+
+#test adding a scooter into the database
+def test_add_scooter(client, session, add_scooter):
+    with client:
+        data = {
+            'availability':True,
+            'location_id': 'Merrion centre',
+            'num_Scooter' : 1
+        }
+        url = '/addingScooter'
+        res = client.post(url, data=data, follow_redirects=True)
+        assert res.status_code == 200
+        assert session.query(models.Scooter).count() == 1
+
+
+#test if the location has been created into the database
+def test_add_location(client, session, add_location):
+    with client:
+        assert session.query(models.Scooter).count() == 1
+        

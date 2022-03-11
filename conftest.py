@@ -9,6 +9,7 @@ def app():
 
     app = _app
     app.config['TESTING'] = True
+    app.config['LOGIN_DISABLED'] = True
     app.config['WTF_CSRF_ENABLED'] = False
     app.config['SECRET_KEY'] = 'Sofwtare-engineering-secret-key'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///memory'
@@ -52,15 +53,43 @@ def session(db):
     yield session
 
     transaction.rollback()
+    session.close()
 
 
-@pytest.fixture(scope='function')
+@pytest.fixture(scope='session')
 def create_user(session):
     user = models.User(forename="test", surname="test", email="test@testing.com", phone="447",password="testing")
     try:
         session.add(user)
         session.commit()
     except:
-        "ERROR WHILE CREATING A USER"
+        print("ERROR WHILE CREATING A USER")
+        session.rollback()
+        
     return user
+
+
+@pytest.fixture(scope='session')
+def add_scooter(session):
+    scooter = models.Scooter(availability=1, location_id=1)
+    try:
+        session.add(scooter)
+        session.commit()
+    except:
+        print("ERROR WHILE CREATING A SCOOTER")
+        session.rollback()
+        
+    return scooter
+
+
+@pytest.fixture(scope='session')
+def add_location(session):
+    location = models.Location(address='Merrion Centre', no_of_scooters=1)
+    try:           
+        session.add(location)
+        session.commit()
+    except:
+        print("ERROR WHILE ADDING LOCATION")
+        session.rollback()
+        
         
