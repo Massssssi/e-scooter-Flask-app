@@ -539,42 +539,50 @@ def generalHelp():
 @app.route('/userHelp/related-to-scooter', methods=['GET', 'POST'])
 @login_required
 def userhelpWithScooter():
-    form = userHelpForm()
-    form.scooter_id.choices = [(userScooter.scooter_id) for userScooter in Session.query.filter_by(user_id = current_user.id)]
-    if request.method == 'POST':
-        if form.validate_on_submit():
-                scooter = Scooter.query.filter_by(id = form.scooter_id.data).first()
-                #Checking if the scooter id exists
-                if scooter:
-                    userFeedback = Feedback(scooter_id = form.scooter_id.data,
-                                            feedback_text = form.feedback_text.data,
-                                            priority = form.priority.data,
-                                            user = current_user)
-                    db.session.add(userFeedback)
-                    db.session.commit()
-                    message = 'Your feedback has been send succesfully.\n Thank you  '
-                    return render_template('userHelpWithScooter.html',form = form, message = message)
-                else :
-                    message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. '
-                    return render_template('/userHelpWithScooter.html',form = form, error_message = message)
-    return render_template('userHelpWithScooter.html', form = form)
+    if current_user.account_type == 0:
+
+        form = userHelpForm()
+        form.scooter_id.choices = [(userScooter.scooter_id) for userScooter in Session.query.filter_by(user_id = current_user.id)]
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                    scooter = Scooter.query.filter_by(id = form.scooter_id.data).first()
+                    #Checking if the scooter id exists
+                    if scooter:
+                        userFeedback = Feedback(scooter_id = form.scooter_id.data,
+                                                feedback_text = form.feedback_text.data,
+                                                priority = form.priority.data,
+                                                user = current_user)
+                        db.session.add(userFeedback)
+                        db.session.commit()
+                        message = 'Your feedback has been send succesfully.\n Thank you  '
+                        return render_template('userHelpWithScooter.html',form = form, message = message)
+                    else :
+                        message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. '
+                        return render_template('/userHelpWithScooter.html',form = form, error_message = message)
+        return render_template('userHelpWithScooter.html', form = form)
+    
+    else: 
+        return "<h1>Page not found </h1>"
 
 @app.route('/userhelp/related-to-general', methods=['GET', 'POST'])
 @login_required
 def generalUserHelp():
-    form = userHelpForm()
-    if request.method == 'POST':
-        if form.validate_on_submit:
-            #scooter id 0 is for general feedback
-            userFeedback = Feedback(scooter_id = 0,
-                                            feedback_text = form.feedback_text.data,
-                                            priority = form.priority.data,
-                                            user = current_user)
-            db.session.add(userFeedback)
-            db.session.commit()
-            message = 'Your General feedback has been send succesfully.\n Thank you '
-            return render_template('userGeneralHelp.html',form = form, message = message)
-    return render_template('userGeneralHelp.html', form = form)
+    if current_user.account_type == 0:
+        form = userHelpForm()
+        if request.method == 'POST':
+            if form.validate_on_submit:
+                #scooter id 0 is for general feedback
+                userFeedback = Feedback(scooter_id = 0,
+                                                feedback_text = form.feedback_text.data,
+                                                priority = form.priority.data,
+                                                user = current_user)
+                db.session.add(userFeedback)
+                db.session.commit()
+                message = 'Your General feedback has been send succesfully.\n Thank you '
+                return render_template('userGeneralHelp.html',form = form, message = message)
+        return render_template('userGeneralHelp.html', form = form)
+    else: 
+        return "<h1>Page not found </h1>"
 
 #route for completed the feedback from the employee
 @app.route('/complete/<int:id>')
@@ -583,22 +591,30 @@ def complete(id):
     if current_feedback:
         current_feedback.status = True
         db.session.commit()
-        return redirect("/admin/userFeedback")
+        return redirect("/employee/userFeedback")
 
 
-@app.route('/admin/userFeedback', methods=['GET', 'POST'])
+@app.route('/employee/userFeedback', methods=['GET', 'POST'])
 @login_required
 def helpUser():
-    feedback = Feedback.query.all()
-    if feedback:
-        return render_template("employeeFeedbackManagement.html", feedback = feedback)
-    render_template("employeeFeedbackManagement.html")
+    if current_user.account_type == 1:
+        if not  Feedback.query.all():
+            return render_template("employeeFeedbackManagement.html", message = "No Feedback has been submitted")
+        else : 
+            return render_template("employeeFeedbackManagement.html", feedback = Feedback.query.all())
+    else: 
+        return "<h1>Page not found </h1>"
 
 
 #Manger needs to see all high priority feedbacks  | backlog ID = 15
 @app.route('/manager/userFeedback', methods=['GET', 'POST'])
 @login_required
 def mangerHighPriority():
-    if Feedback.query.filter_by(priority = 1):
-        return render_template("employeeFeedbackManagement.html", feedback = Feedback.query.filter_by(priority = 1))
-    render_template("employeeFeedbackManagement.html")
+    if current_user.account_type == 2:
+
+        if not Feedback.query.all():
+            return render_template("managerFeedbackManagement.html", message = "The database is empty | no feedback has been submitted")
+        else:
+            return render_template("managerFeedbackManagement.html", feedback = Feedback.query.filter_by(priority = 1))
+    else:
+        return "<h1>Page not found </h1>"
