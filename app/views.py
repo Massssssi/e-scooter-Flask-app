@@ -590,12 +590,20 @@ def generalUserHelp():
 #route for completed the feedback from the employee
 @app.route('/complete/<int:id>')
 def complete(id):
-    current_feedback = Feedback.query.filter_by(id = id).first()
-    if current_feedback:
-        current_feedback.status = True
-        db.session.commit()
-        return redirect("/employee/userFeedback")
-
+    #For the employee
+    if current_user.account_type == 1:
+        current_feedback = Feedback.query.filter_by(id = id).first()
+        if current_feedback:
+            current_feedback.status = True
+            db.session.commit()
+            return redirect("/employee/userFeedback")
+    #For the manager
+    if current_user.account_type == 2:
+        current_feedback = Feedback.query.filter_by(id = id).first()
+        if current_feedback:
+            current_feedback.status = True
+            db.session.commit()
+            return redirect("/manager/userFeedback")
 
 @app.route('/employee/userFeedback', methods=['GET', 'POST'])
 @login_required
