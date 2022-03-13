@@ -530,11 +530,14 @@ def selectLocationguest():
 
     return render_template('selectLocation.html', user=current_user, form=form)
 
+#Render the user base page | he can choose between general or related feedback
 @app.route('/help', methods=['GET', 'POST'])
 @login_required
 def generalHelp():
-    return render_template("userHelpPage.html")
-
+    if current_user.account_type == 0:
+        return render_template("userHelpPage.html")
+    else:
+        return "<h1>Page not found </h1>"
 
 @app.route('/userHelp/related-to-scooter', methods=['GET', 'POST'])
 @login_required
