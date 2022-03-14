@@ -141,7 +141,7 @@ def userScooterViewing():
         if session.returned is True:
             sessions.append(session)
 
-    return render_template('userScooterManagement.html', title='Home', user=current_user, sessions=sessions)
+    return render_template('userPreviousSessions.html', title='Home', user=current_user, sessions=sessions)
 
 
 @app.route('/user/manageSessions', methods=['GET'])
@@ -154,7 +154,7 @@ def userScooterManagement():
         if session.returned is False:
             sessions.append(session)
 
-    return render_template('userScooterManagement.html', title='Home',
+    return render_template('userManageSessions.html', title='Home',
                            user=current_user, sessions=sessions, time=datetime.utcnow())
 
 
