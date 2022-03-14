@@ -40,6 +40,21 @@ class RegisterForm(FlaskForm):
     password = PasswordField('password', validators=[DataRequired("Please enter your password")])
 
 
+class UserChangeDetailsForm(FlaskForm):
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
+    email = StringField('email', validators=[DataRequired("Please enter an email address")])
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
+
+
+class UserChangePasswordForm(FlaskForm):
+    password = PasswordField('New password', validators=[DataRequired(), Length(3, 50,
+                                                                                "Error, Password length must be "
+                                                                                "between 3 and 50 characters")])
+    password_repeat = PasswordField('Enter New password again',
+                                    validators=[DataRequired(), EqualTo('password', 'Error, Passwords do not match')])
+
+
 class BookScooterForm(FlaskForm):
     scooter = SelectField('scooter', choices=[], validators=[DataRequired()])
     hire_period = SelectField('hire_period', choices=["One hour", "four hours", "One day", "one week"])
@@ -77,7 +92,6 @@ class userHelpForm(FlaskForm):
     scooter_id = SelectField('Scooter number', choices=[])
     feedback_text = TextAreaField('Feedback text')
     priority = SelectField('priority', choices=[(1, "High priority"), (2, "Medium priority"), (3, "Low priority")])
-
 
 
 class DateForm(FlaskForm):

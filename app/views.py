@@ -8,8 +8,8 @@ from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_mail import Message
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
-    ReturnScooterForm, ExtendScooterForm,selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
-    ConfigureScooterCostForm
+    ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
+    ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
 import operator
@@ -193,7 +193,6 @@ def returnScooter(session_id):
 @login_required
 def extend(session_id):
     session = Session.query.filter_by(id=session_id).first()  # the session
-    scooter = Scooter.query.filter_by(id=session.scooter_id).first()
     hourly_cost = ScooterCost.query.first().hourly_cost  # only one value in this table
 
     form = ExtendScooterForm()
@@ -262,7 +261,7 @@ def incomeReports():
                 income += sess.cost
             a = [len(d), income]
             result.append(a)
-        rank = {"One hour":result[0][0], "Four hour":result[1][0], "One day":result[2][0], "One Week":result[3][0]}
+        rank = {"One hour": result[0][0], "Four hour": result[1][0], "One day": result[2][0], "One Week": result[3][0]}
         freq = sorted(rank.items(), key=operator.itemgetter(1), reverse=True)
     return render_template('managerIncomeReports.html', title='Income Report', form=form, result=result, freq=freq)
 
@@ -306,9 +305,10 @@ def bookScooter():
     typ = session['typ']
 
     p = models.Location.query.filter_by(id=int(loc_id)).first()
-    m=models.Scooter.query.filter(Scooter.availability == True).first()
+    m = models.Scooter.query.filter(Scooter.availability == True).first()
     if m:
-        form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
+        form.scooter.choices = [(scooter.id) for scooter in
+                                Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
         print(m.availability)
 
     if form.validate_on_submit():
@@ -338,10 +338,9 @@ def bookScooter():
                         end_date=final_time)
             db.session.add(a)
 
-
             scooter = models.Scooter.query.filter_by(id=form.scooter.data).first()
             if scooter:
-                    scooter.availability = False
+                scooter.availability = False
             db.session.commit()
         elif typ == 1:
             a = Session(cost=cost,
@@ -364,7 +363,6 @@ def bookScooter():
         return render_template('guestScooterBooking.html', user=current_user, form=form)
     elif typ == 0:
         return render_template('userScooterBooking.html', user=current_user, form=form)
-
 
 
 @app.route('/payment', methods=['GET', 'POST'])
@@ -412,6 +410,7 @@ def payment():
 
     return render_template('payment.html', title='Payment', form=form)
 
+
 @app.route('/configureCost', methods=['GET', 'POST'])
 @login_required
 def configureScooterCost():
@@ -442,9 +441,9 @@ def configureScooterCost():
                            title='Configure Scooters',
                            form=form)
 
+
 @app.route('/configureScooters', methods=['GET', 'POST'])
 @login_required
-
 def configureScooters():
     form = ConfigureScooterForm()
     form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
@@ -464,7 +463,6 @@ def configureScooters():
     return render_template('configureScooters.html',
                            title='Configure Scooters',
                            form=form)
-
 
 
 @app.route('/ScooterList', methods=['GET', 'POST'])
@@ -530,7 +528,8 @@ def selectLocationguest():
 
     return render_template('selectLocation.html', user=current_user, form=form)
 
-#Render the user base page | he can choose between general or related feedback
+
+# Render the user base page | he can choose between general or related feedback
 @app.route('/help', methods=['GET', 'POST'])
 @login_required
 def generalHelp():
@@ -539,33 +538,36 @@ def generalHelp():
     else:
         return "<h1>Page not found </h1>"
 
+
 @app.route('/userHelp/related-to-scooter', methods=['GET', 'POST'])
 @login_required
 def userhelpWithScooter():
     if current_user.account_type == 0:
 
         form = userHelpForm()
-        form.scooter_id.choices = [(userScooter.scooter_id) for userScooter in Session.query.filter_by(user_id = current_user.id)]
+        form.scooter_id.choices = [(userScooter.scooter_id) for userScooter in
+                                   Session.query.filter_by(user_id=current_user.id)]
         if request.method == 'POST':
             if form.validate_on_submit():
-                    scooter = Scooter.query.filter_by(id = form.scooter_id.data).first()
-                    #Checking if the scooter id exists
-                    if scooter:
-                        userFeedback = Feedback(scooter_id = form.scooter_id.data,
-                                                feedback_text = form.feedback_text.data,
-                                                priority = form.priority.data,
-                                                user = current_user)
-                        db.session.add(userFeedback)
-                        db.session.commit()
-                        message = 'Your feedback has been send succesfully.\n Thank you  '
-                        return render_template('userHelpWithScooter.html',form = form, message = message)
-                    else :
-                        message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. '
-                        return render_template('/userHelpWithScooter.html',form = form, error_message = message)
-        return render_template('userHelpWithScooter.html', form = form)
-    
-    else: 
+                scooter = Scooter.query.filter_by(id=form.scooter_id.data).first()
+                # Checking if the scooter id exists
+                if scooter:
+                    userFeedback = Feedback(scooter_id=form.scooter_id.data,
+                                            feedback_text=form.feedback_text.data,
+                                            priority=form.priority.data,
+                                            user=current_user)
+                    db.session.add(userFeedback)
+                    db.session.commit()
+                    message = 'Your feedback has been send succesfully.\n Thank you  '
+                    return render_template('userHelpWithScooter.html', form=form, message=message)
+                else:
+                    message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. '
+                    return render_template('/userHelpWithScooter.html', form=form, error_message=message)
+        return render_template('userHelpWithScooter.html', form=form)
+
+    else:
         return "<h1>Page not found </h1>"
+
 
 @app.route('/userhelp/related-to-general', methods=['GET', 'POST'])
 @login_required
@@ -574,58 +576,113 @@ def generalUserHelp():
         form = userHelpForm()
         if request.method == 'POST':
             if form.validate_on_submit:
-                #scooter id 0 is for general feedback
-                userFeedback = Feedback(scooter_id = 0,
-                                                feedback_text = form.feedback_text.data,
-                                                priority = form.priority.data,
-                                                user = current_user)
+                # scooter id 0 is for general feedback
+                userFeedback = Feedback(scooter_id=0,
+                                        feedback_text=form.feedback_text.data,
+                                        priority=form.priority.data,
+                                        user=current_user)
                 db.session.add(userFeedback)
                 db.session.commit()
                 message = 'Your General feedback has been send succesfully.\n Thank you '
-                return render_template('userGeneralHelp.html',form = form, message = message)
-        return render_template('userGeneralHelp.html', form = form)
-    else: 
+                return render_template('userGeneralHelp.html', form=form, message=message)
+        return render_template('userGeneralHelp.html', form=form)
+    else:
         return "<h1>Page not found </h1>"
 
-#route for completed the feedback from the employee
+
+# route for completed the feedback from the employee
 @app.route('/complete/<int:id>')
 def complete(id):
-    #For the employee
+    # For the employee
     if current_user.account_type == 1:
-        current_feedback = Feedback.query.filter_by(id = id).first()
+        current_feedback = Feedback.query.filter_by(id=id).first()
         if current_feedback:
             current_feedback.status = True
             db.session.commit()
             return redirect("/employee/userFeedback")
-    #For the manager
+    # For the manager
     if current_user.account_type == 2:
-        current_feedback = Feedback.query.filter_by(id = id).first()
+        current_feedback = Feedback.query.filter_by(id=id).first()
         if current_feedback:
             current_feedback.status = True
             db.session.commit()
             return redirect("/manager/userFeedback")
 
+
 @app.route('/employee/userFeedback', methods=['GET', 'POST'])
 @login_required
 def helpUser():
     if current_user.account_type == 1:
-        if not  Feedback.query.all():
-            return render_template("employeeFeedbackManagement.html", message = "No Feedback has been submitted")
-        else : 
-            return render_template("employeeFeedbackManagement.html", feedback = Feedback.query.all())
-    else: 
+        if not Feedback.query.all():
+            return render_template("employeeFeedbackManagement.html", message="No Feedback has been submitted")
+        else:
+            return render_template("employeeFeedbackManagement.html", feedback=Feedback.query.all())
+    else:
         return "<h1>Page not found </h1>"
 
 
-#Manger needs to see all high priority feedbacks  | backlog ID = 15
+# Manger needs to see all high priority feedbacks  | backlog ID = 15
 @app.route('/manager/userFeedback', methods=['GET', 'POST'])
 @login_required
 def mangerHighPriority():
     if current_user.account_type == 2:
 
         if not Feedback.query.all():
-            return render_template("managerFeedbackManagement.html", message = "The database is empty | no feedback has been submitted")
+            return render_template("managerFeedbackManagement.html",
+                                   message="The database is empty | no feedback has been submitted")
         else:
-            return render_template("managerFeedbackManagement.html", feedback = Feedback.query.filter_by(priority = 1))
+            return render_template("managerFeedbackManagement.html", feedback=Feedback.query.filter_by(priority=1))
     else:
         return "<h1>Page not found </h1>"
+
+
+@app.route('/userChangeDetails', methods=['GET', 'POST'])
+@login_required
+def userChangeDetails():
+
+    form = UserChangeDetailsForm()
+
+    if request.method == 'GET':
+        form.forename.data = current_user.forename
+        form.surname.data = current_user.surname
+        form.email.data = current_user.email
+        form.phone.data = current_user.phone
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            logged_in_user = current_user
+            logged_in_user.forename = form.forename.data
+            logged_in_user.surname = form.surname.data
+            logged_in_user.email = form.email.data
+            logged_in_user.phone = form.phone.data
+            db.session.add(logged_in_user)
+            db.session.commit()
+            return redirect("/user")
+        else:
+            flash("Invalid details entered")
+
+    return render_template('userChangeDetails.html',
+                           title='Change details',
+                           form=form)
+
+
+@app.route('/userChangePassword', methods=['GET', 'POST'])
+@login_required
+def userChangePassword():
+
+    form = UserChangePasswordForm()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            logged_in_user = current_user
+            if check_password_hash(logged_in_user.password, form.password.data) is True:
+                flash("Error, new password is the same as the old password")
+            else:
+                logged_in_user.password = generate_password_hash(form.password.data)
+                db.session.add(logged_in_user)
+                db.session.commit()
+                return redirect("/user")
+
+    return render_template('userChangePassword.html',
+                           title='Change details',
+                           form=form)
