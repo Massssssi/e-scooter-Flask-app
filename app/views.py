@@ -9,7 +9,7 @@ from flask_login import current_user, login_user, login_required, logout_user
 from flask_mail import Message
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
     ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
-    ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm
+    ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm, RegisterEmployeeForm
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
 import operator
@@ -639,7 +639,6 @@ def mangerHighPriority():
 @app.route('/userChangeDetails', methods=['GET', 'POST'])
 @login_required
 def userChangeDetails():
-
     form = UserChangeDetailsForm()
 
     if request.method == 'GET':
@@ -669,7 +668,6 @@ def userChangeDetails():
 @app.route('/userChangePassword', methods=['GET', 'POST'])
 @login_required
 def userChangePassword():
-
     form = UserChangePasswordForm()
 
     if request.method == 'POST':
@@ -685,4 +683,35 @@ def userChangePassword():
 
     return render_template('userChangePassword.html',
                            title='Change details',
+                           form=form)
+
+
+@app.route('/managerCreateEmployee', methods=['GET', 'POST'])
+@login_required
+def managerCreateEmployee():
+    form = RegisterEmployeeForm()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            employee = User()
+            if form.account_type.data == "Manager":
+                employee.account_type = 2
+            else:
+                employee.account_type = 1
+
+            employee.forename = form.forename.data
+            employee.surname = form.surname.data
+            employee.email = form.email.data
+            employee.phone = form.phone.data
+            employee.national_insurance_number = form.national_insurance_number.data
+            employee.password = generate_password_hash(form.password.data)
+
+            db.session.add(employee)
+            db.session.commit()
+            return redirect("/manager")
+        else:
+            flash("Invalid details entered")
+
+    return render_template('managerCreateEmployee.html',
+                           title='Create New Employee',
                            form=form)

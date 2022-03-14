@@ -40,6 +40,17 @@ class RegisterForm(FlaskForm):
     password = PasswordField('password', validators=[DataRequired("Please enter your password")])
 
 
+class RegisterEmployeeForm(FlaskForm):
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
+    email = StringField('email', validators=[DataRequired("Please enter an email address")])
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
+    password = PasswordField('password', validators=[DataRequired("Please enter your password")])
+    account_type = SelectField('account_type', choices=["Employee", "Manager"])
+    national_insurance_number = StringField('national_insurance_number', validators=[DataRequired(), Length(9,9,
+                                                                                                            "Error, National insurance number must be exactly 9 characters")])
+
+
 class UserChangeDetailsForm(FlaskForm):
     forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
     surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
