@@ -182,6 +182,9 @@ def returnScooter(session_id):
 
         scooter.location_id = form.location_id.data  # moves the scooter location
 
+        if  scooter:
+                    scooter.availability = True
+
         db.session.commit()
 
         return redirect(url_for('userScooterManagement'))
@@ -213,7 +216,7 @@ def extend(session_id):
 
         db.session.commit()
 
-        return redirect(url_for('payment'))
+        return redirect(url_for('userScooterManagement'))
 
     return render_template('extendSession.html', user=current_user, form=form, hourly_cost=hourly_cost)
 
@@ -341,7 +344,6 @@ def bookScooter():
             Cost=cost
             global f_start_date
             f_start_date=form.start_date.data
-            print(f_start_date)
             global f_scooter_data
             f_scooter_data=form.scooter.data
             global us_id
@@ -394,7 +396,6 @@ def payment():
                         user_id=us_id,
                         end_date=f_time)
             db.session.add(a)
-
             scooter = models.Scooter.query.filter_by(id=f_scooter_data)
             if scooter:
                     scooter.availability = False
