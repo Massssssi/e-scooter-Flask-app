@@ -289,6 +289,8 @@ def selectLocation():
     return render_template('selectLocation.html', user=current_user, form=form)
 
 
+
+
 @app.route('/bookScooter', methods=['GET', 'POST'])
 @login_required
 def bookScooter():
@@ -309,8 +311,7 @@ def bookScooter():
     m=models.Scooter.query.filter(Scooter.availability == True).first()
     if m:
         form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
-        print(m.availability)
-
+   
     if form.validate_on_submit():
         c = models.ScooterCost.query.filter_by(id=1).first()
 
@@ -318,39 +319,47 @@ def bookScooter():
         if (a == "One hour"):
             cost = 1 * c.hourly_cost
             n = 1
+            global N
+            N=n
         elif (a == "four hours"):
             cost = 4 * c.hourly_cost
             n = 4
+            N=n
         elif (a == "One day"):
             cost = 24 * c.hourly_cost
             n = 24
+            N=n
         elif (a == "one week"):
             cost = 168 * c.hourly_cost
             n = 168
+            N=n
 
         given_time = form.start_date.data
         final_time = given_time + timedelta(hours=n)
         if typ == 0:
-            a = Session(cost=cost,
-                        start_date=form.start_date.data,
-                        scooter_id=form.scooter.data,
-                        user_id=usid,
-                        end_date=final_time)
-            db.session.add(a)
+            global Cost
+            Cost=cost
+            global f_start_date
+            f_start_date=form.start_date.data
+            print(f_start_date)
+            global f_scooter_data
+            f_scooter_data=form.scooter.data
+            global us_id
+            us_id =usid
+            global f_time
+            f_time=final_time
+            global g_time
+            g_time=given_time
 
 
-            scooter = models.Scooter.query.filter_by(id=form.scooter.data).first()
-            if scooter:
-                    scooter.availability = False
-            db.session.commit()
         elif typ == 1:
-            a = Session(cost=cost,
-                        start_date=form.start_date.data,
-                        scooter_id=form.scooter.data,
-                        guest_id=usid,
-                        end_date=final_time)
-            db.session.add(a)
-        db.session.commit()
+            Cost=cost
+            f_start_date=form.start_date.data
+            f_scooter_data=form.scooter.data
+            global g_id
+            g_id=usid
+            f_time=final_time
+            g_time=given_time
 
         typ = typ
         session['typ'] = typ
@@ -377,9 +386,19 @@ def payment():
     usid = session['usid']
 
     form = CardForm()
-
     if form.validate_on_submit():
         if typ == 0:
+            a = Session(cost=Cost,
+                        start_date=f_start_date,
+                        scooter_id=f_scooter_data,
+                        user_id=us_id,
+                        end_date=f_time)
+            db.session.add(a)
+
+            scooter = models.Scooter.query.filter_by(id=f_scooter_data)
+            if scooter:
+                    scooter.availability = False
+
             card = Card(holder=form.card_holder.data,
                         card_number=form.card_number.data,
                         expiry_date=form.card_expiry_date.data,
@@ -388,6 +407,7 @@ def payment():
             if form.save_card == True:
                 db.session.add(card)
                 db.session.commit()
+        
 
             # Sending the confirmation email to the user
             Subject = 'Confermation Email | please do not reply'
@@ -401,10 +421,22 @@ def payment():
             print(g)
             Subject = 'Confermation Email | please do not reply'
             msg = Message(Subject, sender='bennabet.abderrahmane213@gmail.com', recipients=[g.email])
-            msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
+            msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride. "
             mail.send(msg)
 
-            flash('The confirmation email has been send successfully')
+            flash('The confirmation email has been sent successfully')
+            a = Session(cost=Cost,
+                        start_date=f_start_date,
+                        scooter_id=f_scooter_data,
+                        guest_id=g_id,
+                        end_date=f_time)
+            db.session.add(a)
+        
+        scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
+        if scooter:
+             scooter.availability = False
+        db.session.commit()
+
         if typ == 0:
             return redirect("/")
         elif typ == 1:
