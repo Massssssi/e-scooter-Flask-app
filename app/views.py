@@ -2,7 +2,8 @@ from turtle import update
 from app import app, db, models, mail, admin
 import json
 from datetime import timedelta, datetime
-
+import folium
+import pandas as pd
 from flask import render_template, flash, request, redirect, url_for, session
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, login_user, login_required, logout_user
@@ -273,6 +274,24 @@ def incomeReports():
 @app.route('/selectlocation', methods=['GET', 'POST'])
 @login_required
 def selectLocation():
+    #This part is for displaying the map#
+     
+     #Latitude and longitude coordinates 
+    start_coords = ( 53.801277, -1.548567)
+    folium_map = folium.Map(
+        location=start_coords, 
+        zoom_start=15
+    )
+    places = pd.read_csv('app/LocationData.csv')
+    for i, place in places.iterrows():
+        folium.Marker(
+            location=[place['Latitude'], place['longitude']],
+            popup=place['Place'],
+            tooltip=place['Place']
+        ).add_to(folium_map)
+    folium_map.save('app/templates/map.html')
+    #end of the part #
+
     form = selectLocationForm()
     form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
     if form.validate_on_submit():
@@ -291,7 +310,10 @@ def selectLocation():
 
     return render_template('selectLocation.html', user=current_user, form=form)
 
-
+@app.route('/map', methods=['GET', 'POST'])
+@login_required
+def map():
+    return render_template('map.html')
 
 
 @app.route('/bookScooter', methods=['GET', 'POST'])
@@ -562,6 +584,8 @@ def selectLocationguest():
         return redirect(url_for('.bookScooter', loc_id=loc_id, usid=usid, typ=typ))
 
     return render_template('selectLocation.html', user=current_user, form=form)
+
+
 
 #Render the user base page | he can choose between general or related feedback
 @app.route('/help', methods=['GET', 'POST'])
