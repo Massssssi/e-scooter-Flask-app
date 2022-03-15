@@ -13,17 +13,23 @@
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-          {% if current_user.isManager == False %}
+          {% if current_user.account_type == 1 %}
               <li class="nav-item"><a class="nav-link" href="#">Employee homepage <span class="sr-only">(current)</span></a></li>
               <li class="nav-item"><a class="nav-link" href="#">Change details</a></li>
-              <li class="nav-item"><a class="nav-link" href="#">Feedback management</a></li>
+              <li class="nav-item"><a class="nav-link" href="/addingScooter">Adding Scooters</a></li>
+              <li class="nav-item"><a class="nav-link" href="/employee/userFeedback">Feedback management</a></li>
+              <li class="nav-item"><a class="nav-link" href="/GuestUsers">Guest Booking</a></li>
               <li class="nav-item"><a class="nav-link" href="#">Book unregistered users</a></li>
               <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
           {% else %}
               <li class="nav-item"><a class="nav-link" href="#">Manager homepage <span class="sr-only">(current)</span></a></li>
               <li class="nav-item"><a class="nav-link" href="#">Change details</a></li>
               <li class="nav-item"><a class="nav-link" href="#">Edit employee</a></li>
-              <li class="nav-item"><a class="nav-link" href="/configureScooters">Configure Scooters</a></li>
+              <li class="nav-item"><a class="nav-link" href="/GuestUsers">Guest Booking</a></li>
+              <li class="nav-item"><a class="nav-link" href="/addingScooter">Adding Scooters</a></li>
+              <li class="nav-item"><a class="nav-link" href="/manager/userFeedback">Feedback management</a></li>
+              <li class="nav-item"><a class="nav-link" href="/configureScooters">Configure Scooter Details</a></li>
+              <li class="nav-item"><a class="nav-link" href="/configureCost">Configure Scooter Cost</a></li>
               <li class="nav-item"><a class="nav-link" href="/incomeReports">Income reports</a></li>
               <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
           {% endif %}
