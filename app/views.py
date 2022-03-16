@@ -9,7 +9,8 @@ from flask_login import current_user, login_user, login_required, logout_user
 from flask_mail import Message
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
     ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
-    ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm, RegisterEmployeeForm
+    ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm, RegisterEmployeeForm, EditEmployeeForm, \
+    EmployeeSearchForm
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
 import operator
@@ -689,6 +690,7 @@ def userChangePassword():
 @app.route('/managerCreateEmployee', methods=['GET', 'POST'])
 @login_required
 def managerCreateEmployee():
+    # need to add checks for failing uniqueness integrity before it gets to the db
     form = RegisterEmployeeForm()
 
     if request.method == 'POST':
@@ -714,4 +716,58 @@ def managerCreateEmployee():
 
     return render_template('managerCreateEmployee.html',
                            title='Create New Employee',
+                           form=form)
+
+
+@app.route('/managerEmployeeSearch', methods=['GET', 'POST'])
+@login_required
+def managerEmployeeSearch():
+    form = EmployeeSearchForm()
+    form.search_field.choices = [(employee.id, employee.surname) for employee in
+                                 models.User.query.filter(User.account_type != 0).all()]
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            session['employee_id'] = form.search_field.data
+            return redirect('/managerEmployeeEdit')
+
+    return render_template('managerEmployeeSearch.html',
+                           title='Change details',
+                           form=form)
+
+@app.route('/managerEmployeeEdit', methods=['GET','POST'])
+@login_required
+def managerEmployeeEdit():
+    employee_id = session['employee_id']
+
+    form = EditEmployeeForm()
+    employee_found = User.query.filter_by(id=employee_id).first()
+
+    if request.method == 'GET':
+        form.forename.data = employee_found.forename
+        form.surname.data = employee_found.surname
+        form.email.data = employee_found.email
+        form.phone.data = employee_found.phone
+        form.national_insurance_number.data = employee_found.national_insurance_number
+        if employee_found.account_type == 1:
+            form.account_type.choices = "Employee"
+        else:
+            form.account_type.choices = "Manager"
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            employee_found.forename = form.forename.data
+            employee_found.surname = form.surname.data
+            employee_found.email = form.email.data
+            employee_found.phone = form.phone.data
+            employee_found.national_insurance_number = form.national_insurance_number.data
+            if form.account_type.data == "Employee":
+                employee_found.account_type = 1
+            else:
+                employee_found.account_type = 2
+            db.session.add(employee_found)
+            db.session.commit()
+
+    return render_template('managerEmployeeEdit.html',
+                           title='Change details',
                            form=form)
