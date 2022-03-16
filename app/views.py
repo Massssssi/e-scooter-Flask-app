@@ -464,7 +464,7 @@ def payment():
 
                     # Sending the confirmation email to the user
                 Subject = 'Confermation Email | please do not reply'
-                msg = Message(Subject, sender='bennabet.abderrahmane213@gmail.com', recipients=[current_user.email])
+                msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
                 msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
                 mail.send(msg)
 
@@ -473,7 +473,7 @@ def payment():
                 g = models.Guest.query.filter_by(id=usid).first()
                 print(g)
                 Subject = 'Confermation Email | please do not reply'
-                msg = Message(Subject, sender='bennabet.abderrahmane213@gmail.com', recipients=[g.email])
+                msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[g.email])
                 msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride. "
                 mail.send(msg)
 
