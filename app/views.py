@@ -275,11 +275,11 @@ def incomeReports():
 @login_required
 def selectLocation():
     #This part is for displaying the map#
-     
-     #Latitude and longitude coordinates 
+
+     #Latitude and longitude coordinates
     start_coords = ( 53.801277, -1.548567)
     folium_map = folium.Map(
-        location=start_coords, 
+        location=start_coords,
         zoom_start=15
     )
     places = pd.read_csv('app/LocationData.csv')
@@ -336,7 +336,7 @@ def bookScooter():
     m=models.Scooter.query.filter(Scooter.availability == True).first()
     if m:
         form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
-   
+
     if form.validate_on_submit():
         c = models.ScooterCost.query.filter_by(id=1).first()
 
@@ -405,65 +405,99 @@ def bookScooter():
 def payment():
     # typ=request.args['typ']
     typ = session['typ']
-
     # usid=request.args['usid']
     usid = session['usid']
-
     form = CardForm()
+
+    #check if the card number and cvv are right.
+    l = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
+    checkcard = 1
+    checkcvv = 1 #everything is right
+
+    c = models.Card.query.filter_by(user_id = current_user.id).first()
+
+    if c:
+        if request.method == 'GET':
+            form.card_holder.data = c.holder
+            form.card_number.data = c.card_number
+            form.card_expiry_date.data = c.expiry_date
+            form.card_cvv.data = c.cvv
+
+
     if form.validate_on_submit():
-        if typ == 0:
-            a = Session(cost=Cost,
-                        start_date=f_start_date,
-                        scooter_id=f_scooter_data,
-                        user_id=us_id,
-                        end_date=f_time)
-            db.session.add(a)
-            scooter = models.Scooter.query.filter_by(id=f_scooter_data)
-            if scooter:
+
+        for n in  form.card_number.data:
+            if n not in l:
+                checkcard = 0
+                break
+        for n in form.card_cvv.data:
+            if n not in l:
+                checkcvv= 0
+        if checkcard == 1 and checkcvv ==1:
+            if typ == 0:
+                a = Session(cost=Cost,
+                            start_date=f_start_date,
+                            scooter_id=f_scooter_data,
+                            user_id=us_id,
+                            end_date=f_time)
+                db.session.add(a)
+                scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
+
+                if scooter:
                     scooter.availability = False
 
-            card = Card(holder=form.card_holder.data,
-                        card_number=form.card_number.data,
-                        expiry_date=form.card_expiry_date.data,
-                        cvv=form.card_cvv.data,
-                        user_id=current_user.id)
-            if form.save_card == True:
-                db.session.add(card)
+            #Query a card object to check there exist already one for the user loged in.
+
+                if not c:
+                    print("Card created")
+                    card = Card(holder=form.card_holder.data,
+                                card_number=form.card_number.data,
+                                expiry_date=form.card_expiry_date.data,
+                                cvv=form.card_cvv.data,
+                                user_id=current_user.id)
+                    if form.save_card.data == True:
+                        print("saved")
+                        db.session.add(card)
                 db.session.commit()
-        
 
-            # Sending the confirmation email to the user
-            Subject = 'Confermation Email | please do not reply'
-            msg = Message(Subject, sender='bennabet.abderrahmane213@gmail.com', recipients=[current_user.email])
-            msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
-            mail.send(msg)
 
-            flash('The confirmation email has been send successfully')
-        elif typ == 1:
-            g = models.Guest.query.filter_by(id=usid).first()
-            print(g)
-            Subject = 'Confermation Email | please do not reply'
-            msg = Message(Subject, sender='bennabet.abderrahmane213@gmail.com', recipients=[g.email])
-            msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride. "
-            mail.send(msg)
 
-            flash('The confirmation email has been sent successfully')
-            a = Session(cost=Cost,
-                        start_date=f_start_date,
-                        scooter_id=f_scooter_data,
-                        guest_id=g_id,
-                        end_date=f_time)
-            db.session.add(a)
-        
-        scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
-        if scooter:
-             scooter.availability = False
-        db.session.commit()
+                    # Sending the confirmation email to the user
+                Subject = 'Confermation Email | please do not reply'
+                msg = Message(Subject, sender='bennabet.abderrahmane213@gmail.com', recipients=[current_user.email])
+                msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
+                mail.send(msg)
 
-        if typ == 0:
-            return redirect("/")
-        elif typ == 1:
-            return redirect("/GuestUsers")
+                flash('The confirmation email has been send successfully')
+            elif typ == 1:
+                g = models.Guest.query.filter_by(id=usid).first()
+                print(g)
+                Subject = 'Confermation Email | please do not reply'
+                msg = Message(Subject, sender='bennabet.abderrahmane213@gmail.com', recipients=[g.email])
+                msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride. "
+                mail.send(msg)
+
+                flash('The confirmation email has been sent successfully')
+                a = Session(cost=Cost,
+                            start_date=f_start_date,
+                            scooter_id=f_scooter_data,
+                            guest_id=g_id,
+                            end_date=f_time)
+                db.session.add(a)
+
+                scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
+                if scooter:
+                    scooter.availability = False
+                db.session.commit()
+
+            if typ == 0:
+                return redirect("/")
+            elif typ == 1:
+                return redirect("/GuestUsers")
+        else:
+            if checkcard == 0:
+                return render_template('payment.html', title = 'Payment', form=form, error_message ="Wrong card number or cvv")
+
 
     return render_template('payment.html', title='Payment', form=form)
 
@@ -620,8 +654,8 @@ def userhelpWithScooter():
                         message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. '
                         return render_template('/userHelpWithScooter.html',form = form, error_message = message)
         return render_template('userHelpWithScooter.html', form = form)
-    
-    else: 
+
+    else:
         return "<h1>Page not found </h1>"
 
 @app.route('/userhelp/related-to-general', methods=['GET', 'POST'])
@@ -641,7 +675,7 @@ def generalUserHelp():
                 message = 'Your General feedback has been send succesfully.\n Thank you '
                 return render_template('userGeneralHelp.html',form = form, message = message)
         return render_template('userGeneralHelp.html', form = form)
-    else: 
+    else:
         return "<h1>Page not found </h1>"
 
 #route for completed the feedback from the employee
@@ -668,9 +702,9 @@ def helpUser():
     if current_user.account_type == 1:
         if not  Feedback.query.all():
             return render_template("employeeFeedbackManagement.html", message = "No Feedback has been submitted")
-        else : 
+        else :
             return render_template("employeeFeedbackManagement.html", feedback = Feedback.query.all())
-    else: 
+    else:
         return "<h1>Page not found </h1>"
 
 
