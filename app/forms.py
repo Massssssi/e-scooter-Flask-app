@@ -58,6 +58,15 @@ class UserChangeDetailsForm(FlaskForm):
     phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
 
 
+class EmployeeChangeDetailsForm(FlaskForm):  # Form for changing details for both employees and managers
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
+    email = StringField('email', validators=[DataRequired("Please enter an email address")])
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
+    national_insurance_number = StringField('national_insurance_number', validators=[DataRequired(), Length(9, 9,
+                                                                                                            "Error, National insurance number must be exactly 9 characters")])
+
+
 class EmployeeSearchForm(FlaskForm):
     search_field = SelectField('search_field', choices=[])
 

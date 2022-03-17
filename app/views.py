@@ -10,7 +10,7 @@ from flask_mail import Message
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
     ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
     ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm, RegisterEmployeeForm, EditEmployeeForm, \
-    EmployeeSearchForm
+    EmployeeSearchForm, EmployeeChangeDetailsForm
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
 import operator
@@ -665,6 +665,38 @@ def userChangeDetails():
                            title='Change details',
                            form=form)
 
+
+@app.route('/employeeChangeDetails', methods=['GET', 'POST'])
+@login_required
+def employeeChangeDetails():
+    form = EmployeeChangeDetailsForm()
+
+    if request.method == 'GET':
+        form.forename.data = current_user.forename
+        form.surname.data = current_user.surname
+        form.email.data = current_user.email
+        form.phone.data = current_user.phone
+        form.national_insurance_number.data = current_user.national_insurance_number
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            logged_in_employee = current_user
+            logged_in_employee.forename = form.forename.data
+            logged_in_employee.surname = form.surname.data
+            logged_in_employee.email = form.email.data
+            logged_in_employee.phone = form.phone.data
+            db.session.add(logged_in_employee)
+            db.session.commit()
+            if logged_in_employee.account_type == 1:
+                return redirect("/employee")
+            else:
+                return redirect("/manager")
+        else:
+            flash("Invalid details entered")
+
+    return render_template('employeeChangeDetails.html',
+                           title='Change details',
+                           form=form)
 
 @app.route('/userChangePassword', methods=['GET', 'POST'])
 @login_required
