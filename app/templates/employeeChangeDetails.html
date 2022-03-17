@@ -1,6 +1,5 @@
 <!-- An area for employees to change their account details -->
-<!-- such as changeing their email etc. -->
-<h1>Hello world</h1>
+<!-- such as changing their email etc. -->
 
 {% extends "baseEmployeeManager.html" %}
   <div class="block_content">
@@ -29,12 +28,14 @@
     <span class="warning">[{{ error }}]</span>
     {% endfor %}<br>
 
+    National Insurance Number: {{ form.national_insurance_number(class_='form-control') }}
+    {% for error in form.national_insurance_number.errors %}
+    <span class="warning">[{{ error }}]</span>
+    {% endfor %}<br>
+
     <input type="submit" class="button" value="Submit">
 </form>
 
     {% endblock %}
-
   </div>
 
-    {% endblock %}
-  </div>

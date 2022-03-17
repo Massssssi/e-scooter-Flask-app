@@ -698,6 +698,7 @@ def employeeChangeDetails():
                            title='Change details',
                            form=form)
 
+
 @app.route('/userChangePassword', methods=['GET', 'POST'])
 @login_required
 def userChangePassword():
@@ -718,6 +719,29 @@ def userChangePassword():
                            title='Change details',
                            form=form)
 
+
+@app.route('/employeeChangePassword', methods=['GET', 'POST'])
+@login_required
+def employeeChangePassword():
+    form = UserChangePasswordForm()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            logged_in_user = current_user
+            if check_password_hash(logged_in_user.password, form.password.data) is True:
+                flash("Error, new password is the same as the old password")
+            else:
+                logged_in_user.password = generate_password_hash(form.password.data)
+                db.session.add(logged_in_user)
+                db.session.commit()
+                if logged_in_user.account_type == 1:
+                    return redirect("/employee")
+                else:
+                    return redirect("/manager")
+
+    return render_template('employeeChangePassword.html',
+                           title='Change details',
+                           form=form)
 
 @app.route('/managerCreateEmployee', methods=['GET', 'POST'])
 @login_required
