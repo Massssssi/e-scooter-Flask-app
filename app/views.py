@@ -9,8 +9,9 @@ from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_mail import Message
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
-    ReturnScooterForm, ExtendScooterForm,selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
-    ConfigureScooterCostForm
+    ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
+    ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm, RegisterEmployeeForm, EditEmployeeForm, \
+    EmployeeSearchForm, EmployeeChangeDetailsForm
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
 import operator
@@ -197,7 +198,6 @@ def returnScooter(session_id):
 @login_required
 def extend(session_id):
     session = Session.query.filter_by(id=session_id).first()  # the session
-    scooter = Scooter.query.filter_by(id=session.scooter_id).first()
     hourly_cost = ScooterCost.query.first().hourly_cost  # only one value in this table
 
     form = ExtendScooterForm()
@@ -266,7 +266,7 @@ def incomeReports():
                 income += sess.cost
             a = [len(d), income]
             result.append(a)
-        rank = {"One hour":result[0][0], "Four hour":result[1][0], "One day":result[2][0], "One Week":result[3][0]}
+        rank = {"One hour": result[0][0], "Four hour": result[1][0], "One day": result[2][0], "One Week": result[3][0]}
         freq = sorted(rank.items(), key=operator.itemgetter(1), reverse=True)
     return render_template('managerIncomeReports.html', title='Income Report', form=form, result=result, freq=freq)
 
@@ -333,7 +333,7 @@ def bookScooter():
     typ = session['typ']
 
     p = models.Location.query.filter_by(id=int(loc_id)).first()
-    m=models.Scooter.query.filter(Scooter.availability == True).first()
+    m = models.Scooter.query.filter(Scooter.availability == True).first()
     if m:
         form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
 
@@ -397,7 +397,6 @@ def bookScooter():
         return render_template('guestScooterBooking.html', user=current_user, form=form)
     elif typ == 0:
         return render_template('userScooterBooking.html', user=current_user, form=form)
-
 
 
 @app.route('/payment', methods=['GET', 'POST'])
@@ -501,6 +500,7 @@ def payment():
 
     return render_template('payment.html', title='Payment', form=form)
 
+
 @app.route('/configureCost', methods=['GET', 'POST'])
 @login_required
 def configureScooterCost():
@@ -531,9 +531,9 @@ def configureScooterCost():
                            title='Configure Scooters',
                            form=form)
 
+
 @app.route('/configureScooters', methods=['GET', 'POST'])
 @login_required
-
 def configureScooters():
     form = ConfigureScooterForm()
     form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
@@ -553,7 +553,6 @@ def configureScooters():
     return render_template('configureScooters.html',
                            title='Configure Scooters',
                            form=form)
-
 
 
 @app.route('/ScooterList', methods=['GET', 'POST'])
@@ -630,13 +629,15 @@ def generalHelp():
     else:
         return "<h1>Page not found </h1>"
 
+
 @app.route('/userHelp/related-to-scooter', methods=['GET', 'POST'])
 @login_required
 def userhelpWithScooter():
     if current_user.account_type == 0:
 
         form = userHelpForm()
-        form.scooter_id.choices = [(userScooter.scooter_id) for userScooter in Session.query.filter_by(user_id = current_user.id)]
+        form.scooter_id.choices = [(userScooter.scooter_id) for userScooter in
+                                   Session.query.filter_by(user_id=current_user.id)]
         if request.method == 'POST':
             if form.validate_on_submit():
                     scooter = Scooter.query.filter_by(id = form.scooter_id.data).first()
@@ -658,6 +659,7 @@ def userhelpWithScooter():
     else:
         return "<h1>Page not found </h1>"
 
+
 @app.route('/userhelp/related-to-general', methods=['GET', 'POST'])
 @login_required
 def generalUserHelp():
@@ -665,11 +667,11 @@ def generalUserHelp():
         form = userHelpForm()
         if request.method == 'POST':
             if form.validate_on_submit:
-                #scooter id 0 is for general feedback
-                userFeedback = Feedback(scooter_id = 0,
-                                                feedback_text = form.feedback_text.data,
-                                                priority = form.priority.data,
-                                                user = current_user)
+                # scooter id 0 is for general feedback
+                userFeedback = Feedback(scooter_id=0,
+                                        feedback_text=form.feedback_text.data,
+                                        priority=form.priority.data,
+                                        user=current_user)
                 db.session.add(userFeedback)
                 db.session.commit()
                 message = 'Your General feedback has been send succesfully.\n Thank you '
@@ -678,23 +680,25 @@ def generalUserHelp():
     else:
         return "<h1>Page not found </h1>"
 
-#route for completed the feedback from the employee
+
+# route for completed the feedback from the employee
 @app.route('/complete/<int:id>')
 def complete(id):
-    #For the employee
+    # For the employee
     if current_user.account_type == 1:
-        current_feedback = Feedback.query.filter_by(id = id).first()
+        current_feedback = Feedback.query.filter_by(id=id).first()
         if current_feedback:
             current_feedback.status = True
             db.session.commit()
             return redirect("/employee/userFeedback")
-    #For the manager
+    # For the manager
     if current_user.account_type == 2:
-        current_feedback = Feedback.query.filter_by(id = id).first()
+        current_feedback = Feedback.query.filter_by(id=id).first()
         if current_feedback:
             current_feedback.status = True
             db.session.commit()
             return redirect("/manager/userFeedback")
+
 
 @app.route('/employee/userFeedback', methods=['GET', 'POST'])
 @login_required
@@ -708,15 +712,209 @@ def helpUser():
         return "<h1>Page not found </h1>"
 
 
-#Manger needs to see all high priority feedbacks  | backlog ID = 15
+# Manger needs to see all high priority feedbacks  | backlog ID = 15
 @app.route('/manager/userFeedback', methods=['GET', 'POST'])
 @login_required
 def mangerHighPriority():
     if current_user.account_type == 2:
 
         if not Feedback.query.all():
-            return render_template("managerFeedbackManagement.html", message = "The database is empty | no feedback has been submitted")
+            return render_template("managerFeedbackManagement.html",
+                                   message="The database is empty | no feedback has been submitted")
         else:
-            return render_template("managerFeedbackManagement.html", feedback = Feedback.query.filter_by(priority = 1))
+            return render_template("managerFeedbackManagement.html", feedback=Feedback.query.filter_by(priority=1))
     else:
         return "<h1>Page not found </h1>"
+
+
+@app.route('/userChangeDetails', methods=['GET', 'POST'])
+@login_required
+def userChangeDetails():
+    form = UserChangeDetailsForm()
+
+    if request.method == 'GET':
+        form.forename.data = current_user.forename
+        form.surname.data = current_user.surname
+        form.email.data = current_user.email
+        form.phone.data = current_user.phone
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            logged_in_user = current_user
+            logged_in_user.forename = form.forename.data
+            logged_in_user.surname = form.surname.data
+            logged_in_user.email = form.email.data
+            logged_in_user.phone = form.phone.data
+            db.session.add(logged_in_user)
+            db.session.commit()
+            return redirect("/user")
+        else:
+            flash("Invalid details entered")
+
+    return render_template('userChangeDetails.html',
+                           title='Change details',
+                           form=form)
+
+
+@app.route('/employeeChangeDetails', methods=['GET', 'POST'])
+@login_required
+def employeeChangeDetails():
+    form = EmployeeChangeDetailsForm()
+
+    if request.method == 'GET':
+        form.forename.data = current_user.forename
+        form.surname.data = current_user.surname
+        form.email.data = current_user.email
+        form.phone.data = current_user.phone
+        form.national_insurance_number.data = current_user.national_insurance_number
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            logged_in_employee = current_user
+            logged_in_employee.forename = form.forename.data
+            logged_in_employee.surname = form.surname.data
+            logged_in_employee.email = form.email.data
+            logged_in_employee.phone = form.phone.data
+            db.session.add(logged_in_employee)
+            db.session.commit()
+            if logged_in_employee.account_type == 1:
+                return redirect("/employee")
+            else:
+                return redirect("/manager")
+        else:
+            flash("Invalid details entered")
+
+    return render_template('employeeChangeDetails.html',
+                           title='Change details',
+                           form=form)
+
+
+@app.route('/userChangePassword', methods=['GET', 'POST'])
+@login_required
+def userChangePassword():
+    form = UserChangePasswordForm()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            logged_in_user = current_user
+            if check_password_hash(logged_in_user.password, form.password.data) is True:
+                flash("Error, new password is the same as the old password")
+            else:
+                logged_in_user.password = generate_password_hash(form.password.data)
+                db.session.add(logged_in_user)
+                db.session.commit()
+                return redirect("/user")
+
+    return render_template('userChangePassword.html',
+                           title='Change details',
+                           form=form)
+
+
+@app.route('/employeeChangePassword', methods=['GET', 'POST'])
+@login_required
+def employeeChangePassword():
+    form = UserChangePasswordForm()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            logged_in_user = current_user
+            if check_password_hash(logged_in_user.password, form.password.data) is True:
+                flash("Error, new password is the same as the old password")
+            else:
+                logged_in_user.password = generate_password_hash(form.password.data)
+                db.session.add(logged_in_user)
+                db.session.commit()
+                if logged_in_user.account_type == 1:
+                    return redirect("/employee")
+                else:
+                    return redirect("/manager")
+
+    return render_template('employeeChangePassword.html',
+                           title='Change details',
+                           form=form)
+
+@app.route('/managerCreateEmployee', methods=['GET', 'POST'])
+@login_required
+def managerCreateEmployee():
+    # need to add checks for failing uniqueness integrity before it gets to the db
+    form = RegisterEmployeeForm()
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            employee = User()
+            if form.account_type.data == "Manager":
+                employee.account_type = 2
+            else:
+                employee.account_type = 1
+
+            employee.forename = form.forename.data
+            employee.surname = form.surname.data
+            employee.email = form.email.data
+            employee.phone = form.phone.data
+            employee.national_insurance_number = form.national_insurance_number.data
+            employee.password = generate_password_hash(form.password.data)
+
+            db.session.add(employee)
+            db.session.commit()
+            return redirect("/manager")
+        else:
+            flash("Invalid details entered")
+
+    return render_template('managerCreateEmployee.html',
+                           title='Create New Employee',
+                           form=form)
+
+
+@app.route('/managerEmployeeSearch', methods=['GET', 'POST'])
+@login_required
+def managerEmployeeSearch():
+    form = EmployeeSearchForm()
+
+    form.search_field.choices = [(employee.id, employee.surname + " , " + employee.forename) for employee in
+                                 models.User.query.filter(User.account_type != 0).all()]
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            session['employee_id'] = form.search_field.data
+            return redirect('/managerEmployeeEdit')
+
+    return render_template('managerEmployeeSearch.html',
+                           title='Change details',
+                           form=form)
+
+
+@app.route('/managerEmployeeEdit', methods=['GET', 'POST'])
+@login_required
+def managerEmployeeEdit():
+    employee_id = session['employee_id']
+
+    form = EditEmployeeForm()
+    employee_found = User.query.filter_by(id=employee_id).first()
+
+    if request.method == 'GET':
+        form.forename.data = employee_found.forename
+        form.surname.data = employee_found.surname
+        form.email.data = employee_found.email
+        form.phone.data = employee_found.phone
+        form.national_insurance_number.data = employee_found.national_insurance_number
+        if employee_found.account_type == 1:
+            form.account_type.choices = ["Employee", "Manager"]
+        else:
+            form.account_type.choices = ["Manager", "Employee"]
+
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            employee_found.forename = form.forename.data
+            employee_found.surname = form.surname.data
+            employee_found.email = form.email.data
+            employee_found.phone = form.phone.data
+            employee_found.national_insurance_number = form.national_insurance_number.data
+            if form.account_type.data == "Employee":
+                employee_found.account_type = 1
+            else:
+                employee_found.account_type = 2
+            db.session.add(employee_found)
+            db.session.commit()
+
+    return render_template('managerEmployeeEdit.html',
+                           title='Change details',
+                           form=form)
