@@ -1,0 +1,122 @@
+<!-- This is where users can see which scooters they have rented out and where they can return active scooters -->
+<!-- We get this info from the sessions table -->
+
+{% extends "baseUser.html" %}
+
+  <div class="block_content">
+    {% block content %}
+
+        {% if sessions|length !=0  %}
+            <table id="sortMe" class="table">
+            <thead>
+                <tr>
+                    <th data-type="number">Scooter ID</th>
+                    <th data-type="datetime">Start Date</th>
+                    <th data-type="datetime">End Date</th>
+                    <th data-type="datetime">Duration</th>
+                    <th data-type="number">Cost</th>
+                </tr>
+            </thead>
+
+            <tbody>
+            {% for s in sessions%}
+                 <tr>
+                    <td>{{ s.scooter_id}}</td>
+                    <td>{{ s.start_date }}</td>
+                    <td>{{s.end_date }}</td>
+                    <td>{{s.end_date - s.start_date}}</td>
+                    <td>{{ "£{:,.2f}".format(s.cost)}}</td>
+                 </tr>
+            {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <h1>There are no sessions to show</h1>
+        {% endif %}
+
+
+    {% endblock %}
+  </div>
+
+<script>
+            document.addEventListener('DOMContentLoaded', function () {
+                console.log("function called")
+                const table = document.getElementById('sortMe');
+                const headers = table.querySelectorAll('th');
+
+                // Loop over the headers
+                [].forEach.call(headers, function (header, index) {
+                    header.addEventListener('click', function () {
+                        // This function will sort the column
+                        sortColumn(index);
+                    });
+                });
+
+                const tableBody = table.querySelector('tbody');
+                const rows = tableBody.querySelectorAll('tr');
+
+                // Track sort directions
+                const directions = Array.from(headers).map(function (header) {
+                    return '';
+                });
+
+                // Transform the content of given cell in given column
+                const transform = function (index, content) {
+                    // Get the data type of column
+                    const type = headers[index].getAttribute('data-type');
+                    switch (type) {
+                        case 'number':
+                            return parseFloat(content);
+                        case 'string':
+                        default:
+                            return content;
+                    }
+                };
+
+                const sortColumn = function (index) {
+                    // Get the current direction
+                    const direction = directions[index] || 'asc';
+
+                    // A factor based on the direction
+                    const multiplier = direction === 'asc' ? 1 : -1;
+
+                    const newRows = Array.from(rows);
+
+                    newRows.sort(function (rowA, rowB) {
+                        const cellA = rowA.querySelectorAll('td')[index].innerHTML;
+                        const cellB = rowB.querySelectorAll('td')[index].innerHTML;
+
+                        const a = transform(index, cellA);
+                        const b = transform(index, cellB);
+
+                        switch (true) {
+                            case a > b:
+                                return 1 * multiplier;
+                            case a < b:
+                                return -1 * multiplier;
+                            case a === b:
+                                return 0;
+                        }
+                    });
+
+                    // Remove old rows
+                    [].forEach.call(rows, function (row) {
+                        tableBody.removeChild(row);
+                    });
+
+                    // Reverse the direction
+                    directions[index] = direction === 'asc' ? 'desc' : 'asc';
+
+                    // Append new row
+                    newRows.forEach(function (newRow) {
+                        tableBody.appendChild(newRow);
+                    });
+                };
+
+                [].forEach.call(headers, function (header, index) {
+                    header.addEventListener('click', function () {
+                        sortColumn(index);
+                    });
+                });
+            });
+        </script>

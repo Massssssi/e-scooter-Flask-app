@@ -3,9 +3,6 @@
 {% extends "baseEmployeeManager.html" %}
   <div class="block_content">
     {% block content %}
-
-    <h1>Passive income</h1>
-
     <form method="post", action="">
       {{ form.hidden_tag() }}
 
@@ -43,6 +40,11 @@
         <td>One week</td>
         <td>{{ result[3][0] }}</td>
         <td>{{ result[3][1] }}</td>
+      </tr>
+      <tr>
+        <td>Other (extended)</td>
+        <td>{{ result[4][0] }}</td>
+        <td>{{ result[4][1] }}</td>
       </tr>
     </table>
 

@@ -1,0 +1,17 @@
+<!-- This is where the manager can view all employees and perform basic CRUD operations -->
+
+{% extends "baseEmployeeManager.html" %}
+  <div class="block_content">
+    {% block content %}
+    <form method="post" , action="/managerEmployeeSearch">
+    {{ form.hidden_tag() }}
+
+     Select Employee To Edit: {{ form.search_field(class_='form-control') }}
+    {% for error in form.search_field.errors %}
+    <span class="warning">[{{ error }}]</span>
+    {% endfor %}<br>
+
+    <input type="submit" value="Search" name="searchButton"/>
+</form>
+    {% endblock %}
+  </div>
