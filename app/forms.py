@@ -12,8 +12,11 @@ from .views import current_user
 class ConfigureScooterForm(FlaskForm):
     id = SelectField('location', choices=[])
     availability = BooleanField('availability')
-    cost = FloatField('cost', validators=[DataRequired("Please enter a cost for this scooter")])
     location = SelectField('location', choices=[])
+
+
+class ConfigureScooterCostForm(FlaskForm):
+    cost = FloatField('cost', validators=[DataRequired("Please enter a cost for this scooter")])
 
 
 class ScooterForm(FlaskForm):
@@ -74,6 +77,7 @@ class userHelpForm(FlaskForm):
     scooter_id = SelectField('Scooter number', choices=[])
     feedback_text = TextAreaField('Feedback text')
     priority = SelectField('priority', choices=[(1, "High priority"), (2, "Medium priority"), (3, "Low priority")])
+
 
 
 class DateForm(FlaskForm):

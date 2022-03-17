@@ -1,0 +1,11 @@
+<!-- This is where the guest looks at available scooters and books them -->
+{% extends "baseEmployeeManager.html" %}
+<div class="block_content">
+  {% block content %}
+  <form method = "POST">
+    {{form.csrf_token}}
+    {{form.location_id}}
+    <input type="submit">
+</form>
+  {% endblock %}
+</div>
