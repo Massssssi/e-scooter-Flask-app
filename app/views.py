@@ -723,9 +723,9 @@ def managerCreateEmployee():
 @login_required
 def managerEmployeeSearch():
     form = EmployeeSearchForm()
-    form.search_field.choices = [(employee.id, employee.surname) for employee in
-                                 models.User.query.filter(User.account_type != 0).all()]
 
+    form.search_field.choices = [(employee.id, employee.surname + " , " + employee.forename) for employee in
+                                 models.User.query.filter(User.account_type != 0).all()]
     if request.method == 'POST':
         if form.validate_on_submit():
             session['employee_id'] = form.search_field.data
@@ -735,7 +735,8 @@ def managerEmployeeSearch():
                            title='Change details',
                            form=form)
 
-@app.route('/managerEmployeeEdit', methods=['GET','POST'])
+
+@app.route('/managerEmployeeEdit', methods=['GET', 'POST'])
 @login_required
 def managerEmployeeEdit():
     employee_id = session['employee_id']
@@ -750,9 +751,9 @@ def managerEmployeeEdit():
         form.phone.data = employee_found.phone
         form.national_insurance_number.data = employee_found.national_insurance_number
         if employee_found.account_type == 1:
-            form.account_type.choices = "Employee"
+            form.account_type.choices = ["Employee", "Manager"]
         else:
-            form.account_type.choices = "Manager"
+            form.account_type.choices = ["Manager", "Employee"]
 
     if request.method == 'POST':
         if form.validate_on_submit():
