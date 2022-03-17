@@ -3,8 +3,8 @@
 {% extends "baseEmployeeManager.html" %}
   <div class="block_content">
     {% block content %}
-    <form method="post" , action="/managerEmployeeEdit">
-    {{ form.hidden_tag() }}
+        <form method="post" , action="/managerCreateEmployee">
+  {{ form.hidden_tag() }}
 
     Forename: {{ form.forename(class_='form-control') }}
     {% for error in form.forename.errors %}
@@ -33,6 +33,11 @@
 
     Account Type: {{ form.account_type(class_='form-control') }}
     {% for error in form.account_type.errors %}
+    <span class="warning">[{{ error }}]</span>
+    {% endfor %}<br>
+
+    Password: {{ form.password(class_='form-control') }}
+    {% for error in form.password.errors %}
     <span class="warning">[{{ error }}]</span>
     {% endfor %}<br>
 
