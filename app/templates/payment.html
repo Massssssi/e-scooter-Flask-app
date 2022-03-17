@@ -50,6 +50,12 @@
 
 
     <input type="submit" class="button" value="Confirm Payment">
+
+    {% if error_message %}
+    <div class="alert alert-primary" role="alert">
+      {{error_message}}
+    </div>
+  {% endif%}
 </form>
 
 {% endblock %}

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<head>    
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    
+        <script>
+            L_NO_TOUCH = false;
+            L_DISABLE_3D = false;
+        </script>
+    
+    <style>html, body {width: 100%;height: 100%;margin: 0;padding: 0;}</style>
+    <style>#map {position:absolute;top:0;bottom:0;right:0;left:0;}</style>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.js"></script>
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.6.0/dist/leaflet.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Leaflet.awesome-markers/2.0.2/leaflet.awesome-markers.css"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/python-visualization/folium/folium/templates/leaflet.awesome.rotate.min.css"/>
+    
+            <meta name="viewport" content="width=device-width,
+                initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+            <style>
+                #map_f1179c1ccd614113b3de08965c8212eb {
+                    position: relative;
+                    width: 100.0%;
+                    height: 100.0%;
+                    left: 0.0%;
+                    top: 0.0%;
+                }
+            </style>
+        
+</head>
+<body>    
+    
+            <div class="folium-map" id="map_f1179c1ccd614113b3de08965c8212eb" ></div>
+        
+</body>
+<script>    
+    
+            var map_f1179c1ccd614113b3de08965c8212eb = L.map(
+                "map_f1179c1ccd614113b3de08965c8212eb",
+                {
+                    center: [53.801277, -1.548567],
+                    crs: L.CRS.EPSG3857,
+                    zoom: 15,
+                    zoomControl: true,
+                    preferCanvas: false,
+                }
+            );
+
+            
+
+        
+    
+            var tile_layer_86a88fa695f54223a820f9932d20dd47 = L.tileLayer(
+                "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                {"attribution": "Data by \u0026copy; \u003ca href=\"http://openstreetmap.org\"\u003eOpenStreetMap\u003c/a\u003e, under \u003ca href=\"http://www.openstreetmap.org/copyright\"\u003eODbL\u003c/a\u003e.", "detectRetina": false, "maxNativeZoom": 18, "maxZoom": 18, "minZoom": 0, "noWrap": false, "opacity": 1, "subdomains": "abc", "tms": false}
+            ).addTo(map_f1179c1ccd614113b3de08965c8212eb);
+        
+    
+            var marker_ae47113648b3444db00ac345a58518cb = L.marker(
+                [53.7966, -1.5445],
+                {}
+            ).addTo(map_f1179c1ccd614113b3de08965c8212eb);
+        
+    
+        var popup_aa30f23b40d24440a28fb3db63845d6e = L.popup({"maxWidth": "100%"});
+
+        
+            var html_ea9a26dd98a24614b77440005b1734fa = $(`<div id="html_ea9a26dd98a24614b77440005b1734fa" style="width: 100.0%; height: 100.0%;">Trinity centre</div>`)[0];
+            popup_aa30f23b40d24440a28fb3db63845d6e.setContent(html_ea9a26dd98a24614b77440005b1734fa);
+        
+
+        marker_ae47113648b3444db00ac345a58518cb.bindPopup(popup_aa30f23b40d24440a28fb3db63845d6e)
+        ;
+
+        
+    
+    
+            marker_ae47113648b3444db00ac345a58518cb.bindTooltip(
+                `<div>
+                     Trinity centre
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_3f628fb36e964e499aeabd7cc064c3a0 = L.marker(
+                [53.795, -1.5474],
+                {}
+            ).addTo(map_f1179c1ccd614113b3de08965c8212eb);
+        
+    
+        var popup_da07acd044c0465a93c1a4fe69101f67 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_20927992e50346109f37315728a0fff6 = $(`<div id="html_20927992e50346109f37315728a0fff6" style="width: 100.0%; height: 100.0%;">Train station</div>`)[0];
+            popup_da07acd044c0465a93c1a4fe69101f67.setContent(html_20927992e50346109f37315728a0fff6);
+        
+
+        marker_3f628fb36e964e499aeabd7cc064c3a0.bindPopup(popup_da07acd044c0465a93c1a4fe69101f67)
+        ;
+
+        
+    
+    
+            marker_3f628fb36e964e499aeabd7cc064c3a0.bindTooltip(
+                `<div>
+                     Train station
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_f49d2d6a8cac4b7ea0ce2fbc72d4d2d1 = L.marker(
+                [53.801163462, -1.53999784],
+                {}
+            ).addTo(map_f1179c1ccd614113b3de08965c8212eb);
+        
+    
+        var popup_cafdce85c3984ed78ea479bc7debe391 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_73522da8174b465d9c878cba86ddfe10 = $(`<div id="html_73522da8174b465d9c878cba86ddfe10" style="width: 100.0%; height: 100.0%;">Merrion centre</div>`)[0];
+            popup_cafdce85c3984ed78ea479bc7debe391.setContent(html_73522da8174b465d9c878cba86ddfe10);
+        
+
+        marker_f49d2d6a8cac4b7ea0ce2fbc72d4d2d1.bindPopup(popup_cafdce85c3984ed78ea479bc7debe391)
+        ;
+
+        
+    
+    
+            marker_f49d2d6a8cac4b7ea0ce2fbc72d4d2d1.bindTooltip(
+                `<div>
+                     Merrion centre
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_35150d2a8a0f4db59a6e189c71f0d157 = L.marker(
+                [53.802080000000004, -1.55083],
+                {}
+            ).addTo(map_f1179c1ccd614113b3de08965c8212eb);
+        
+    
+        var popup_5e06322a6d9c4101876e440569b20695 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_64d36e2c01b144bd890bb0e66afa8f02 = $(`<div id="html_64d36e2c01b144bd890bb0e66afa8f02" style="width: 100.0%; height: 100.0%;">LGI hospital</div>`)[0];
+            popup_5e06322a6d9c4101876e440569b20695.setContent(html_64d36e2c01b144bd890bb0e66afa8f02);
+        
+
+        marker_35150d2a8a0f4db59a6e189c71f0d157.bindPopup(popup_5e06322a6d9c4101876e440569b20695)
+        ;
+
+        
+    
+    
+            marker_35150d2a8a0f4db59a6e189c71f0d157.bindTooltip(
+                `<div>
+                     LGI hospital
+                 </div>`,
+                {"sticky": true}
+            );
+        
+    
+            var marker_0d32c42e6fcd49bbaa6f952cb33108ac = L.marker(
+                [53.8042, -1.5532],
+                {}
+            ).addTo(map_f1179c1ccd614113b3de08965c8212eb);
+        
+    
+        var popup_d27b4f8ed48143a5a3f0b5cc34dfb497 = L.popup({"maxWidth": "100%"});
+
+        
+            var html_4b82ad81193140618df387b975b52f11 = $(`<div id="html_4b82ad81193140618df387b975b52f11" style="width: 100.0%; height: 100.0%;">UoL Edge sports centre</div>`)[0];
+            popup_d27b4f8ed48143a5a3f0b5cc34dfb497.setContent(html_4b82ad81193140618df387b975b52f11);
+        
+
+        marker_0d32c42e6fcd49bbaa6f952cb33108ac.bindPopup(popup_d27b4f8ed48143a5a3f0b5cc34dfb497)
+        ;
+
+        
+    
+    
+            marker_0d32c42e6fcd49bbaa6f952cb33108ac.bindTooltip(
+                `<div>
+                     UoL Edge sports centre
+                 </div>`,
+                {"sticky": true}
+            );
+        
+</script>
