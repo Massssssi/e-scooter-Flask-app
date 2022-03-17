@@ -1,3 +1,4 @@
+from flask_login import login_user
 import pytest
 from sqlalchemy import create_engine
 from app import app as _app, db as _db, models
@@ -9,7 +10,7 @@ def app():
 
     app = _app
     app.config['TESTING'] = True
-    app.config['LOGIN_DISABLED'] = True
+    #app.config['LOGIN_DISABLED'] = True
     app.config['WTF_CSRF_ENABLED'] = False
     app.config['SECRET_KEY'] = 'Sofwtare-engineering-secret-key'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///memory'
@@ -17,7 +18,7 @@ def app():
     yield app
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='session', autouse=True)
 def client(app):
     return app.test_client()
 
@@ -56,17 +57,25 @@ def session(db):
     session.close()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture(scope='session', autouse=True)
 def create_user(session):
-    user = models.User(forename="test", surname="test", email="test@testing.com", phone="447",password="testing")
+    user = models.User(forename="test", surname="test", email="test@testing.com", phone="447")
+    user.set_password('testing')
     try:
         session.add(user)
         session.commit()
     except:
         print("ERROR WHILE CREATING A USER")
         session.rollback()
-        
-    return user
+
+    yield user
+
+
+# @pytest.fixture(scope='session')
+# def login(client):
+#     with client:
+#         res = client.post('/login', data={'email': "test@testing.com", 'password':'testing'})
+#         return res
 
 
 @pytest.fixture(scope='session')
@@ -79,7 +88,7 @@ def add_scooter(session):
         print("ERROR WHILE CREATING A SCOOTER")
         session.rollback()
         
-    return scooter
+    yield scooter
 
 
 @pytest.fixture(scope='session')
@@ -91,5 +100,4 @@ def add_location(session):
     except:
         print("ERROR WHILE ADDING LOCATION")
         session.rollback()
-        
         

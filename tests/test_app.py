@@ -1,3 +1,4 @@
+import email
 from flask_login import current_user, login_user
 from app import models
 
@@ -17,7 +18,7 @@ def test_register_user(client, session):
 
         res = client.post(url, data=data, follow_redirects=True)
         assert res.status_code == 200
-        assert session.query(models.User).filter_by(email='try@gmail.com').count() == 1
+        assert session.query(models.User).filter_by(email="try@gmail.com").count() == 1
         assert res.request.path == '/login'
 
 
@@ -40,7 +41,7 @@ def test_login_user(client):
 #test user logout
 def test_logout_user(client, create_user):
     with client:
-        login_user(user=create_user)
+        login_user(create_user)
         assert current_user.is_authenticated == True
         url = '/logout'
         res = client.get(url, follow_redirects=True)
@@ -67,4 +68,16 @@ def test_add_scooter(client, session, add_scooter):
 def test_add_location(client, session, add_location):
     with client:
         assert session.query(models.Scooter).count() == 1
+
+
+def test_payment(client, session):
+    with client:
+        data = {'location_id': 1}
+        url = '/selectlocation'
+        assert session.query(models.User).filter_by(email="test@testing.com").count() == 1
+        los = client.post('/login', data = {'email':'try@gmail.com', 'password':'123'})
+        res = client.post(url, data=data, follow_redirects=True)
+        assert current_user.is_authenticated == True
+        assert res.status_code == 200
+        assert res.request.path == '/bookScooter'
         
