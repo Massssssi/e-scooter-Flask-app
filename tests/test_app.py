@@ -3,6 +3,10 @@ from flask_login import current_user, login_user
 from app import models
 
 
+def login(client):
+    client.post('/login', data = {'email':'try@gmail.com', 'password':'123'})
+    pass
+
 # test the user registration form and redirect to the login page
 def test_register_user(client, session):
     with client:
@@ -72,12 +76,25 @@ def test_add_location(client, session, add_location):
 
 def test_payment(client, session):
     with client:
-        data = {'location_id': 1}
+        login(client)
+        loc_data = {'location_id': 1}
         url = '/selectlocation'
-        assert session.query(models.User).filter_by(email="test@testing.com").count() == 1
-        los = client.post('/login', data = {'email':'try@gmail.com', 'password':'123'})
-        res = client.post(url, data=data, follow_redirects=True)
+        
+        res = client.post(url, data=loc_data, follow_redirects=True)
         assert current_user.is_authenticated == True
         assert res.status_code == 200
         assert res.request.path == '/bookScooter'
+
+        data = {'scooter': 1,
+                    'hire_period': 'One hour',
+                    'start_date': '29-03-2022'}
+
+        res = client.post('/bookScooter?loc_id={}&usid={}&typ=0'.format(loc_data['location_id'], current_user.id), data=data, follow_redirects=True)
+        assert session.query(models.Scooter).count()==1
+        assert res.status_code == 200
+        assert res.request.path == '/payment'
+
+
+
+
         

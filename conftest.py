@@ -71,13 +71,6 @@ def create_user(session):
     yield user
 
 
-# @pytest.fixture(scope='session')
-# def login(client):
-#     with client:
-#         res = client.post('/login', data={'email': "test@testing.com", 'password':'testing'})
-#         return res
-
-
 @pytest.fixture(scope='session')
 def add_scooter(session):
     scooter = models.Scooter(availability=1, location_id=1)
@@ -100,4 +93,14 @@ def add_location(session):
     except:
         print("ERROR WHILE ADDING LOCATION")
         session.rollback()
-        
+
+
+@pytest.fixture(scope='session', autouse=True)
+def hourly_cost(client, session):
+    cost = models.ScooterCost(hourly_cost=10.0)
+    try:
+        session.add(cost)
+        session.commit()
+    except:
+        print("ERROR WHILE ADDING A PRICE")
+        session.rollback()
