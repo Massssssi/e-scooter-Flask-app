@@ -13,6 +13,7 @@ from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardFo
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
 import operator
+from flask import Markup
 
 # # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Location, db.session))
@@ -234,16 +235,15 @@ def manager():
 @login_required
 def incomeReports():
     form = DateForm()
-    data = []
+    data = [[],[],[],[],[]]
     result = []
     freq = {}
+    line_labels = []
+    line_values = []
     if form.validate_on_submit():
         date1 = datetime(form.date.data.year, form.date.data.month, form.date.data.day)
         date2 = date1 + timedelta(days=7)
         record = Session.query.all()
-        for i in range(5):
-            a = []
-            data.append(a)
         for s in record:
             if s.start_date > date1 and s.start_date < date2:
                 if s.end_date == s.start_date + timedelta(hours=1):
@@ -264,8 +264,22 @@ def incomeReports():
             result.append(a)
         rank = {"One hour":result[0][0], "Four hour":result[1][0], "One day":result[2][0], "One Week":result[3][0]}
         freq = sorted(rank.items(), key=operator.itemgetter(1), reverse=True)
-    return render_template('managerIncomeReports.html', title='Income Report', form=form, result=result, freq=freq)
 
+        labels = [
+            'SUN', 'MON', 'TUE', 'WED',
+            'THU', 'FRI', 'SAT']
+        values = [
+            967.67, 1190.89, 1079.75, 1349.19,
+            2328.91, 2504.28, 2873.83]
+
+        colors = [
+            "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
+            "#ABCDEF", "#DDDDDD", "#ABCABC"]
+        line_labels=labels
+        line_values=values
+    return render_template('managerIncomeReports.html', title='Income Report',
+                            form=form, result=result, freq=freq,
+                            max=max(values), labels=line_labels, values=line_values)
 
 @app.route('/selectlocation', methods=['GET', 'POST'])
 @login_required
