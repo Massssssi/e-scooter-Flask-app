@@ -58,58 +58,73 @@
 
       <canvas id="chart" width="600" height="400"></canvas>
       <script>
+            // bar chart data
+            var barData = {
+              type: "Bar",
+              labels : [
+                {% for item in labels %}
+                 "{{ item }}",
+                {% endfor %}
+      	       ],
 
-        // bar chart data
-        var barData = {
-          labels : [
-            {% for item in labels %}
-              "{{ item }}",
-            {% endfor %}
-          ],
+              datasets : [{
+                fillColor: "rgba(0,187,205,0.2)",
+                strokeColor: "rgba(100,187,205,1)",
+                data : [
+                  {% for i in range(7) %}
+                     "{{ v0[i] }}",
+                    {% endfor %}
+      	           ]
+                },
+                {
+                  fillColor: "rgba(100,0,205,0.2)",
+                  strokeColor: "rgba(100,100,205,1)",
+                  data : [
+                    {% for i in range(7) %}
+                       "{{ v0[i+7] }}",
+                      {% endfor %}
+        	           ]
+                  },
+                  {
+                    fillColor: "rgba(151,187,0,0.2)",
+                    strokeColor: "rgba(151,187,100,1)",
+                    data : [
+                      {% for i in range(7) %}
+                         "{{ v0[i+14] }}",
+                        {% endfor %}
+          	        ]
+                  },
+                  {
+                    fillColor: "rgba(151,0,0,0.2)",
+                    strokeColor: "rgba(151,100,100,1)",
+                    data : [
+                      {% for i in range(7) %}
+                         "{{ v0[i+21] }}",
+                        {% endfor %}
+                    ]
+                  }]
+              }
 
-          datasets : [{
-            fillColor: "rgba(151,187,205,0.2)",
-            strokeColor: "rgba(151,187,205,1)",
-            pointColor: "rgba(151,187,205,1)",
-            pointStrokeColor: "#fff",
-            pointHighlightFill: "#fff",
-            pointHighlightStroke: "rgba(151,187,205,1)",
-            bezierCurve : false,
-            data : [{% for item in values %}
-                      {{ item }},
-                    {% endfor %}]
-            }]
-        }
+           // get bar chart canvas
+           var mychart = document.getElementById("chart").getContext("2d");
 
-        Chart.defaults.global.animationSteps = 50;
-        Chart.defaults.global.tooltipYPadding = 16;
-        Chart.defaults.global.tooltipCornerRadius = 0;
-        Chart.defaults.global.tooltipTitleFontStyle = "normal";
-        Chart.defaults.global.tooltipFillColor = "rgba(0,0,0,0.8)";
-        Chart.defaults.global.animationEasing = "easeOutBounce";
-        Chart.defaults.global.responsive = false;
-        Chart.defaults.global.scaleLineColor = "black";
-        Chart.defaults.global.scaleFontSize = 16;
+             steps = 20
+             max = {{max}}
 
-        // get bar chart canvas
-        var mychart = document.getElementById("chart").getContext("2d");
+           // draw bar chart
+           new Chart(mychart).Bar(barData, {
+             scaleOverride: true,
+             scaleSteps: Math.ceil(max / steps),
+             scaleStepWidth: steps,
+             scaleStartValue: 0,
+             scaleShowVerticalLines: true,
+             scaleShowGridLines : true,
+             barShowStroke : true,
+             scaleShowLabels: true
+             }
+           );
 
-        steps = 10
-        max = {{ max }}
-        // draw bar chart
-        var LineChartDemo = new Chart(mychart).Line(barData, {
-          scaleOverride: true,
-          scaleSteps: steps,
-          scaleStepWidth: Math.ceil(max / steps),
-          scaleStartValue: 0,
-          scaleShowVerticalLines: true,
-          scaleShowGridLines : true,
-          barShowStroke : true,
-          scaleShowLabels: true,
-          bezierCurve: false,
-        });
-
-      </script>
+          </script>
     </center>
 
     {% endif %}

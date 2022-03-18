@@ -237,9 +237,6 @@ def incomeReports():
     form = DateForm()
     data = [[],[],[],[],[]]
     result = []
-    freq = {}
-    line_labels = []
-    line_values = []
     if form.validate_on_submit():
         date1 = datetime(form.date.data.year, form.date.data.month, form.date.data.day)
         date2 = date1 + timedelta(days=7)
@@ -268,18 +265,12 @@ def incomeReports():
         labels = [
             'SUN', 'MON', 'TUE', 'WED',
             'THU', 'FRI', 'SAT']
-        values = [
-            967.67, 1190.89, 1079.75, 1349.19,
-            2328.91, 2504.28, 2873.83]
-
-        colors = [
-            "#F7464A", "#46BFBD", "#FDB45C", "#FEDCBA",
-            "#ABCDEF", "#DDDDDD", "#ABCABC"]
-        line_labels=labels
-        line_values=values
-    return render_template('managerIncomeReports.html', title='Income Report',
+        v0 = [30, 60, 90, 120, 150, 180, 210, 10,20,30,40,50,60,70, 20,40,60,80,100,120,140, 20,40,60,80,100,120,140,]
+        return render_template('managerIncomeReports.html', title='Income Report',
                             form=form, result=result, freq=freq,
-                            max=max(values), labels=line_labels, values=line_values)
+                            max=max(v0), labels=labels, v0=v0)
+    return render_template('managerIncomeReports.html', title='Income Report', form=form)
+
 
 @app.route('/selectlocation', methods=['GET', 'POST'])
 @login_required
