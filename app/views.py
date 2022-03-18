@@ -675,7 +675,7 @@ def generalUserHelp():
                                         user=current_user)
                 db.session.add(userFeedback)
                 db.session.commit()
-                message = 'Your General feedback has been send succesfully.\n Thank you '
+                message = 'Your General feedback has been send succesfully. Thank you '
                 return render_template('userGeneralHelp.html',form = form, message = message)
         return render_template('userGeneralHelp.html', form = form)
     else:

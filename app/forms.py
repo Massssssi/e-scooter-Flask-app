@@ -122,7 +122,7 @@ class ReturnScooterForm(FlaskForm):
 
 class userHelpForm(FlaskForm):
     scooter_id = SelectField('Scooter number', choices=[])
-    feedback_text = TextAreaField('Feedback text')
+    feedback_text = TextAreaField('Feedback text', validators=[DataRequired()],render_kw={"placeholder" :"Please write your Feedback here.."})
     priority = SelectField('priority', choices=[(1, "High priority"), (2, "Medium priority"), (3, "Low priority")])
 
 
