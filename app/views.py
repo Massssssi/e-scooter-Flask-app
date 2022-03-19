@@ -12,7 +12,7 @@ from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardFo
     ConfigureScooterCostForm
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
-import operator
+import operator, copy
 from flask import Markup
 
 # # Adds the ability to view all tables in Flask Admin
@@ -253,21 +253,27 @@ def incomeReports():
                     data[3].append(s)
                 else:
                     data[4].append(s)
+        f_sorted = []
         for d in data:
             income = 0
             for sess in d:
                 income += sess.cost
             a = [len(d), income]
             result.append(a)
-        rank = {"One hour":result[0][0], "Four hour":result[1][0], "One day":result[2][0], "One Week":result[3][0]}
-        freq = sorted(rank.items(), key=operator.itemgetter(1), reverse=True)
+            f_sorted.append(len(d))
+        f = copy.deepcopy(f_sorted)
+        f_sorted.sort()
+        f_sorted.reverse()
+        rank = []
+        for data in f:
+            rank.append(f_sorted.index(data) + 1)
 
         labels = [
             'SUN', 'MON', 'TUE', 'WED',
             'THU', 'FRI', 'SAT']
         v0 = [30, 60, 90, 120, 150, 180, 210, 10,20,30,40,50,60,70, 20,40,60,80,100,120,140, 20,40,60,80,100,120,140,]
         return render_template('managerIncomeReports.html', title='Income Report',
-                            form=form, result=result, freq=freq,
+                            form=form, result=result, rank=rank,
                             max=max(v0), labels=labels, v0=v0)
     return render_template('managerIncomeReports.html', title='Income Report', form=form)
 

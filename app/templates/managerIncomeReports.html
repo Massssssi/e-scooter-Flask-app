@@ -23,38 +23,39 @@
         <td>Hire length</td>
         <td>No. of session</td>
         <td>Total income</td>
+        <td>Ranking of popularity</td>
       </tr>
       <tr>
         <td>One hour</td>
         <td>{{ result[0][0] }}</td>
         <td>{{ result[0][1] }}</td>
+        <td>{{ rank[0] }}</td>
       </tr>
       <tr>
         <td>Four hour</td>
         <td>{{ result[1][0] }}</td>
         <td>{{ result[1][1] }}</td>
+        <td>{{ rank[1] }}</td>
       </tr>
       <tr>
         <td>One day</td>
         <td>{{ result[2][0] }}</td>
         <td>{{ result[2][1] }}</td>
+        <td>{{ rank[2] }}</td>
       </tr>
       <tr>
         <td>One week</td>
         <td>{{ result[3][0] }}</td>
         <td>{{ result[3][1] }}</td>
+        <td>{{ rank[3] }}</td>
       </tr>
       <tr>
         <td>Other (extended)</td>
         <td>{{ result[4][0] }}</td>
         <td>{{ result[4][1] }}</td>
+        <td>{{ rank[4] }}</td>
       </tr>
     </table>
-
-    <p>Popular hire length ranking:</p>
-    {% for i in freq %}
-    <p>{{ i[0] }}</p>
-    {% endfor %}
 
       <canvas id="chart" width="600" height="400"></canvas>
       <script>
