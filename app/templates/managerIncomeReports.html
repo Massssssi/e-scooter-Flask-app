@@ -17,7 +17,8 @@
         <input type="submit" class="button" value="Submit">
     </form>
 
-    {% if result %}
+    {% if rank %}
+
     <h5>For the whole week:</h5>
     <table border="1">
       <tr>
@@ -28,37 +29,36 @@
       </tr>
       <tr>
         <td>One hour</td>
-        <td>{{ result[0][0] }}</td>
-        <td>{{ result[0][1] }}</td>
+        <td>{{ freq[0] }}</td>
+        <td>{{ income[0] }}</td>
         <td>{{ rank[0] }}</td>
       </tr>
       <tr>
         <td>Four hour</td>
-        <td>{{ result[1][0] }}</td>
-        <td>{{ result[1][1] }}</td>
+        <td>{{ freq[1] }}</td>
+        <td>{{ income[1] }}</td>
         <td>{{ rank[1] }}</td>
       </tr>
       <tr>
         <td>One day</td>
-        <td>{{ result[2][0] }}</td>
-        <td>{{ result[2][1] }}</td>
+        <td>{{ freq[2] }}</td>
+        <td>{{ income[2] }}</td>
         <td>{{ rank[2] }}</td>
       </tr>
       <tr>
         <td>One week</td>
-        <td>{{ result[3][0] }}</td>
-        <td>{{ result[3][1] }}</td>
+        <td>{{ freq[3] }}</td>
+        <td>{{ income[3] }}</td>
         <td>{{ rank[3] }}</td>
       </tr>
       <tr>
         <td>Other (extended)</td>
-        <td>{{ result[4][0] }}</td>
-        <td>{{ result[4][1] }}</td>
+        <td>{{ freq[4] }}</td>
+        <td>{{ income[4] }}</td>
         <td>{{ rank[4] }}</td>
       </tr>
     </table>
-
-    </br>
+  </br>
     <h5>Number of session on each day:</h5>
     <table border="1">
       <tr>
@@ -84,7 +84,7 @@
       </tr>
       {% endfor %}
     </table>
-
+  </br>
       <canvas id="chart" width="600" height="400"></canvas>
       <script>
             // bar chart data
@@ -161,13 +161,13 @@
              scaleShowGridLines : true,
              barShowStroke : true,
              scaleShowLabels: true,
-
-             title: {
-               display: true,
-               text: 'Population growth (millions)'
+             plugins:{
+               title: {
+                 display: true,
+                 text: 'Population growth (millions)'
+               }
              }
            });
-
           </script>
     </center>
 
