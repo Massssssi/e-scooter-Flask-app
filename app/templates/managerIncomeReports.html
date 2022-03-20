@@ -18,6 +18,7 @@
     </form>
 
     {% if result %}
+    <h5>For the whole week:</h5>
     <table border="1">
       <tr>
         <td>Hire length</td>
@@ -57,6 +58,33 @@
       </tr>
     </table>
 
+    </br>
+    <h5>Number of session on each day:</h5>
+    <table border="1">
+      <tr>
+        <td>Date</td>
+        <td>Weekday</td>
+        <td>One hour</td>
+        <td>Four hour</td>
+        <td>One day</td>
+        <td>One week</td>
+        <td>Other (extended)</td>
+        <td>Total</td>
+      </tr>
+      {% for i in range(7) %}
+      <tr>
+        <td>{{ labels[i] }}</td>
+        <td>{{ wd[i] }}</td>
+        <td>{{ v1[i*5] }}</td>
+        <td>{{ v1[i*5+1] }}</td>
+        <td>{{ v1[i*5+2] }}</td>
+        <td>{{ v1[i*5+3] }}</td>
+        <td>{{ v1[i*5+4] }}</td>
+        <td>{{ v1[i*5] + v1[i*5+1] + v1[i*5+2] + v1[i*5+3] + v1[i*5+4] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+
       <canvas id="chart" width="600" height="400"></canvas>
       <script>
             // bar chart data
@@ -69,48 +97,59 @@
       	       ],
 
               datasets : [{
+                label: "One hour",
                 fillColor: "rgba(0,187,205,0.2)",
-                strokeColor: "rgba(100,187,205,1)",
+                strokeColor: "rgba(0,187,205,1)",
                 data : [
                   {% for i in range(7) %}
-                     "{{ v0[i] }}",
+                     "{{ v0[i*5] }}",
                     {% endfor %}
       	           ]
                 },
                 {
-                  fillColor: "rgba(100,0,205,0.2)",
-                  strokeColor: "rgba(100,100,205,1)",
+                  fillColor: "rgba(200,100,285,0.2)",
+                  strokeColor: "rgba(200,100,285,1)",
                   data : [
                     {% for i in range(7) %}
-                       "{{ v0[i+7] }}",
+                       "{{ v0[i*5+1] }}",
                       {% endfor %}
         	           ]
                   },
                   {
                     fillColor: "rgba(151,187,0,0.2)",
-                    strokeColor: "rgba(151,187,100,1)",
+                    strokeColor: "rgba(151,187,0,1)",
                     data : [
                       {% for i in range(7) %}
-                         "{{ v0[i+14] }}",
+                         "{{ v0[i*5+2] }}",
                         {% endfor %}
           	        ]
                   },
                   {
-                    fillColor: "rgba(151,0,0,0.2)",
-                    strokeColor: "rgba(151,100,100,1)",
+                    fillColor: "rgba(200,100,100,0.2)",
+                    strokeColor: "rgba(200,100,100,1)",
                     data : [
                       {% for i in range(7) %}
-                         "{{ v0[i+21] }}",
+                         "{{ v0[i*5+3] }}",
                         {% endfor %}
                     ]
-                  }]
+                  },
+                  {
+                    fillColor: "rgba(100,100,200,0.2)",
+                    strokeColor: "rgba(100,100,200,1)",
+                    data : [
+                      {% for i in range(7) %}
+                         "{{ v0[i*5+4] }}",
+                        {% endfor %}
+                    ]
+                  }
+                ]
               }
 
            // get bar chart canvas
            var mychart = document.getElementById("chart").getContext("2d");
 
-             steps = 20
-             max = {{max}}
+             max = {{ max }}
+             steps = Math.ceil(max/100)*10
 
            // draw bar chart
            new Chart(mychart).Bar(barData, {
@@ -121,9 +160,13 @@
              scaleShowVerticalLines: true,
              scaleShowGridLines : true,
              barShowStroke : true,
-             scaleShowLabels: true
+             scaleShowLabels: true,
+
+             title: {
+               display: true,
+               text: 'Population growth (millions)'
              }
-           );
+           });
 
           </script>
     </center>

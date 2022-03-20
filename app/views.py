@@ -230,6 +230,13 @@ def employee():
 def manager():
     return render_template('manager.html', title='Manager Home', user=current_user)
 
+def check_day(start_date, session):
+    for i in range(7):
+        check = start_date + timedelta(days=i)
+        if (check.strftime("%d%m%Y") == session.start_date.strftime("%d%m%Y")):
+            return i
+    return -1
+
 
 @app.route('/incomeReports', methods=['GET', 'POST'])
 @login_required
@@ -241,18 +248,34 @@ def incomeReports():
         date1 = datetime(form.date.data.year, form.date.data.month, form.date.data.day)
         date2 = date1 + timedelta(days=7)
         record = Session.query.all()
+        day = [[], [], [], [], [], [], []]
+        for i in day:
+            for j in range(5):
+                x = []
+                i.append(x)
         for s in record:
             if s.start_date > date1 and s.start_date < date2:
                 if s.end_date == s.start_date + timedelta(hours=1):
                     data[0].append(s)
+                    d = check_day(date1, s)
+                    day[d][0].append(s)
                 elif s.end_date == s.start_date + timedelta(hours=4):
                     data[1].append(s)
+                    d = check_day(date1, s)
+                    day[d][1].append(s)
                 elif s.end_date == s.start_date + timedelta(days=1):
                     data[2].append(s)
+                    d = check_day(date1, s)
+                    day[d][2].append(s)
                 elif s.end_date == s.start_date + timedelta(days=7):
                     data[3].append(s)
+                    d = check_day(date1, s)
+                    day[d][3].append(s)
                 else:
                     data[4].append(s)
+                    d = check_day(date1, s)
+                    day[d][4].append(s)
+        print(day)
         f_sorted = []
         for d in data:
             income = 0
@@ -264,17 +287,35 @@ def incomeReports():
         f = copy.deepcopy(f_sorted)
         f_sorted.sort()
         f_sorted.reverse()
+
         rank = []
         for data in f:
             rank.append(f_sorted.index(data) + 1)
 
-        labels = [
-            'SUN', 'MON', 'TUE', 'WED',
-            'THU', 'FRI', 'SAT']
-        v0 = [30, 60, 90, 120, 150, 180, 210, 10,20,30,40,50,60,70, 20,40,60,80,100,120,140, 20,40,60,80,100,120,140,]
+        labels = []
+        for i in range(7):
+            labels.append(date1.strftime("%d/%m/%Y"))
+            date1 += timedelta(days=1)
+        date1 -= timedelta(days=7)
+        v0 = []
+        v1 = []
+        for d in day:
+            for time in d:
+                income = 0
+                for sess in time:
+                    income += sess.cost
+                v0.append(income)
+                v1.append(len(time))
+        wd = []
+        weekday = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+        for i in range(7):
+            wd.append(weekday[date1.weekday()])
+            date1 += timedelta(days=1)
+        print(v0)
+        #v0 = [30, 60, 90, 120, 150, 180, 210, 10,20,30,40,50,60,70, 20,40,60,80,100,120,140, 20,40,60,80,100,120,140, 20,40,60,80,100,120,140]
         return render_template('managerIncomeReports.html', title='Income Report',
                             form=form, result=result, rank=rank,
-                            max=max(v0), labels=labels, v0=v0)
+                            max=max(v0), labels=labels, v0=v0, v1=v1, wd=wd)
     return render_template('managerIncomeReports.html', title='Income Report', form=form)
 
 
