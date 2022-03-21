@@ -155,14 +155,19 @@ def userScooterViewing():
 @login_required
 def userScooterManagement():
     user = User.query.get(current_user.id)
-    sessions = []
+    futureSessions = []
+    activeSessions = []
 
     for session in user.session:
         if session.returned is False:
-            sessions.append(session)
+            if session.start_date > datetime.now():  # future sessions
+                futureSessions.append(session)
+            else:
+                activeSessions.append(session)  # active sessions
 
     return render_template('userManageSessions.html', title='Home',
-                           user=current_user, sessions=sessions, time=datetime.utcnow())
+                           user=current_user, futureSessions=futureSessions, activeSessions=activeSessions,
+                           time=datetime.utcnow())
 
 
 @app.route('/cancel', methods=['POST'])
@@ -178,7 +183,8 @@ def cancel():
 @app.template_filter('strftime')
 def _jinja2_filter_datetime(date, val="full"):
     if val == "half":
-        newDate = str(date.days) + " days, " + str(divmod(date.seconds, 3600)[0]) + " hours and " + str(date.seconds % 60) + " minutes"
+        newDate = str(date.days) + " days, " + str(divmod(date.seconds, 3600)[0]) + " hours and " + str(
+            date.seconds % 60) + " minutes"
         # newDate = date.strftime("%a %d, %H:%M")
     else:
         newDate = date.strftime("%a %d of %b %Y, %H:%M")

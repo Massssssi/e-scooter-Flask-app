@@ -1,0 +1,12 @@
+table { !important;
+  table-layout: fixed ;
+  width: 100% ;
+}
+td, th{ !important;
+  width: 15%;
+    height: 50px;
+}
+
+form{
+    padding: 0;
+}
