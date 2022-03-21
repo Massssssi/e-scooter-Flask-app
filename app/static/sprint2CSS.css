@@ -59,6 +59,7 @@ form {
   }
   form {
     text-align: left;
+      padding: 12px;
   }
 
   .overdue{
