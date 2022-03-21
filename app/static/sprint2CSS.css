@@ -42,6 +42,23 @@ form {
  background: none;
 }
 
+.nav-item{
+  height: 60px;
+}
+
+.nav-item image {
+  width: 100%;
+}
+
+#dino{
+  /*height: 60px;*/
+  width: 60px;
+}
+
+#bigLogo{
+  float: right;
+}
+
   table {
       padding: 12px;
       margin: 20px 10px;
