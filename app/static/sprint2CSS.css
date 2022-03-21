@@ -42,6 +42,23 @@ form {
  background: none;
 }
 
+.nav-item{
+  height: 60px;
+}
+
+.nav-item image {
+  width: 100%;
+}
+
+#dino{
+  /*height: 60px;*/
+  width: 60px;
+}
+
+#bigLogo{
+  float: right;
+}
+
   table {
       padding: 12px;
       margin: 20px 10px;
@@ -98,9 +115,9 @@ form {
   display: table;
   clear: both;
 }
-body.user-HelpPage-body{
-  background-image: url("background.png");
-  background-size: 60%;
+.user-HelpPage-body{
+  background-image: url("background1.jpg");
+  background-size: cover;
   background-position: center;
   background-attachment: fixed;
   background-repeat: no-repeat;
@@ -113,7 +130,7 @@ body.user-HelpPage-body{
 }
 
 
-/* Responsive layout - makes the three columns stack on top of each other instead of next to each other */
+
 @media screen and (max-width: 600px) {
   .column {
     width: 100%;
@@ -167,5 +184,101 @@ body.user-HelpPage-body{
     font-weight: bold; 
     font-family: 'georgia';
     text-decoration: double;
-
   }
+  .general-user-help-form{
+    text-align: center;
+    font-family: 'georgia';
+    background-color:blanchedalmond;
+    
+  }
+  .btn{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    margin: auto;
+    width: 50%;
+    max-width: 700px;
+    align-items: center;
+    margin-top: 5%;
+  }
+
+
+.help-user-image{
+
+  min-width: 400px;
+  max-width: 500px;
+
+  position: relative;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.help-scooter-image{
+  position: relative;
+  width: 20%;
+  vertical-align: middle;
+}
+
+
+.employee-submit1 {
+  background-color: #fbeee0;
+  border: 2px solid #422800;
+  border-radius: 30px;
+  box-shadow: #422800 4px 4px 0 0;
+  color: #422800;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 0 5px;
+  line-height: 25px;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: 250px;
+}
+
+.employee-submit1 {
+  background-color:beige;
+}
+
+.employee-submit1 {
+  box-shadow: #422800 2px 2px 0 0;
+  transform: translate(2px, 2px);
+}
+
+@media (min-width: 250px) {
+  .employee-submit1 {
+    min-width: 50px;
+    padding: 0 25px;
+  }
+}
+.filter-and-submition{
+  margin: auto;
+  width: 25%;
+  min-width: 250px;
+  padding-top: 2.5%;
+  font-family: 'Times New Roman', Times, serif;
+  text-align: center;
+
+}
+.employeeBody{
+  background-image: url("background1.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+#employee-tables{
+  margin: auto;
+  text-align: center;
+  width: 85%;
+}
+#no-message{
+  text-align: center;
+  padding-top: 5%;
+  font-family:'Times New Roman', Times, serif;
+  font-size: 30px;
+  text-decoration: underline;
+  font-weight: bold;
+  
+
+}

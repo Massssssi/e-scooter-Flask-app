@@ -14,7 +14,7 @@ from flask_mail import Message
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
     ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
     ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm, RegisterEmployeeForm, EditEmployeeForm, \
-    EmployeeSearchForm, EmployeeChangeDetailsForm
+    EmployeeSearchForm, EmployeeChangeDetailsForm, employeeManagerFilterOption
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
 import operator
@@ -693,9 +693,9 @@ def generalUserHelp():
                                         user=current_user)
                 db.session.add(userFeedback)
                 db.session.commit()
-                message = 'Your General feedback has been send succesfully.\n Thank you '
-                return render_template('userGeneralHelp.html', form=form, message=message)
-        return render_template('userGeneralHelp.html', form=form)
+                message = 'Your General feedback has been send succesfully. Thank you '
+                return render_template('userGeneralHelp.html',form = form, message = message)
+        return render_template('userGeneralHelp.html', form = form)
     else:
         return "<h1>Page not found </h1>"
 
@@ -723,10 +723,17 @@ def complete(id):
 @login_required
 def helpUser():
     if current_user.account_type == 1:
-        if not Feedback.query.all():
-            return render_template("employeeFeedbackManagement.html", message="No Feedback has been submitted")
-        else:
-            return render_template("employeeFeedbackManagement.html", feedback=Feedback.query.all())
+        if not  Feedback.query.all():
+            
+            return render_template("employeeFeedbackManagement.html")
+        else :
+            
+            form = employeeManagerFilterOption()
+            if form.validate_on_submit:
+                print("in here")
+                return render_template("employeeFeedbackManagement.html", form = form, feedback = Feedback.query.all())
+            else:
+                return "<h1>Page not found </h1>"
     else:
         return "<h1>Page not found </h1>"
 
@@ -736,12 +743,13 @@ def helpUser():
 @login_required
 def mangerHighPriority():
     if current_user.account_type == 2:
-
         if not Feedback.query.all():
-            return render_template("managerFeedbackManagement.html",
-                                   message="The database is empty | no feedback has been submitted")
+            return render_template("managerFeedbackManagement.html")
         else:
-            return render_template("managerFeedbackManagement.html", feedback=Feedback.query.filter_by(priority=1))
+            form = employeeManagerFilterOption()
+            form.filter.choices = [(1, "Completed Feedback"), (2, "Non-completed Feedback")]
+            if form.validate_on_submit:
+                return render_template("managerFeedbackManagement.html", form = form, feedback=Feedback.query.filter_by(priority=1))
     else:
         return "<h1>Page not found </h1>"
 

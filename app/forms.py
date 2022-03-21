@@ -122,9 +122,11 @@ class ReturnScooterForm(FlaskForm):
 
 class userHelpForm(FlaskForm):
     scooter_id = SelectField('Scooter number', choices=[])
-    feedback_text = TextAreaField('Feedback text')
+    feedback_text = TextAreaField('Feedback text', validators=[DataRequired()],render_kw={"placeholder" :"Please write your Feedback here.."})
     priority = SelectField('priority', choices=[(1, "High priority"), (2, "Medium priority"), (3, "Low priority")])
 
+class employeeManagerFilterOption(FlaskForm):
+    filter = SelectField('Filter by', choices=[(1, "Scooter feedback"), (0, "General feedback"), (2, "Completed feedback")])
 
 class DateForm(FlaskForm):
     date = DateField('date', format='%Y-%m-%d', validators=[DataRequired("Please enter a date.")])
