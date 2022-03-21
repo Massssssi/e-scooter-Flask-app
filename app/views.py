@@ -1,4 +1,7 @@
 from turtle import update
+
+import dateutil
+
 from app import app, db, models, mail, admin
 import json
 from datetime import timedelta, datetime
@@ -15,6 +18,7 @@ from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardFo
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
 import operator
+import babel
 
 # # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Location, db.session))
@@ -171,6 +175,16 @@ def cancel():
     return redirect("/user/manageSessions")
 
 
+@app.template_filter('strftime')
+def _jinja2_filter_datetime(date, val="full"):
+    if val == "half":
+        newDate = str(date.days) + " days, " + str(divmod(date.seconds, 3600)[0]) + " hours and " + str(date.seconds % 60) + " minutes"
+        # newDate = date.strftime("%a %d, %H:%M")
+    else:
+        newDate = date.strftime("%a %d of %b %Y, %H:%M")
+    return newDate
+
+
 @app.route('/user/returnScooter/<session_id>', methods=['POST'])
 @login_required
 def returnScooter(session_id):
@@ -185,8 +199,8 @@ def returnScooter(session_id):
         scooter.location_id = form.location_id.data  # moves the scooter location
         scooter.availability = True
 
-        if  scooter:
-                    scooter.availability = True
+        if scooter:
+            scooter.availability = True
 
         db.session.commit()
 
@@ -275,10 +289,10 @@ def incomeReports():
 @app.route('/selectlocation', methods=['GET', 'POST'])
 @login_required
 def selectLocation():
-    #This part is for displaying the map#
+    # This part is for displaying the map#
 
-     #Latitude and longitude coordinates
-    start_coords = ( 53.801277, -1.548567)
+    # Latitude and longitude coordinates
+    start_coords = (53.801277, -1.548567)
     folium_map = folium.Map(
         location=start_coords,
         zoom_start=15
@@ -291,7 +305,7 @@ def selectLocation():
             tooltip=place['Place']
         ).add_to(folium_map)
     folium_map.save('app/templates/map.html')
-    #end of the part #
+    # end of the part #
 
     form = selectLocationForm()
     form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
@@ -310,6 +324,7 @@ def selectLocation():
         return redirect(url_for('.bookScooter', loc_id=loc_id, usid=usid, typ=typ))
 
     return render_template('selectLocation.html', user=current_user, form=form)
+
 
 @app.route('/map', methods=['GET', 'POST'])
 @login_required
@@ -336,7 +351,8 @@ def bookScooter():
     p = models.Location.query.filter_by(id=int(loc_id)).first()
     m = models.Scooter.query.filter(Scooter.availability == True).first()
     if m:
-        form.scooter.choices = [(scooter.id) for scooter in Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
+        form.scooter.choices = [(scooter.id) for scooter in
+                                Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
 
     if form.validate_on_submit():
         c = models.ScooterCost.query.filter_by(id=1).first()
@@ -346,45 +362,45 @@ def bookScooter():
             cost = 1 * c.hourly_cost
             n = 1
             global N
-            N=n
+            N = n
         elif (a == "four hours"):
             cost = 4 * c.hourly_cost
             n = 4
-            N=n
+            N = n
         elif (a == "One day"):
             cost = 24 * c.hourly_cost
             n = 24
-            N=n
+            N = n
         elif (a == "one week"):
             cost = 168 * c.hourly_cost
             n = 168
-            N=n
+            N = n
 
         given_time = form.start_date.data
         final_time = given_time + timedelta(hours=n)
         if typ == 0:
             global Cost
-            Cost=cost
+            Cost = cost
             global f_start_date
-            f_start_date=form.start_date.data
+            f_start_date = form.start_date.data
             global f_scooter_data
-            f_scooter_data=form.scooter.data
+            f_scooter_data = form.scooter.data
             global us_id
-            us_id =usid
+            us_id = usid
             global f_time
-            f_time=final_time
+            f_time = final_time
             global g_time
-            g_time=given_time
+            g_time = given_time
 
 
         elif typ == 1:
-            Cost=cost
-            f_start_date=form.start_date.data
-            f_scooter_data=form.scooter.data
+            Cost = cost
+            f_start_date = form.start_date.data
+            f_scooter_data = form.scooter.data
             global g_id
-            g_id=usid
-            f_time=final_time
-            g_time=given_time
+            g_id = usid
+            f_time = final_time
+            g_time = given_time
 
         typ = typ
         session['typ'] = typ
@@ -409,12 +425,12 @@ def payment():
     usid = session['usid']
     form = CardForm()
 
-    #check if the card number and cvv are right.
+    # check if the card number and cvv are right.
     l = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     checkcard = 1
-    checkcvv = 1 #everything is right
+    checkcvv = 1  # everything is right
 
-    c = models.Card.query.filter_by(user_id = current_user.id).first()
+    c = models.Card.query.filter_by(user_id=current_user.id).first()
 
     if c:
         if request.method == 'GET':
@@ -423,17 +439,16 @@ def payment():
             form.card_expiry_date.data = c.expiry_date
             form.card_cvv.data = c.cvv
 
-
     if form.validate_on_submit():
 
-        for n in  form.card_number.data:
+        for n in form.card_number.data:
             if n not in l:
                 checkcard = 0
                 break
         for n in form.card_cvv.data:
             if n not in l:
-                checkcvv= 0
-        if checkcard == 1 and checkcvv ==1:
+                checkcvv = 0
+        if checkcard == 1 and checkcvv == 1:
             if typ == 0:
                 a = Session(cost=Cost,
                             start_date=f_start_date,
@@ -446,7 +461,7 @@ def payment():
                 if scooter:
                     scooter.availability = False
 
-            #Query a card object to check there exist already one for the user loged in.
+                # Query a card object to check there exist already one for the user loged in.
 
                 if not c:
                     print("Card created")
@@ -460,9 +475,7 @@ def payment():
                         db.session.add(card)
                 db.session.commit()
 
-
-
-                    # Sending the confirmation email to the user
+                # Sending the confirmation email to the user
                 Subject = 'Confermation Email | please do not reply'
                 msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
                 msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
@@ -496,8 +509,8 @@ def payment():
                 return redirect("/GuestUsers")
         else:
             if checkcard == 0:
-                return render_template('payment.html', title = 'Payment', form=form, error_message ="Wrong card number or cvv")
-
+                return render_template('payment.html', title='Payment', form=form,
+                                       error_message="Wrong card number or cvv")
 
     return render_template('payment.html', title='Payment', form=form)
 
@@ -620,8 +633,7 @@ def selectLocationguest():
     return render_template('selectLocation.html', user=current_user, form=form)
 
 
-
-#Render the user base page | he can choose between general or related feedback
+# Render the user base page | he can choose between general or related feedback
 @app.route('/help', methods=['GET', 'POST'])
 @login_required
 def generalHelp():
@@ -641,21 +653,21 @@ def userhelpWithScooter():
                                    Session.query.filter_by(user_id=current_user.id)]
         if request.method == 'POST':
             if form.validate_on_submit():
-                    scooter = Scooter.query.filter_by(id = form.scooter_id.data).first()
-                    #Checking if the scooter id exists
-                    if scooter:
-                        userFeedback = Feedback(scooter_id = form.scooter_id.data,
-                                                feedback_text = form.feedback_text.data,
-                                                priority = form.priority.data,
-                                                user = current_user)
-                        db.session.add(userFeedback)
-                        db.session.commit()
-                        message = 'Your feedback has been send succesfully.\n Thank you  '
-                        return render_template('userHelpWithScooter.html',form = form, message = message)
-                    else :
-                        message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. '
-                        return render_template('/userHelpWithScooter.html',form = form, error_message = message)
-        return render_template('userHelpWithScooter.html', form = form)
+                scooter = Scooter.query.filter_by(id=form.scooter_id.data).first()
+                # Checking if the scooter id exists
+                if scooter:
+                    userFeedback = Feedback(scooter_id=form.scooter_id.data,
+                                            feedback_text=form.feedback_text.data,
+                                            priority=form.priority.data,
+                                            user=current_user)
+                    db.session.add(userFeedback)
+                    db.session.commit()
+                    message = 'Your feedback has been send succesfully.\n Thank you  '
+                    return render_template('userHelpWithScooter.html', form=form, message=message)
+                else:
+                    message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. '
+                    return render_template('/userHelpWithScooter.html', form=form, error_message=message)
+        return render_template('userHelpWithScooter.html', form=form)
 
     else:
         return "<h1>Page not found </h1>"
@@ -676,8 +688,8 @@ def generalUserHelp():
                 db.session.add(userFeedback)
                 db.session.commit()
                 message = 'Your General feedback has been send succesfully.\n Thank you '
-                return render_template('userGeneralHelp.html',form = form, message = message)
-        return render_template('userGeneralHelp.html', form = form)
+                return render_template('userGeneralHelp.html', form=form, message=message)
+        return render_template('userGeneralHelp.html', form=form)
     else:
         return "<h1>Page not found </h1>"
 
@@ -705,10 +717,10 @@ def complete(id):
 @login_required
 def helpUser():
     if current_user.account_type == 1:
-        if not  Feedback.query.all():
-            return render_template("employeeFeedbackManagement.html", message = "No Feedback has been submitted")
-        else :
-            return render_template("employeeFeedbackManagement.html", feedback = Feedback.query.all())
+        if not Feedback.query.all():
+            return render_template("employeeFeedbackManagement.html", message="No Feedback has been submitted")
+        else:
+            return render_template("employeeFeedbackManagement.html", feedback=Feedback.query.all())
     else:
         return "<h1>Page not found </h1>"
 
@@ -833,6 +845,7 @@ def employeeChangePassword():
     return render_template('employeeChangePassword.html',
                            title='Change details',
                            form=form)
+
 
 @app.route('/managerCreateEmployee', methods=['GET', 'POST'])
 @login_required
