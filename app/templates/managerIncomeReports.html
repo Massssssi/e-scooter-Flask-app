@@ -85,92 +85,76 @@
       {% endfor %}
     </table>
   </br>
-      <canvas id="chart" width="600" height="400"></canvas>
-      <script>
-            // bar chart data
-            var barData = {
-              type: "Bar",
-              labels : [
-                {% for item in labels %}
-                 "{{ item }}",
-                {% endfor %}
-      	       ],
+  <h5>Income of each day:</h5>
+    <canvas id="chart" width="800" height="400"></canvas>
+    <script>
+    var ctx = document.getElementById('chart');
+    var myChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels : [
+      {% for item in labels %}
+       "{{ item }}",
+      {% endfor %}
+     ],
+     datasets : [{
+       label: "One hour",
+       backgroundColor: "#ff5121",
+       data : [
+         {% for i in range(7) %}
+            "{{ v0[i*5] }}",
+           {% endfor %}
+          ]
+       },
+       {
+         label: "Four hour",
+         backgroundColor: "#ffed21",
+         data : [
+           {% for i in range(7) %}
+              "{{ v0[i*5+1] }}",
+             {% endfor %}
+            ]
+         },
+         {
+           label: "One day",
+           backgroundColor: "#60ff21",
+           data : [
+             {% for i in range(7) %}
+                "{{ v0[i*5+2] }}",
+               {% endfor %}
+           ]
+         },
+         {
+           label: "One week",
+           backgroundColor: "#21ffe5",
+           data : [
+             {% for i in range(7) %}
+                "{{ v0[i*5+3] }}",
+               {% endfor %}
+           ]
+         },
+         {
+           label: "Other",
+           backgroundColor: "#2c21ff",
+           data : [
+             {% for i in range(7) %}
+                "{{ v0[i*5+4] }}",
+               {% endfor %}
+           ]
+         }
+       ]
+     },
+     options: {
+       responsive: false,
+       scales: {
+         xAxes: [{ stacked: true }],
+         yAxes: [{ stacked: true }]
+       }
+     }
+   });
 
-              datasets : [{
-                label: "One hour",
-                fillColor: "rgba(0,187,205,0.2)",
-                strokeColor: "rgba(0,187,205,1)",
-                data : [
-                  {% for i in range(7) %}
-                     "{{ v0[i*5] }}",
-                    {% endfor %}
-      	           ]
-                },
-                {
-                  fillColor: "rgba(200,100,285,0.2)",
-                  strokeColor: "rgba(200,100,285,1)",
-                  data : [
-                    {% for i in range(7) %}
-                       "{{ v0[i*5+1] }}",
-                      {% endfor %}
-        	           ]
-                  },
-                  {
-                    fillColor: "rgba(151,187,0,0.2)",
-                    strokeColor: "rgba(151,187,0,1)",
-                    data : [
-                      {% for i in range(7) %}
-                         "{{ v0[i*5+2] }}",
-                        {% endfor %}
-          	        ]
-                  },
-                  {
-                    fillColor: "rgba(200,100,100,0.2)",
-                    strokeColor: "rgba(200,100,100,1)",
-                    data : [
-                      {% for i in range(7) %}
-                         "{{ v0[i*5+3] }}",
-                        {% endfor %}
-                    ]
-                  },
-                  {
-                    fillColor: "rgba(100,100,200,0.2)",
-                    strokeColor: "rgba(100,100,200,1)",
-                    data : [
-                      {% for i in range(7) %}
-                         "{{ v0[i*5+4] }}",
-                        {% endfor %}
-                    ]
-                  }
-                ]
-              }
-
-           // get bar chart canvas
-           var mychart = document.getElementById("chart").getContext("2d");
-
-             max = {{ max }}
-             steps = Math.ceil(max/100)*10
-
-           // draw bar chart
-           new Chart(mychart).Bar(barData, {
-             scaleOverride: true,
-             scaleSteps: Math.ceil(max / steps),
-             scaleStepWidth: steps,
-             scaleStartValue: 0,
-             scaleShowVerticalLines: true,
-             scaleShowGridLines : true,
-             barShowStroke : true,
-             scaleShowLabels: true,
-             plugins:{
-               title: {
-                 display: true,
-                 text: 'Population growth (millions)'
-               }
-             }
-           });
-          </script>
-    </center>
-
+    </script>
+  </br>
     {% endif %}
     {% endblock %}
   </div>

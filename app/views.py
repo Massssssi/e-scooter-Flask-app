@@ -307,7 +307,7 @@ def incomeReports():
 
         #wd - table 2 weekday column
         wd = []
-        weekday = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"]
+        weekday = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN", "NONE"]
         for i in range(7):
             wd.append(weekday[date1.weekday()])
             date1 += timedelta(days=1)
