@@ -3,7 +3,7 @@
   padding-top: 10px;
   padding-bottom: 10px;
   background-color: #FFB6C1;
-  text-align: center;
+  text-align: left;
   border-radius: 10px;
 }
 
@@ -12,32 +12,29 @@ div.container {
 }
 
 table {
-    margin-top: 20px;
-    margin-bottom: 20px;
-    margin-right: 10px;
-    margin-left: 10px
+    margin: 20px 10px;
 } 
 
 hr.solid {
  border-top: 3px solid rgb(204, 191, 191);
 }
 h3 {
- text-align: center;
- font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
- padding: 12px;
+   font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+   text-align: left;
+      padding: 12px;
 }
 p {
- font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
- text-align: center;
+ font-family:'Trebuchet MS', sans-serif;
+ text-align: left;
 }
 a {	
- text-align: center;
+ text-align: left;
 }
 table {
- text-align: center;
+ text-align: left;
 }
 form {
- text-align: center;
+ text-align: left;
   }
 .deletebutton {
  border: none;
@@ -45,29 +42,243 @@ form {
  background: none;
 }
 
+.nav-item{
+  height: 60px;
+}
+
+.nav-item image {
+  width: 100%;
+}
+
+#dino{
+  /*height: 60px;*/
+  width: 60px;
+}
+
+#bigLogo{
+  float: right;
+}
+
   table {
-      margin-top: 20px;
-      margin-bottom: 20px;
-      margin-right: 10px;
-      margin-left: 10px
+      padding: 12px;
+      margin: 20px 10px;
   } 
 
   h4 {
-   text-align: center;
+   text-align: left;
    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
    padding: 12px;
   }
   p {
    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-   text-align: center;
+   text-align: left;
+      padding: 12px;
   }
   form {
-    text-align: center;
+    text-align: left;
+      padding: 12px;
+  }
+
+  .overdue{
+      background-color: red;
+  }
+
+  .on-time{
+      background-color: green;
   }
   span {
     color: red;
   }
   ul {
-    text-align: center;
+    text-align: left;
     color: red;
   }
+
+  * {
+  box-sizing: border-box;
+}
+
+  table{
+      width:100%;
+  }
+/* Create three equal columns that floats next to each other */
+.column {
+  float: left;
+  width: 33.33%;
+  padding: 10px;
+  height: 300px; /* Should be removed. Only for demonstration */
+}
+
+/* Clear floats after the columns */
+.row:after {
+  content: "";
+  display: table;
+  clear: both;
+}
+.user-HelpPage-body{
+  background-image: url("background1.jpg");
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+.summaryStyle{
+  padding-top: 5%;
+  margin-left: auto;
+  margin-right: auto;
+  width: 60%;
+}
+
+
+
+@media screen and (max-width: 600px) {
+  .column {
+    width: 100%;
+  }
+}
+  div.map{
+    padding-top: 5%;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 40%;
+  }
+
+  summary {
+    font-size: 1.25rem;
+    font-weight: 600;
+    background-color: rgb(32, 8, 54);
+    color: rgb(255, 255, 255);
+    padding: 1rem;
+    margin-bottom: 5%;
+    outline: none;
+    border-radius: 0.25rem;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+
+  }
+  details > summary::after {
+    position: absolute;
+    content: "+";
+    right: 20px;
+  }
+  details[open] > summary::after {
+    position: absolute;
+    content: "-";
+    right: 20px;
+  }
+  details > summary::-webkit-details-marker {
+    display: none;
+  }
+  details[open] summary ~ * {
+    animation: sweep .7s ease-in-out;
+  }
+  @keyframes sweep {
+    0%    {opacity: 0; margin-top: -10px}
+    100%  {opacity: 1; margin-top: 0px}
+  }
+  .faq__content{
+    color: rgb(0, 0, 0);
+    font-size: 18px;
+    font-weight: bold; 
+    font-family: 'georgia';
+    text-decoration: double;
+  }
+  .general-user-help-form{
+    text-align: center;
+    font-family: 'georgia';
+    background-color:blanchedalmond;
+    
+  }
+  .btn{
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    margin: auto;
+    width: 50%;
+    max-width: 700px;
+    align-items: center;
+    margin-top: 5%;
+  }
+
+
+.help-user-image{
+
+  min-width: 400px;
+  max-width: 500px;
+
+  position: relative;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.help-scooter-image{
+  position: relative;
+  width: 20%;
+  vertical-align: middle;
+}
+
+
+.employee-submit1 {
+  background-color: #fbeee0;
+  border: 2px solid #422800;
+  border-radius: 30px;
+  box-shadow: #422800 4px 4px 0 0;
+  color: #422800;
+  cursor: pointer;
+  display: inline-block;
+  font-weight: 600;
+  font-size: 15px;
+  padding: 0 5px;
+  line-height: 25px;
+  text-align: center;
+  text-decoration: none;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  width: 250px;
+}
+
+.employee-submit1 {
+  background-color:beige;
+}
+
+.employee-submit1 {
+  box-shadow: #422800 2px 2px 0 0;
+  transform: translate(2px, 2px);
+}
+
+@media (min-width: 250px) {
+  .employee-submit1 {
+    min-width: 50px;
+    padding: 0 25px;
+  }
+}
+.filter-and-submition{
+  margin: auto;
+  width: 25%;
+  min-width: 250px;
+  padding-top: 2.5%;
+  font-family: 'Times New Roman', Times, serif;
+  text-align: center;
+
+}
+.employeeBody{
+  background-image: url("background1.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+#employee-tables{
+  margin: auto;
+  text-align: center;
+  width: 85%;
+}
+#no-message{
+  text-align: center;
+  padding-top: 5%;
+  font-family:'Times New Roman', Times, serif;
+  font-size: 30px;
+  text-decoration: underline;
+  font-weight: bold;
+  
+
+}

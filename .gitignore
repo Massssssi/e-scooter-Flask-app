@@ -1,0 +1,8 @@
+#ignore cache files
+__pycache__/
+*.pytest_cache
+
+#ignore db and migrations
+app.db
+memory
+migrations/

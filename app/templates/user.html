@@ -1,9 +1,13 @@
 <!-- the basic hompeage for regular users, once logged in of course -->
 {% extends "baseUser.html" %}
-  <div class="block_content">
+  <button class="block_content">
     {% block content %}
 
-      <h3>Hello, {{ user.forename }}!</h3>
+        <h3>Hello, {{ user.forename }}!</h3>
+
+        <p>Welcome to our scooter hiring website.</p>
+        <p>Click here to book a scooter: </p>
+        <a class="nav-link" href="/selectlocation">Book a scooter</a>
 
     {% endblock %}
   </div>

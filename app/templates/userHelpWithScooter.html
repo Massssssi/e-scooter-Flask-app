@@ -6,44 +6,40 @@
     {% block content %}
 
 <form method="post", action="">
+  <body class = "general-user-help-form">
   {{ form.hidden_tag() }}
   {% for field, errors in form.errors.items() %}
   {% endfor %}
   <fieldset class="form-group">
-    <legend> <bold>Help</bold></legend>
-      <div class="form-group mx-sm-5 mb-2">
+      <img class = "help-scooter-image" src="{{ url_for('static', filename = 'e-scooter-helpPage.png')}}" alt="Scooter">
+      <div class="form-group mx-sm-5 mb-2" style="margin-top: 5%; display: inline-block; width: 40%;">
         <label> Scooter number  </label>
         {{ form.scooter_id(class_ = "form-control form-control-sm")}}
       </div>
 
-      <div class="form-group  mx-sm-5 mb-2">
-        <label> Feedback Text  </label>
-        {{ form.feedback_text(class_ = "form-control form-control-lg", rows = "3")}}
+      <div class="form-group  mx-sm-5 mb-2" style="margin-top:2%;">
+        {{ form.feedback_text(class_ = "form-control form-control-lg",rows = "4") }}
       </div>
 
-      <div class="form-group  mx-sm-5 mb-2 ">
-       <label> Feedback Priority </label>
+      <div class="form-group  mx-sm-5 mb-2"style="margin-top:2%;">
         {{form.priority(class_='form-control')}}
       </div>
 
-
+      
   </fieldset>
 
-  <button type="submit" class="btn btn-primary mb-2">Confirm and Send</button>
+  <button type="submit" class="btn btn-primary mb-2 btn-block">Confirm and Send</button>
 
-  {% if error_message %}
-    <div class="alert alert-primary" role="alert">
-      {{error_message}}
-    </div>
-  {% endif%}
+
 
   {% if message%}
-    <div class="alert alert-primary" role="alert">
-      {{message}}
-    </div>
-  {% endif %}
+  <div class="alert alert-primary" role="alert" style="margin : auto; margin-top: 5%;margin-bottom: 5%; width: 80%; box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19); ">
+    {{message}}
+  </div>
+{% endif %}
 
 </form>
+</body>
 
 {% endblock %}
   </div>

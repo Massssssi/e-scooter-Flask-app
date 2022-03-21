@@ -5,8 +5,6 @@ from wtforms import StringField, IntegerField, DateField, TextAreaField, Boolean
     ValidationError, SelectField, FloatField
 # from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, EqualTo, Length, NumberRange, InputRequired
-from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
-from .views import current_user
 
 
 class ConfigureScooterForm(FlaskForm):
@@ -38,6 +36,55 @@ class RegisterForm(FlaskForm):
     email = StringField('email', validators=[DataRequired("Please enter an email address")])
     phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
     password = PasswordField('password', validators=[DataRequired("Please enter your password")])
+
+
+class RegisterEmployeeForm(FlaskForm):  # Used by managers to create or edit employees
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
+    email = StringField('email', validators=[DataRequired("Please enter an email address")])
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
+    password = PasswordField('password', validators=[DataRequired("Please enter your password")])
+    account_type = SelectField('account_type', choices=["Employee", "Manager"])
+    national_insurance_number = StringField('national_insurance_number', validators=[DataRequired(), Length(9, 9,
+                                                                                                            "Error, National insurance number must be exactly 9 characters")])
+
+
+class UserChangeDetailsForm(FlaskForm):
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
+    email = StringField('email', validators=[DataRequired("Please enter an email address")])
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
+
+
+class EmployeeChangeDetailsForm(FlaskForm):  # Form for changing details for both employees and managers
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
+    email = StringField('email', validators=[DataRequired("Please enter an email address")])
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
+    national_insurance_number = StringField('national_insurance_number', validators=[DataRequired(), Length(9, 9,
+                                                                                                            "Error, National insurance number must be exactly 9 characters")])
+
+
+class EmployeeSearchForm(FlaskForm):
+    search_field = SelectField('search_field', choices=[])
+
+
+class EditEmployeeForm(FlaskForm):  # Used by managers to edit employees
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
+    email = StringField('email', validators=[DataRequired("Please enter an email address")])
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
+    account_type = SelectField('account_type', choices=["Employee", "Manager"])
+    national_insurance_number = StringField('national_insurance_number', validators=[DataRequired(), Length(9, 9,
+                                                                                                            "Error, National insurance number must be exactly 9 characters")])
+
+
+class UserChangePasswordForm(FlaskForm):
+    password = PasswordField('New password', validators=[DataRequired(), Length(3, 50,
+                                                                                "Error, Password length must be "
+                                                                                "between 3 and 50 characters")])
+    password_repeat = PasswordField('Enter New password again',
+                                    validators=[DataRequired(), EqualTo('password', 'Error, Passwords do not match')])
 
 
 class BookScooterForm(FlaskForm):
@@ -75,10 +122,11 @@ class ReturnScooterForm(FlaskForm):
 
 class userHelpForm(FlaskForm):
     scooter_id = SelectField('Scooter number', choices=[])
-    feedback_text = TextAreaField('Feedback text')
+    feedback_text = TextAreaField('Feedback text', validators=[DataRequired()],render_kw={"placeholder" :"Please write your Feedback here.."})
     priority = SelectField('priority', choices=[(1, "High priority"), (2, "Medium priority"), (3, "Low priority")])
 
-
+class employeeManagerFilterOption(FlaskForm):
+    filter = SelectField('Filter by', choices=[(1, "Scooter feedback"), (0, "General feedback"), (2, "Completed feedback")])
 
 class DateForm(FlaskForm):
     date = DateField('date', format='%Y-%m-%d', validators=[DataRequired("Please enter a date.")])

@@ -1,8 +1,32 @@
 {% extends "baseUser.html" %}
-  <div class="block_content">
     {% block content %}
-        <a href="/userHelp/related-to-scooter"> If you wish to submit a feedback related to your scooter</a>
-        <br> <br>
-        <a href="/userhelp/related-to-general">If you wish to submit a general feedback related to your scooter</a>
-
+    <body class = "user-HelpPage-body">
+      
+    
+    <div class = "summaryStyle">
+    <details open>
+      <summary>FAQ</summary>
+      <div class="faq__content">
+        <p>If you have any question regarding the scooter or the company. <br>
+          Please call us on : +441111111 <br>Email : software.project.0011@gmail.com</a></p>
+      </div>
+    </details>  
+    <details>
+          <summary>General Feedback</summary>
+          <div class="faq__content">
+            <p>Well we consider your feedback very seriously, please feel free to express your feeling  <a href="/userhelp/related-to-general">Here</a></p>
+          </div>
+    </details>
+    <details>
+          <summary>Feedback related to scooter </summary>
+          <div class="faq__content">
+            <p>If you faced a problem with your scooter, then you need to report that immediately so we can resolve the problem as soon as possible <a href="/userHelp/related-to-scooter">Click Here</a></p>
+          </div>
+    </details>
+    
+    </div>
+  </body>
+    
+        
     {% endblock %}
+  
