@@ -18,7 +18,7 @@
   </p>
   <p>Choose Location:{{ form.location }}</p>
   <p>Number of Scooters:{{form.num_Scooter}}
-  {% for error in form.location.errors %}
+  {% for error in form.location.errors %}</p>
    <span style="color: red";>[{{error}}]</span>
   {% endfor %}<br>
     <p><input type="submit" value="Submit"></p>

@@ -4,7 +4,7 @@
   {% block content %}  
   <form method = "POST">
     {{form.csrf_token}}
-    {{form.location_id}}
+    <span id="locs" name="locs">{{form.location_id}}</span>
     <input type="submit">
 </form>
 <body>

@@ -1,15 +1,30 @@
 {# This is where the user says which location to return their scooter to #}
 
 {% extends "baseUser.html" %}
+<link rel="stylesheet" href="/static/returnScooter.css">
 <div class="block_content">
-  {% block content %}
-  <form method = "POST">
-    {{form.csrf_token}}
-    {{form.location_id}}
-    {{form.scooter}}
-    {{form.hire_period}}
-    {{form.start_date}}
-    <input type="submit">
-</form>
+    {% block content %}
+        <table>
+        <tr>
+            <th>
+                <form method = "POST">
+                    {{form.csrf_token}}
+                    Return Location:    {{form.location_id}}
+                    <input type="submit">
+                </form>
+                <p>Select the location which you returned your scooter to</p>
+                <p>ALl available locations are shown on the map to the right</p>
+            </th>
+            <th>
+                <h1>All available locations 🌏</h1>
+                <iframe class="map" , src="/map" width="500" height="500"></iframe>
+                <h3><b style="background-color: rgb(255, 255, 255); color: rgb(0, 255, 255);">
+                </b></h3>
+            </th>
+        </tr>
+        </table>
+
+
   {% endblock %}
+
 </div>
