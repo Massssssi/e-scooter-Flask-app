@@ -11,7 +11,7 @@ from flask_mail import Message
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
     ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
     ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm, RegisterEmployeeForm, EditEmployeeForm, \
-    EmployeeSearchForm, EmployeeChangeDetailsForm
+    EmployeeSearchForm, EmployeeChangeDetailsForm, employeeManagerFilterOption
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
 import operator
@@ -708,7 +708,10 @@ def helpUser():
         if not  Feedback.query.all():
             return render_template("employeeFeedbackManagement.html", message = "No Feedback has been submitted")
         else :
-            return render_template("employeeFeedbackManagement.html", feedback = Feedback.query.all())
+            form = employeeManagerFilterOption()
+            if form.validate_on_submit:
+                print(form.filter.data)
+                return render_template("employeeFeedbackManagement.html", form = form, feedback = Feedback.query.all())
     else:
         return "<h1>Page not found </h1>"
 
