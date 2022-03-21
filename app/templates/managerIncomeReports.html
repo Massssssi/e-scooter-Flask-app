@@ -85,7 +85,7 @@
       {% endfor %}
     </table>
   </br>
-  <h5>Income of each day:</h5>
+  <h5>Income of each day (not include one week hire sessions):</h5>
     <canvas id="chart" width="800" height="400"></canvas>
     <script>
     var ctx = document.getElementById('chart');
@@ -121,15 +121,6 @@
            data : [
              {% for i in range(7) %}
                 "{{ v0[i*5+2] }}",
-               {% endfor %}
-           ]
-         },
-         {
-           label: "One week",
-           backgroundColor: "#21ffe5",
-           data : [
-             {% for i in range(7) %}
-                "{{ v0[i*5+3] }}",
                {% endfor %}
            ]
          },
