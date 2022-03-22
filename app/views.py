@@ -17,13 +17,9 @@ from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardFo
     EmployeeSearchForm, EmployeeChangeDetailsForm, employeeManagerFilterOption
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 from werkzeug.security import generate_password_hash, check_password_hash
-<<<<<<< HEAD
 import operator, copy
 from flask import Markup
-=======
-import operator
 import babel
->>>>>>> 180667a23d305c378c0fd2db63cc180260ceb9b2
 
 # # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Location, db.session))
