@@ -4,9 +4,33 @@
   {% block content %}  
   <form  method = "POST">
     {{form.csrf_token}}
-    {{form.scooter}}
+ <!--{{form.scooter}}
     {{form.hire_period}}
     {{form.start_date}}
-    <input type="submit">
+    {% if form.start_date %}
+    <input type="datetime-local">
+    {% endif %}-->
+    <body class = "bc">
+    <fieldset class="form-group">
+      <div  class="bc" style="margin-top:4%;">
+        <label> Scooter number  </label>
+        {{ form.scooter(class_ = "form-control form-control-sm")}}
+      </div>
+  
+      <div class="bc" style="margin-top:3%;">
+        {{ form.hire_period(class_ = "form-control form-control-lg",rows = "4") }}
+      </div>
+
+      <div class="bc1"style="margin-top:3%  ;" type="datetime-local">
+        {{form.start_date(class_='form-control')}}
+  
+      </div>
+
+      
+  </fieldset>
+  <button type="submit" class="btn btn-primary mb-2 btn-block">Confirm and Send</button>
+</div>
+</body>
+  
     {% endblock %}
 </div>

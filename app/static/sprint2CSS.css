@@ -141,7 +141,7 @@ form {
     display: block;
     margin-left: auto;
     margin-right: auto;
-    width: 40%;
+    width: 35%;
   }
 
   summary {
@@ -281,4 +281,22 @@ form {
   font-weight: bold;
   
 
+}
+
+.bc{
+  background-image: url("background1.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  text-align: center;
+  font-family: 'georgia';
+
+}
+
+
+.sl{
+  background-image: url("background1.jpg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  text-align: center;
+  font-family: 'georgia';
 }
