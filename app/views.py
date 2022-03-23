@@ -1,3 +1,5 @@
+from dis import dis
+from pickle import FALSE
 from turtle import update
 
 import dateutil
@@ -103,19 +105,32 @@ def user_login():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
+        discount=form.discount.data
 
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             flash("This email had already sign up.")
         else:
-            p = User(email=form.email.data,
+            if(discount==False):
+                p = User(email=form.email.data,
                      password=generate_password_hash(form.password.data, method='sha256'),
                      phone=form.phone.data,
                      forename=form.forename.data,
-                     surname=form.surname.data)
+                     surname=form.surname.data,
+                     discount=False)
 
-            db.session.add(p)
-            db.session.commit()
+                db.session.add(p)
+                db.session.commit()
+            elif(discount==True):
+                p = User(email=form.email.data,
+                     password=generate_password_hash(form.password.data, method='sha256'),
+                     phone=form.phone.data,
+                     forename=form.forename.data,
+                     surname=form.surname.data,
+                     discount=True)
+                db.session.add(p)
+                db.session.commit()
+            
             return redirect("/login")
     return render_template('register.html', title='Register', form=form)
 
@@ -233,12 +248,19 @@ def extend(session_id):
         extension_length = key[form.hire_period.data]
 
         session.end_date += key[form.hire_period.data]  # adds on the new period that they've paid for
+        Discount=models.User.query.filter_by(id=current_user.id).first()
+        discountRate=models.ScooterCost.query.filter_by(id=1).first()
 
         # works out the amount of hours and then multiplies this by the current rate
-        session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600)
+        if(Discount.discount==False):
+            session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600)
 
-        db.session.commit()
+            db.session.commit()
 
+        elif(Discount.discount==True):
+             session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600)-(Cost*discountRate.discount_rate)
+
+             db.session.commit()
         return redirect(url_for('userScooterManagement'))
 
     return render_template('extendSession.html', user=current_user, form=form, hourly_cost=hourly_cost)
@@ -394,7 +416,6 @@ def bookScooter():
     n = 0
     cost = 0
     form = BookScooterForm()
-
     loc_id = request.args['loc_id']
     loc_id = session['loc_id']
 
@@ -411,6 +432,7 @@ def bookScooter():
                                 Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
 
     if form.validate_on_submit():
+        print(form.start_date.data)
         c = models.ScooterCost.query.filter_by(id=1).first()
 
         a = form.hire_period.data
@@ -433,6 +455,8 @@ def bookScooter():
             N = n
 
         given_time = form.start_date.data
+        a=datetime.ctime
+        print(a)
         final_time = given_time + timedelta(hours=n)
         if typ == 0:
             global Cost
@@ -486,8 +510,13 @@ def payment():
     checkcard = 1
     checkcvv = 1  # everything is right
 
-    c = models.Card.query.filter_by(user_id=current_user.id).first()
-
+    Discount=models.User.query.filter_by(id=current_user.id).first()
+    discountRate=models.ScooterCost.query.filter_by(id=1).first()
+    c = models.Card.query.filter_by(user_id = current_user.id).first()
+    #print(c)
+    #print(current_user.id)
+    #print(discountRate.discount_rate)
+    #print(Discount.discount)
     if c:
         if request.method == 'GET':
             form.card_holder.data = c.holder
@@ -496,26 +525,36 @@ def payment():
             form.card_cvv.data = c.cvv
 
     if form.validate_on_submit():
-
-        for n in form.card_number.data:
+        
+        for n in  form.card_number.data:
             if n not in l:
                 checkcard = 0
                 break
         for n in form.card_cvv.data:
             if n not in l:
-                checkcvv = 0
-        if checkcard == 1 and checkcvv == 1:
-            if typ == 0:
+                checkcvv= 0
+        if checkcard == 1 and checkcvv ==1:
+            if typ == 0 and Discount.discount==False:
                 a = Session(cost=Cost,
                             start_date=f_start_date,
                             scooter_id=f_scooter_data,
                             user_id=us_id,
                             end_date=f_time)
                 db.session.add(a)
-                scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
+                db.session.commit()
+            elif(typ == 0 and Discount.discount==True):
+                a = Session(cost=Cost-(Cost*discountRate.discount_rate),
+                            start_date=f_start_date,
+                            scooter_id=f_scooter_data,
+                            user_id=us_id,
+                            end_date=f_time)
+                db.session.add(a)
+                db.session.commit()
 
-                if scooter:
-                    scooter.availability = False
+            scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
+
+            if scooter:
+                scooter.availability = False
 
                 # Query a card object to check there exist already one for the user loged in.
 

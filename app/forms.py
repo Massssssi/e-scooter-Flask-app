@@ -3,7 +3,6 @@ from wtforms import StringField, IntegerField, DateField, TextAreaField, Boolean
     ValidationError, SelectField, FloatField, DateTimeField
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, \
     ValidationError, SelectField, FloatField
-# from wtforms.fields.html5 import DateField
 from wtforms.validators import DataRequired, EqualTo, Length, NumberRange, InputRequired
 
 
@@ -36,6 +35,7 @@ class RegisterForm(FlaskForm):
     email = StringField('email', validators=[DataRequired("Please enter an email address")])
     phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
     password = PasswordField('password', validators=[DataRequired("Please enter your password")])
+    discount = BooleanField('discount')
 
 
 class RegisterEmployeeForm(FlaskForm):  # Used by managers to create or edit employees
@@ -91,7 +91,6 @@ class BookScooterForm(FlaskForm):
     scooter = SelectField('scooter', choices=[], validators=[DataRequired()])
     hire_period = SelectField('hire_period', choices=["One hour", "four hours", "One day", "one week"])
     start_date = DateTimeField('datetime', format='%Y-%m-%d %H:%M:%S')
-
 
 class selectLocationForm(FlaskForm):
     location_id = SelectField('location_id', choices=[])
