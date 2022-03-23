@@ -104,7 +104,7 @@ class CardForm(FlaskForm):
     card_holder = StringField('Card Holder', validators=[DataRequired("Please enter the card holder")])
     card_number = StringField('Card Number', validators=[DataRequired("Please enter the card number"),
                                                          Length(min=16, max=16, message="Not a valid card number")])
-    card_expiry_date = DateField('Expiry Date')
+    card_expiry_date = DateField('Expiry Date', format = '%Y-%m')
     card_cvv = StringField('cvv', validators=[DataRequired("Please enter card cvv"),
                                               Length(min=3, max=4, message="Not a valid cvv")])
     save_card = BooleanField('saveCard')  # Asking the user to save his card details.

@@ -7,13 +7,13 @@
   border-radius: 10px;
 }
 
-div.container { 
+div.container {
     width:1000px;
 }
 
 table {
     margin: 20px 10px;
-} 
+}
 
 hr.solid {
  border-top: 3px solid rgb(204, 191, 191);
@@ -27,7 +27,7 @@ p {
  font-family:'Trebuchet MS', sans-serif;
  text-align: left;
 }
-a {	
+a {
  text-align: left;
 }
 table {
@@ -62,7 +62,7 @@ form {
   table {
       padding: 12px;
       margin: 20px 10px;
-  } 
+  }
 
   h4 {
    text-align: left;
@@ -181,7 +181,7 @@ form {
   .faq__content{
     color: rgb(0, 0, 0);
     font-size: 18px;
-    font-weight: bold; 
+    font-weight: bold;
     font-family: 'georgia';
     text-decoration: double;
   }
@@ -189,7 +189,7 @@ form {
     text-align: center;
     font-family: 'georgia';
     background-color:blanchedalmond;
-    
+
   }
   .btn{
     box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
@@ -279,7 +279,7 @@ form {
   font-size: 30px;
   text-decoration: underline;
   font-weight: bold;
-  
+
 
 }
 
@@ -299,4 +299,29 @@ form {
   background-repeat: no-repeat;
   text-align: center;
   font-family: 'georgia';
+}
+
+.ListScoot  td{
+  border: 1px solid;
+  height: 50px;
+}
+.ListScoot tr:hover
+{
+  background-color: yellow;
+}
+.ListScoot th{
+  border: 1px solid;
+  background-color: green;
+  color: white;
+  height: 80px;
+}
+.ListScoot table{
+  border: 1px solid;
+  width: 80%;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+}
+.ListScoot h1{
+  text-align: center;
 }
