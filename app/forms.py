@@ -90,7 +90,7 @@ class UserChangePasswordForm(FlaskForm):
 class BookScooterForm(FlaskForm):
     scooter = SelectField('scooter', choices=[], validators=[DataRequired()])
     hire_period = SelectField('hire_period', choices=["One hour", "four hours", "One day", "one week"])
-    start_date = DateTimeField('datetime', format='%Y-%m-%d %H:%M:%S')
+    start_date = DateTimeField('datetime',format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
 
 class selectLocationForm(FlaskForm):
     location_id = SelectField('location_id', choices=[])
