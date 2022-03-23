@@ -23,6 +23,7 @@ class Scooter(db.Model):
 class ScooterCost(db.Model):  # A table that only stores the cost of all scooters, as they are all identical
     id = db.Column(db.Integer, primary_key=True)
     hourly_cost = db.Column(db.Float, nullable=False, default=10.00)
+    discount_rate = db.Column(db.Float, nullable=False, default=0.1)
 
 
 class Session(db.Model):
@@ -58,6 +59,7 @@ class User(UserMixin, db.Model):
     card = db.relationship('Card', backref='user')
     feedback = db.relationship('Feedback', backref='user')
     session = db.relationship('Session', backref='user')
+    discount= db.Column(db.Boolean)
 
     def get_id(self):
         return self.id
