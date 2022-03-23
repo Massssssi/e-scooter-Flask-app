@@ -147,6 +147,15 @@ def logout():
 def user():
     return render_template('user.html', title='Home', user=current_user)
 
+@app.route('/userAccountSettings')
+@login_required
+def userAccountSettings():
+    return render_template('userAccountSettings.html', title='User Account Settings', user=current_user)
+
+@app.route('/employeeAccountSettings')
+@login_required
+def employeeAccountSettings():
+    return render_template('employeeAccountSettings.html', title='Employee Account Settings', user=current_user)
 
 @app.route('/user/booking')
 @login_required
