@@ -14,45 +14,135 @@
         <input type="submit" class="button" value="Submit">
     </form>
 
-    {% if result %}
+    {% if rank %}
+
+    <h5>For the whole week:</h5>
     <table border="1">
       <tr>
         <td>Hire length</td>
         <td>No. of session</td>
         <td>Total income</td>
+        <td>Ranking of popularity</td>
       </tr>
       <tr>
         <td>One hour</td>
-        <td>{{ result[0][0] }}</td>
-        <td>{{ result[0][1] }}</td>
+        <td>{{ freq[0] }}</td>
+        <td>{{ income[0] }}</td>
+        <td>{{ rank[0] }}</td>
       </tr>
       <tr>
         <td>Four hour</td>
-        <td>{{ result[1][0] }}</td>
-        <td>{{ result[1][1] }}</td>
+        <td>{{ freq[1] }}</td>
+        <td>{{ income[1] }}</td>
+        <td>{{ rank[1] }}</td>
       </tr>
       <tr>
         <td>One day</td>
-        <td>{{ result[2][0] }}</td>
-        <td>{{ result[2][1] }}</td>
+        <td>{{ freq[2] }}</td>
+        <td>{{ income[2] }}</td>
+        <td>{{ rank[2] }}</td>
       </tr>
       <tr>
         <td>One week</td>
-        <td>{{ result[3][0] }}</td>
-        <td>{{ result[3][1] }}</td>
+        <td>{{ freq[3] }}</td>
+        <td>{{ income[3] }}</td>
+        <td>{{ rank[3] }}</td>
       </tr>
       <tr>
         <td>Other (extended)</td>
-        <td>{{ result[4][0] }}</td>
-        <td>{{ result[4][1] }}</td>
+        <td>{{ freq[4] }}</td>
+        <td>{{ income[4] }}</td>
+        <td>{{ rank[4] }}</td>
       </tr>
     </table>
+  </br>
+    <h5>Number of session on each day:</h5>
+    <table border="1">
+      <tr>
+        <td>Date</td>
+        <td>Weekday</td>
+        <td>One hour</td>
+        <td>Four hour</td>
+        <td>One day</td>
+        <td>One week</td>
+        <td>Other (extended)</td>
+        <td>Total</td>
+      </tr>
+      {% for i in range(7) %}
+      <tr>
+        <td>{{ labels[i] }}</td>
+        <td>{{ wd[i] }}</td>
+        <td>{{ v1[i*5] }}</td>
+        <td>{{ v1[i*5+1] }}</td>
+        <td>{{ v1[i*5+2] }}</td>
+        <td>{{ v1[i*5+3] }}</td>
+        <td>{{ v1[i*5+4] }}</td>
+        <td>{{ v1[i*5] + v1[i*5+1] + v1[i*5+2] + v1[i*5+3] + v1[i*5+4] }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+  </br>
+  <h5>Income of each day (not include one week hire sessions):</h5>
+    <canvas id="chart" width="800" height="400"></canvas>
+    <script>
+    var ctx = document.getElementById('chart');
+    var myChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels : [
+      {% for item in labels %}
+       "{{ item }}",
+      {% endfor %}
+     ],
+     datasets : [{
+       label: "One hour",
+       backgroundColor: "#ff5121",
+       data : [
+         {% for i in range(7) %}
+            "{{ v0[i*5] }}",
+           {% endfor %}
+          ]
+       },
+       {
+         label: "Four hour",
+         backgroundColor: "#ffed21",
+         data : [
+           {% for i in range(7) %}
+              "{{ v0[i*5+1] }}",
+             {% endfor %}
+            ]
+         },
+         {
+           label: "One day",
+           backgroundColor: "#60ff21",
+           data : [
+             {% for i in range(7) %}
+                "{{ v0[i*5+2] }}",
+               {% endfor %}
+           ]
+         },
+         {
+           label: "Other",
+           backgroundColor: "#2c21ff",
+           data : [
+             {% for i in range(7) %}
+                "{{ v0[i*5+4] }}",
+               {% endfor %}
+           ]
+         }
+       ]
+     },
+     options: {
+       responsive: false,
+       scales: {
+         xAxes: [{ stacked: true }],
+         yAxes: [{ stacked: true }]
+       }
+     }
+   });
 
-    <p>Popular hire length ranking:</p>
-    {% for i in freq %}
-    <p>{{ i[0] }}</p>
-    {% endfor %}
+    </script>
+  </br>
     {% endif %}
-
     {% endblock %}
   </div>
