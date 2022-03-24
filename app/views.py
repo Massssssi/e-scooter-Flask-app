@@ -1,27 +1,21 @@
-from dis import dis
-from pickle import FALSE
-from turtle import update
-
-import dateutil
-
-from app import app, db, models, mail, admin
+import copy
 import json
 from datetime import timedelta, datetime, date
+
 import folium
 import pandas as pd
 from flask import render_template, flash, request, redirect, url_for, session
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_mail import Message
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from app import app, db, models, mail, admin
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
     ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
     ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm, RegisterEmployeeForm, EditEmployeeForm, \
     EmployeeSearchForm, EmployeeChangeDetailsForm, employeeManagerFilterOption
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
-from werkzeug.security import generate_password_hash, check_password_hash
-import operator, copy
-from flask import Markup
-import babel
 
 # # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Location, db.session))
