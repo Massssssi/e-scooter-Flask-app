@@ -570,11 +570,9 @@ def payment():
                             end_date=f_time)
                 db.session.add(a)
                 db.session.commit()
-
-            scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
-
-            if scooter:
-                scooter.availability = False
+                scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
+                if scooter:
+                    scooter.availability = False
 
                 # Query a card object to check there exist already one for the user loged in.
 
