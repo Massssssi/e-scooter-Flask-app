@@ -13,7 +13,7 @@
         {% if sessions|length==0 %}
             <h1>You currently have no sessions booked in, go get scooting!</h1>
         {% else %}
-            <h2>Future Sessions:</h2>
+            <h2>Future Sessions</h2>
             <table>
             <thead style="display:table-header-group">
              <tr>
@@ -27,25 +27,27 @@
              </thead>
             <tbody>
             {% for s in sessions%}
-                    <td class = "first">{{ s.scooter_id}}</td>
-                    <td class = "second">{{ s.start_date|strftime }}</td>
-                    <td class = "third">{{s.end_date|strftime }}</td>
-                    <td class = "fourth">{{(s.end_date - s.start_date)|strftime("half")}}</td>
-                    <td class = "fifth">{{ "£{:,.2f}".format(s.cost)}}</td>
+                <tr>
+                <td class = "first">{{ s.scooter_id}}</td>
+                <td class = "second">{{ s.start_date|strftime }}</td>
+                <td class = "third">{{s.end_date|strftime }}</td>
+                <td class = "fourth">{{(s.end_date - s.start_date)|strftime("half")}}</td>
+                <td class = "fifth">{{ "£{:,.2f}".format(s.cost)}}</td>
 
-                        <td>
-                         <form action="{{url_for('cancel')}}" name = "statusform" method="post">
-                          <input type="hidden" name="cancel" value="{{ s.id }}"/>
-                          <input type="submit" class="deletebutton" value="Cancel Booking" name="cancelButton"/>
-                        </form>
-                        </td>
+                <td>
+                 <form action="{{url_for('cancel')}}" name = "statusform" method="post">
+                  <input type="hidden" name="cancel" value="{{ s.id }}"/>
+                  <input type="submit" class="deletebutton" value="Cancel Booking" name="cancelButton"/>
+                </form>
+                </td>
 
-                    <td>
-                        <form action="{{'extendSession/' + s.id|string}}" name = "statusform" method="post">
-                        <input type="hidden" name="extend" value="{{ s.id }}"/>
-                        <input type="submit" class="deletebutton" value="Extend Booking" name="extendButton"/>
-                        </form>
-                    </td>
+                <td>
+                    <form action="{{'extendSession/' + s.id|string}}" name = "statusform" method="post">
+                    <input type="hidden" name="extend" value="{{ s.id }}"/>
+                    <input type="submit" class="deletebutton" value="Extend Booking" name="extendButton"/>
+                    </form>
+                </td>
+                </tr>
 
             {% endfor %}
             </tbody>

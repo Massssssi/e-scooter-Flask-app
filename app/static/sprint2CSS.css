@@ -80,11 +80,11 @@ form {
   }
 
   .overdue{
-      background-color: red;
+      background-color: rgba(255,116,87,0.71);
   }
 
   .on-time{
-      background-color: green;
+      background-color: rgba(151,255,88,0.71);
   }
   span {
     color: red;
@@ -176,18 +176,19 @@ form {
   }
   @keyframes sweep {
     0%    {opacity: 0; margin-top: -10px}
-    100%  {opacity: 1; margin-top: 0px}
+    100%  {opacity: 1; margin-top: 0
+    }
   }
   .faq__content{
     color: rgb(0, 0, 0);
     font-size: 18px;
     font-weight: bold;
-    font-family: 'georgia';
+    font-family: 'georgia', serif;
     text-decoration: double;
   }
   .general-user-help-form{
     text-align: center;
-    font-family: 'georgia';
+    font-family: 'georgia', serif;
     background-color:blanchedalmond;
 
   }
@@ -289,7 +290,7 @@ form {
   background-size: cover;
   background-repeat: no-repeat;
   text-align: center;
-  font-family: 'georgia';
+  font-family: 'georgia', serif;
 
 }
 
@@ -299,7 +300,7 @@ form {
   background-size: cover;
   background-repeat: no-repeat;
   text-align: center;
-  font-family: 'georgia';
+  font-family: 'georgia', serif;
 }
 
 .ListScoot  td{
@@ -360,6 +361,7 @@ form {
   background-color: inherit;
   font-family: inherit; /* Important for vertical align on mobile phones */
   margin: 0; /* Important for vertical align on mobile phones */
+  text-decoration: none;
 }
 
 /* Dropdown content (hidden by default) */
@@ -394,6 +396,21 @@ form {
 /* Show the dropdown menu on hover */
 .dropdown:hover .dropdown-content {
   display: block;
+}
+
+#userHomepageTable{
+  margin-left: auto;
+  margin-right: auto;
+  width: 70%;
+}
+.userHomepageImages td, .userHomepageImages img{
+  width: 150px;
+  text-align: center;
+}
+
+.userHomepageHeaders td{
+  text-align: center;
+  font-size: xx-large;
 }
 
 /* Styling for the forms on every form page */

@@ -99,29 +99,29 @@ def user_login():
 def register():
     form = RegisterForm()
     if form.validate_on_submit():
-        discount=form.discount.data
+        discount = form.discount.data
 
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             flash("This email had already sign up.")
         else:
-            if(discount==False):
+            if (discount == False):
                 p = User(email=form.email.data,
-                     password=generate_password_hash(form.password.data, method='sha256'),
-                     phone=form.phone.data,
-                     forename=form.forename.data,
-                     surname=form.surname.data,
-                     discount=False)
+                         password=generate_password_hash(form.password.data, method='sha256'),
+                         phone=form.phone.data,
+                         forename=form.forename.data,
+                         surname=form.surname.data,
+                         discount=False)
 
                 db.session.add(p)
                 db.session.commit()
-            elif(discount==True):
+            elif (discount == True):
                 p = User(email=form.email.data,
-                     password=generate_password_hash(form.password.data, method='sha256'),
-                     phone=form.phone.data,
-                     forename=form.forename.data,
-                     surname=form.surname.data,
-                     discount=True)
+                         password=generate_password_hash(form.password.data, method='sha256'),
+                         phone=form.phone.data,
+                         forename=form.forename.data,
+                         surname=form.surname.data,
+                         discount=True)
                 db.session.add(p)
                 db.session.commit()
 
@@ -141,15 +141,18 @@ def logout():
 def user():
     return render_template('user.html', title='Home', user=current_user)
 
+
 @app.route('/userAccountSettings')
 @login_required
 def userAccountSettings():
     return render_template('userAccountSettings.html', title='User Account Settings', user=current_user)
 
+
 @app.route('/employeeAccountSettings')
 @login_required
 def employeeAccountSettings():
     return render_template('employeeAccountSettings.html', title='Employee Account Settings', user=current_user)
+
 
 @app.route('/user/booking')
 @login_required
@@ -177,13 +180,19 @@ def userScooterManagement():
     activeSessions = []
 
     for session in user.session:
-        if session.returned is False:
-            if session.start_date <= datetime.now():
-                activeSessions.append(session)
+        if session.returned is False and session.start_date < datetime.now():
+            activeSessions.append(session)
+    print("Active sessions", activeSessions)
 
     return render_template('userActiveSessions.html', title='Home',
                            user=current_user, sessions=activeSessions,
                            time=datetime.utcnow())
+
+
+# for sorting the sessions into the correct order
+def sortByDate(session):
+    return session.start_date
+
 
 @app.route('/user/futureSessions', methods=['GET'])
 @login_required
@@ -192,10 +201,11 @@ def userFutureManagement():
     activeSessions = []
 
     for session in user.session:
-        if session.returned is False:
-            if session.start_date <= datetime.now():
-                activeSessions.append(session)
+        if session.start_date > datetime.now():
+            activeSessions.append(session)
 
+    activeSessions.sort(key=sortByDate)
+    print(activeSessions)
     return render_template('userFutureSessions.html', title='Home',
                            user=current_user, sessions=activeSessions,
                            time=datetime.utcnow())
@@ -263,19 +273,20 @@ def extend(session_id):
         extension_length = key[form.hire_period.data]
 
         session.end_date += key[form.hire_period.data]  # adds on the new period that they've paid for
-        Discount=models.User.query.filter_by(id=current_user.id).first()
-        discountRate=models.ScooterCost.query.filter_by(id=1).first()
+        Discount = models.User.query.filter_by(id=current_user.id).first()
+        discountRate = models.ScooterCost.query.filter_by(id=1).first()
 
         # works out the amount of hours and then multiplies this by the current rate
-        if(Discount.discount==False):
+        if (Discount.discount == False):
             session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600)
 
             db.session.commit()
 
-        elif(Discount.discount==True):
-             session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600)-(Cost*discountRate.discount_rate)
+        elif (Discount.discount == True):
+            session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600) - (
+                        Cost * discountRate.discount_rate)
 
-             db.session.commit()
+            db.session.commit()
         return redirect(url_for('userScooterManagement'))
 
     return render_template('extendSession.html', user=current_user, form=form, hourly_cost=hourly_cost)
@@ -292,12 +303,14 @@ def employee():
 def manager():
     return render_template('manager.html', title='Manager Home', user=current_user)
 
+
 def check_day(start_date, session):
     for i in range(7):
         check = start_date + timedelta(days=i)
         if (check.strftime("%d%m%Y") == session.start_date.strftime("%d%m%Y")):
             return i
     return -1
+
 
 @app.route('/incomeReports', methods=['GET', 'POST'])
 @login_required
@@ -330,14 +343,14 @@ def incomeReports():
                     d = check_day(date1, s)
                     day[d][4].append(s)
 
-        #x-axis in the graph, dd/mm/yyyy
+        # x-axis in the graph, dd/mm/yyyy
         labels = []
         for i in range(7):
             labels.append(date1.strftime("%d/%m/%Y"))
             date1 += timedelta(days=1)
         date1 -= timedelta(days=7)
 
-        #v0 - graph data    v1 - table 2 data
+        # v0 - graph data    v1 - table 2 data
         v0 = []
         v1 = []
         f_sorted = [0, 0, 0, 0, 0]
@@ -351,15 +364,15 @@ def incomeReports():
                 v1.append(len(time))
                 f_sorted[n] += len(time)
                 n += 1
-        #income - table income column
+        # income - table income column
         income = []
         for i in range(5):
             inc = 0
             for j in range(7):
-                inc += v0[j*5+i]
+                inc += v0[j * 5 + i]
             income.append(inc)
 
-        #freq - table 1 no. of session      rank - table 1 ranking
+        # freq - table 1 no. of session      rank - table 1 ranking
         freq = copy.deepcopy(f_sorted)
         f_sorted.sort()
         f_sorted.reverse()
@@ -367,7 +380,7 @@ def incomeReports():
         for data in freq:
             rank.append(f_sorted.index(data) + 1)
 
-        #wd - table 2 weekday column
+        # wd - table 2 weekday column
         wd = []
         weekday = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN", "NONE"]
         for i in range(7):
@@ -375,9 +388,10 @@ def incomeReports():
             date1 += timedelta(days=1)
 
         return render_template('managerIncomeReports.html', title='Income Report',
-                            form=form, income=income, freq=freq, rank=rank,
-                            max=max(v0), labels=labels, v0=v0, v1=v1, wd=wd)
+                               form=form, income=income, freq=freq, rank=rank,
+                               max=max(v0), labels=labels, v0=v0, v1=v1, wd=wd)
     return render_template('managerIncomeReports.html', title='Income Report', form=form)
+
 
 @app.route('/selectlocation', methods=['GET', 'POST'])
 @login_required
@@ -456,7 +470,7 @@ def bookScooter():
             n = 1
             global N
             N = n
-        elif (a == "four hours"):
+        elif (a == "Four hours"):
             cost = 4 * c.hourly_cost
             n = 4
             N = n
@@ -464,13 +478,13 @@ def bookScooter():
             cost = 24 * c.hourly_cost
             n = 24
             N = n
-        elif (a == "one week"):
+        elif (a == "One week"):
             cost = 168 * c.hourly_cost
             n = 168
             N = n
 
         given_time = form.start_date.data
-        a=datetime.ctime
+        a = datetime.ctime
         print(a)
         final_time = given_time + timedelta(hours=n)
         if typ == 0:
@@ -525,14 +539,14 @@ def payment():
     checkcard = 1
     checkcvv = 1  # everything is right
 
-    Discount=models.User.query.filter_by(id=current_user.id).first()
-    discountRate=models.ScooterCost.query.filter_by(id=1).first()
-    c = models.Card.query.filter_by(user_id = current_user.id).first()
-    #print(c)
-    #print(current_user.id)
-    #print(discountRate.discount_rate)
-    #print(Discount.discount)
-    today_year= date.today().year
+    Discount = models.User.query.filter_by(id=current_user.id).first()
+    discountRate = models.ScooterCost.query.filter_by(id=1).first()
+    c = models.Card.query.filter_by(user_id=current_user.id).first()
+    # print(c)
+    # print(current_user.id)
+    # print(discountRate.discount_rate)
+    # print(Discount.discount)
+    today_year = date.today().year
     choice = []
     for i in range(6):
         choice.append(today_year + i)
@@ -546,15 +560,15 @@ def payment():
 
     if form.validate_on_submit():
 
-        for n in  form.card_number.data:
+        for n in form.card_number.data:
             if n not in l:
                 checkcard = 0
                 break
         for n in form.card_cvv.data:
             if n not in l:
-                checkcvv= 0
-        if checkcard == 1 and checkcvv ==1:
-            if typ == 0 and Discount.discount==False:
+                checkcvv = 0
+        if checkcard == 1 and checkcvv == 1:
+            if typ == 0 and Discount.discount == False:
                 a = Session(cost=Cost,
                             start_date=f_start_date,
                             scooter_id=f_scooter_data,
@@ -562,8 +576,8 @@ def payment():
                             end_date=f_time)
                 db.session.add(a)
                 db.session.commit()
-            elif(typ == 0 and Discount.discount==True):
-                a = Session(cost=Cost-(Cost*discountRate.discount_rate),
+            elif (typ == 0 and Discount.discount == True):
+                a = Session(cost=Cost - (Cost * discountRate.discount_rate),
                             start_date=f_start_date,
                             scooter_id=f_scooter_data,
                             user_id=us_id,
@@ -577,7 +591,7 @@ def payment():
                 # Query a card object to check there exist already one for the user loged in.
 
                 if not c:
-                    expdate = str(form.card_expiry_Year.data)+"-"+str(form.card_expiry_Month.data)+"-01"
+                    expdate = str(form.card_expiry_Year.data) + "-" + str(form.card_expiry_Month.data) + "-01"
                     date_time_obj = datetime.strptime(expdate, '%Y-%m-%d').date()
                     print("Card created")
                     card = Card(holder=form.card_holder.data,
@@ -802,9 +816,9 @@ def generalUserHelp():
                                         user=current_user)
                 db.session.add(userFeedback)
                 db.session.commit()
-                message = 'Your General feedback has been send succesfully. Thank you '
-                return render_template('userGeneralHelp.html',form = form, message = message)
-        return render_template('userGeneralHelp.html', form = form)
+                message = 'Your General feedback has been sent successfully. Thank you '
+                return render_template('userGeneralHelp.html', form=form, message=message)
+        return render_template('userGeneralHelp.html', form=form)
     else:
         return "<h1>Page not found </h1>"
 
@@ -832,15 +846,15 @@ def complete(id):
 @login_required
 def helpUser():
     if current_user.account_type == 1:
-        if not  Feedback.query.all():
+        if not Feedback.query.all():
 
             return render_template("employeeFeedbackManagement.html")
-        else :
+        else:
 
             form = employeeManagerFilterOption()
             if form.validate_on_submit:
                 print("in here")
-                return render_template("employeeFeedbackManagement.html", form = form, feedback = Feedback.query.all())
+                return render_template("employeeFeedbackManagement.html", form=form, feedback=Feedback.query.all())
             else:
                 return "<h1>Page not found </h1>"
     else:
@@ -850,7 +864,7 @@ def helpUser():
 # Manger needs to see all high priority feedbacks  | backlog ID = 15
 @app.route('/manager/userFeedback', methods=['GET', 'POST'])
 @login_required
-def mangerHighPriority():
+def managerHighPriority():
     if current_user.account_type == 2:
         if not Feedback.query.all():
             return render_template("managerFeedbackManagement.html")
@@ -858,7 +872,8 @@ def mangerHighPriority():
             form = employeeManagerFilterOption()
             form.filter.choices = [(1, "Completed Feedback"), (2, "Non-completed Feedback")]
             if form.validate_on_submit:
-                return render_template("managerFeedbackManagement.html", form = form, feedback=Feedback.query.filter_by(priority=1))
+                return render_template("managerFeedbackManagement.html", form=form,
+                                       feedback=Feedback.query.filter_by(priority=1))
     else:
         return "<h1>Page not found </h1>"
 
