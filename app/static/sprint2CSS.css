@@ -395,3 +395,60 @@ form {
 .dropdown:hover .dropdown-content {
   display: block;
 }
+
+/* Styling for the forms on every form page */
+.form-control {
+  width: 70%;
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+  align-content: center;
+  text-align: center;
+}
+
+/* Highlights around form on click */
+.form-control:focus {
+  border: 3px solid #555;
+}
+
+/* Styling of the remember me button */
+.rememberme {
+    align-content: center;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.checkbox {
+  height: 35px;
+  width: 35px;
+}
+
+/* Responsible for the bottom section of every form page (i.e. after the forms themselves) */
+
+.button {
+    align-content: center;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* Styling for all the form buttons */
+input[type=button], input[type=submit], input[type=search] {
+  background-color: white;
+  border: 3px solid #555;
+  padding: 16px 32px;
+  text-decoration: none;
+  margin-left: auto;
+  margin-right: auto;
+  align-content: center;
+  text-align: center;
+  cursor: pointer;
+}
+
+.subheading {
+    align-content: center;
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}

@@ -1,47 +1,51 @@
 <!-- This is where the manager can view all employees and perform basic CRUD operations -->
 
 {% extends "baseEmployeeManager.html" %}
+<link rel="stylesheet" href="/static/forms.css">
   <div class="block_content">
     {% block content %}
-        <form method="post" , action="/managerCreateEmployee">
+    <h1>Search for an employee</h1>
+    <form method="post" , action="/managerCreateEmployee">
   {{ form.hidden_tag() }}
-
-    Forename: {{ form.forename(class_='form-control') }}
+  <div class="form">
+    {{ form.forename(class='form-control') }}
     {% for error in form.forename.errors %}
     <span class="warning">[{{ error }}]</span>
     {% endfor %}<br>
 
-    Surname: {{ form.surname(class_='form-control') }}
+    {{ form.surname(class='form-control') }}
     {% for error in form.surname.errors %}
     <span class="warning">[{{ error }}]</span>
     {% endfor %}<br>
 
-    Email: {{ form.email(class_='form-control', type = 'email') }}
+    {{ form.email(class='form-control', type = 'email') }}
     {% for error in form.email.errors %}
     <span class="warning">[{{ error }}]</span>
     {% endfor %}<br>
 
-    Phone: {{ form.phone(class_='form-control') }}
+    {{ form.phone(class='form-control') }}
     {% for error in form.phone.errors %}
     <span class="warning">[{{ error }}]</span>
     {% endfor %}<br>
 
-    National Insurance Number: {{ form.national_insurance_number(class_='form-control') }}
+    {{ form.national_insurance_number(class='form-control') }}
     {% for error in form.national_insurance_number.errors %}
     <span class="warning">[{{ error }}]</span>
     {% endfor %}<br>
 
-    Account Type: {{ form.account_type(class_='form-control') }}
+    {{ form.account_type(class_='form-control') }}
     {% for error in form.account_type.errors %}
     <span class="warning">[{{ error }}]</span>
     {% endfor %}<br>
 
-    Password: {{ form.password(class_='form-control') }}
+    {{ form.password(class='form-control') }}
     {% for error in form.password.errors %}
     <span class="warning">[{{ error }}]</span>
     {% endfor %}<br>
-
+  </div>
+  <div class="button">
     <input type="submit" class="button" value="Submit">
+  </div>
 </form>
     {% endblock %}
   </div>

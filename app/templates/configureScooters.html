@@ -13,27 +13,36 @@
   {% endif %}
 {% endwith %}
 <div class="container">
-  <h4>Configure Scooters</h4>
+  <h1>Configure Scooters</h1>
 <form action="" method="post" name="configurescooter">
     {{ form.hidden_tag() }}
-    <p>Scooter ID</p>
+    <div class="subheading">
+      Scooter ID
+    </div>
     <p>
-       {{ form.id }}<br>
+       {{ form.id(class_='form-control')}}<br>
        {% for error in form.id.errors %}
        <span>[{{ error }}] </span>
        {% endfor %}
     </p>
-    <p>Availability</p>
-    <p>{{ form.availability }}</p>
+    <div class="subheading">
+      Availability
+    </div>
+    <p>{{ form.availability(class_='form-control')}}</p>
     {% for error in form.availability.errors %}
        <span>[{{ error }}] </span>
        {% endfor %}
-    <p>Location</p>
-    <p>{{ form.location }}</p>
+    <div class="subheading">
+        Location
+    </div>
+    <p>{{ form.location(class_='form-control')}}</p>
     {% for error in form.location.errors %}
        <span>[{{ error }}] </span>
        {% endfor %}
-    <p><input type="submit" class="btn btn-dark" value="Submit"></p>
+    <div class="button">
+        <input type="submit" class="submit" value="Submit">
+    </div>
 </form>
+    </div>
 {% endblock %}
-  </div>
+</div>

@@ -13,15 +13,22 @@
   {% endif %}
 {% endwith %}
 <div class="container">
-  <h4>Configure Scooters</h4>
+  <h1>Configure Scooters</h1>
 <form action="" method="post" name="configurescooter">
     {{ form.hidden_tag() }}
-    <p>Hourly cost for all scooters</p>
-    <p>{{ form.cost }}</p>
+    <div class="form">
+        <div class="subheading">
+            Hourly cost for all scooters
+        </div>
+    <p>{{ form.cost(class_='form-control')}}</p>
     {% for error in form.cost.errors %}
        <span>[{{ error }}] </span>
        {% endfor %}
-    <p><input type="submit" class="btn btn-dark" value="Submit"></p>
+    </div>
+    <div class="button">
+        <input type="submit" class="submit" value="Submit">
+    </div>
 </form>
 {% endblock %}
   </div>
+</div>

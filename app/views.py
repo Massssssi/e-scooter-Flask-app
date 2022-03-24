@@ -979,7 +979,7 @@ def managerCreateEmployee():
     if request.method == 'POST':
         if form.validate_on_submit():
             employee = User()
-            if form.account_type.data == "Manager":
+            if form.account_type.data == "Account Type: Manager":
                 employee.account_type = 2
             else:
                 employee.account_type = 1
@@ -1034,9 +1034,9 @@ def managerEmployeeEdit():
         form.phone.data = employee_found.phone
         form.national_insurance_number.data = employee_found.national_insurance_number
         if employee_found.account_type == 1:
-            form.account_type.choices = ["Employee", "Manager"]
+            form.account_type.choices = ["Account Type: Employee", "Account Type: Manager"]
         else:
-            form.account_type.choices = ["Manager", "Employee"]
+            form.account_type.choices = ["Account Type: Manager", "Account Type: Employee"]
 
     if request.method == 'POST':
         if form.validate_on_submit():
@@ -1045,7 +1045,7 @@ def managerEmployeeEdit():
             employee_found.email = form.email.data
             employee_found.phone = form.phone.data
             employee_found.national_insurance_number = form.national_insurance_number.data
-            if form.account_type.data == "Employee":
+            if form.account_type.data == "Account Type: Employee":
                 employee_found.account_type = 1
             else:
                 employee_found.account_type = 2
