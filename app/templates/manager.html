@@ -1,10 +1,41 @@
 <!-- the standard homepage for managers -->
 
 {% extends "baseEmployeeManager.html" %}
-  <div class="block_content">
     {% block content %}
 
-    <h1>Hello world</h1>
+        <h3>Hello, {{ user.forename }}!</h3>
+
+        <p>This is your manager portal. Here are some of your core functions</p>
+        <br>
+
+        <table id = "userHomepageTable">
+            <tr class = "userHomepageHeaders">
+                <td>Create New Employee</td>
+                <td>Edit Existing Employees</td>
+                <td>Manage Feedback</td>
+            </tr>
+            <tr class = "userHomepageImages">
+                <td><a href="/managerCreateEmployee"><img  src="http://simpleicon.com/wp-content/uploads/new.png"
+                                         alt="add new employee"></a></td>
+                <td><a href="/managerEmployeeSearch"><img  src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/Edit_icon_%28the_Noun_Project_30184%29.svg/1200px-Edit_icon_%28the_Noun_Project_30184%29.svg.png"
+                                         alt="edit employees"></a></td>
+                <td><a href="/manager/userFeedback"><img  src="https://www.zohowebstatic.com/sites/default/files/sprints/seo/product-manager-illustration.png"
+                                         alt="manage user feedback"></a></td>
+            </tr>
+            <tr class = "userHomepageHeaders">
+                <td>Configure Scooters</td>
+                <td>Configure Cost</td>
+                <td>Income Reports</td>
+            </tr>
+            <tr class = "userHomepageImages">
+                <td><a href="/configureScooters"><img  src="https://i.pinimg.com/originals/b1/c0/cb/b1c0cb3c0186f4d2b880284cabdc7eec.png"
+                                         alt="configure scooters"></a></td>
+                <td><a href="/configureCost"><img  src="https://cdn.pixabay.com/photo/2013/07/13/12/03/banknotes-159085__340.png"
+                                         alt="configure scooter costs"></a></td>
+                <td><a href="/incomeReports"><img  src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Emblem-money.svg/1024px-Emblem-money.svg.png"
+                                         alt="income reports"></a></td>
+            </tr>
+        </table>
 
     {% endblock %}
-  </div>
+
