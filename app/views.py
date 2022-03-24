@@ -45,7 +45,7 @@ def AddScooter():
     form = ScooterForm()
     form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
     if form.validate_on_submit():
-        flash('Succesfully received from data. %s and %s' % (form.availability.data, form.location.data))
+        flash('Successfully received from data. %s and %s' % (form.availability.data, form.location.data))
 
         location = Location.query.get(form.location.data)
 
@@ -105,7 +105,7 @@ def register():
         if user:
             flash("This email had already sign up.")
         else:
-            if (discount == False):
+            if not discount:
                 p = User(email=form.email.data,
                          password=generate_password_hash(form.password.data, method='sha256'),
                          phone=form.phone.data,
@@ -115,7 +115,7 @@ def register():
 
                 db.session.add(p)
                 db.session.commit()
-            elif (discount == True):
+            elif discount:
                 p = User(email=form.email.data,
                          password=generate_password_hash(form.password.data, method='sha256'),
                          phone=form.phone.data,
@@ -277,14 +277,14 @@ def extend(session_id):
         discountRate = models.ScooterCost.query.filter_by(id=1).first()
 
         # works out the amount of hours and then multiplies this by the current rate
-        if (Discount.discount == False):
+        if Discount.discount == False:
             session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600)
 
             db.session.commit()
 
-        elif (Discount.discount == True):
+        elif Discount.discount == True:
             session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600) - (
-                        Cost * discountRate.discount_rate)
+                    Cost * discountRate.discount_rate)
 
             db.session.commit()
         return redirect(url_for('userScooterManagement'))
@@ -307,7 +307,7 @@ def manager():
 def check_day(start_date, session):
     for i in range(7):
         check = start_date + timedelta(days=i)
-        if (check.strftime("%d%m%Y") == session.start_date.strftime("%d%m%Y")):
+        if check.strftime("%d%m%Y") == session.start_date.strftime("%d%m%Y"):
             return i
     return -1
 
@@ -326,7 +326,7 @@ def incomeReports():
                 x = []
                 i.append(x)
         for s in record:
-            if s.start_date > date1 and s.start_date < date2:
+            if date1 < s.start_date < date2:
                 if s.end_date == s.start_date + timedelta(hours=1):
                     d = check_day(date1, s)
                     day[d][0].append(s)
@@ -457,7 +457,7 @@ def bookScooter():
     p = models.Location.query.filter_by(id=int(loc_id)).first()
     m = models.Scooter.query.filter(Scooter.availability == True).first()
     if m:
-        form.scooter.choices = [(scooter.id) for scooter in
+        form.scooter.choices = [scooter.id for scooter in
                                 Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
 
     if form.validate_on_submit():
@@ -465,20 +465,20 @@ def bookScooter():
         c = models.ScooterCost.query.filter_by(id=1).first()
 
         a = form.hire_period.data
-        if (a == "One hour"):
-            cost = 1 * c.hourly_cost
+        if a == "One hour":
+            cost = c.hourly_cost
             n = 1
             global N
             N = n
-        elif (a == "Four hours"):
+        elif a == "Four hours":
             cost = 4 * c.hourly_cost
             n = 4
             N = n
-        elif (a == "One day"):
+        elif a == "One day":
             cost = 24 * c.hourly_cost
             n = 24
             N = n
-        elif (a == "One week"):
+        elif a == "One week":
             cost = 168 * c.hourly_cost
             n = 168
             N = n
@@ -500,7 +500,6 @@ def bookScooter():
             f_time = final_time
             global g_time
             g_time = given_time
-
 
         elif typ == 1:
             Cost = cost
@@ -576,7 +575,7 @@ def payment():
                             end_date=f_time)
                 db.session.add(a)
                 db.session.commit()
-            elif (typ == 0 and Discount.discount == True):
+            elif typ == 0 and Discount.discount == True:
                 a = Session(cost=Cost - (Cost * discountRate.discount_rate),
                             start_date=f_start_date,
                             scooter_id=f_scooter_data,
@@ -605,7 +604,7 @@ def payment():
                 db.session.commit()
 
                 # Sending the confirmation email to the user
-                Subject = 'Confermation Email | please do not reply'
+                Subject = 'Conformation Email | please do not reply'
                 msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
                 msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
                 mail.send(msg)
@@ -614,7 +613,7 @@ def payment():
             elif typ == 1:
                 g = models.Guest.query.filter_by(id=usid).first()
                 print(g)
-                Subject = 'Confermation Email | please do not reply'
+                Subject = 'Conformation Email | please do not reply'
                 msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[g.email])
                 msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride. "
                 mail.send(msg)
@@ -650,7 +649,7 @@ def configureScooterCost():
     form = ConfigureScooterCostForm()
     scooter_cost = ScooterCost.query.first()
 
-    if scooter_cost is None:  # if no cost declared in the database
+    if scooter_cost is None:  # if no cost is declared in the database
         scooter_cost = ScooterCost()
         scooter_cost.hourly_cost = 10.00  # default not done until entity actually in the database
         db.session.add(scooter_cost)
@@ -787,7 +786,7 @@ def userhelpWithScooter():
     if current_user.account_type == 0:
 
         form = userHelpForm()
-        form.scooter_id.choices = [(userScooter.scooter_id) for userScooter in
+        form.scooter_id.choices = [userScooter.scooter_id for userScooter in
                                    Session.query.filter_by(user_id=current_user.id)]
         if request.method == 'POST':
             if form.validate_on_submit():
@@ -800,7 +799,7 @@ def userhelpWithScooter():
                                             user=current_user)
                     db.session.add(userFeedback)
                     db.session.commit()
-                    message = 'Your feedback has been send succesfully.\n Thank you  '
+                    message = 'Your feedback has been sent successfully.\n Thank you  '
                     return render_template('userHelpWithScooter.html', form=form, message=message)
                 else:
                     message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. '
@@ -1058,7 +1057,8 @@ def managerEmployeeSearch():
     form = EmployeeSearchForm()
 
     form.search_field.choices = [(employee.id, employee.surname + " , " + employee.forename) for employee in
-                                 models.User.query.filter(User.account_type == 1).all()] #Can only edit employees, not other managers
+                                 models.User.query.filter(
+                                     User.account_type == 1).all()]  # Can only edit employees, not other managers
     if request.method == 'POST':
         if form.validate_on_submit():
             session['employee_id'] = form.search_field.data
