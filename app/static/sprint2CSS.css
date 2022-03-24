@@ -382,6 +382,10 @@ form {
   text-align: left;
 }
 
+.btn btn-link {
+  text-decoration: none;
+}
+
 /* Add a grey background color to dropdown links on hover */
 .dropdown-content a:hover {
   background-color: #ddd;

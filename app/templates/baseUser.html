@@ -28,19 +28,17 @@
 
               <li class="nav-item">
                 <div class="dropdown">
-                    <button class = "btn btn-link">Dropdown
-                        <i class="fa fa-caret-down"></i>
+                    <button class = "btn btn-link" style="text-underline: none">Dropdown
                         </button>
                         <div class="dropdown-content">
-                        <a href="#">Link 1</a>
-                        <a href="#">Link 2</a>
-                        <a href="#">Link 3</a>
+                            <a href="/user/manageSessions">Manage Active Sessions</a>
+                            <a href="#">Manage Future Sessions</a>
+                            <a href="/user/viewSessions">View Previous Sessions</a>
+
                     </div>
                 </div>
               </li>
 
-              <li class="nav-item"><a class="nav-link" href="/user/manageSessions">Manage active sessions</a></li>
-              <li class="nav-item"><a class="nav-link" href="/user/viewSessions">View previous sessions</a></li>
               <li class="nav-item"><a class="nav-link" href="/userAccountSettings">Account settings</a></li>
               <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
               <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
@@ -53,7 +51,7 @@
     </nav>
 
   <!--main content of the page-->
-  <body>
+  <body class="sl">
     {% block content %}
     {% endblock %}
   </body>
