@@ -6,23 +6,34 @@
 <!--all pages share this base-->
 <div>
     <nav class="navbar navbar-expand-sm navbar-light bg-light">
-      <a class="navbar-brand" href="#">Scooters!</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
           {% if current_user.account_type == 1 %}
-              <li class="nav-item"><a class="nav-link" href="#">Employee homepage <span class="sr-only">(current)</span></a></li>
+              <a class="navbar-brand" href="/employee"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png" alt="dino logo"></a>
+              <li class="nav-item"><a class="nav-link" href="/employee">Employee homepage <span class="sr-only">(current)</span></a></li>
               <li class="nav-item"><a class="nav-link" href="/addingScooter">Adding Scooters</a></li>
               <li class="nav-item"><a class="nav-link" href="/employee/userFeedback">Feedback management</a></li>
               <li class="nav-item"><a class="nav-link" href="/GuestUsers">Guest Booking</a></li>
               <li class="nav-item"><a class="nav-link" href="/ScooterList">Scooter List</a></li>
-              <li class="nav-item"><a class="nav-link" href="/employeeAccountSettings">Account settings</a></li>
+              <li class="nav-item">
+                <div class="dropdown">
+                    <button class = "btn btn-link" style="text-underline: none">Account Settings
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="/employeeChangeDetails">Change Account Details</a>
+                            <a href="/employeeChangePassword">Change Password</a>
+
+                    </div>
+                </div>
+              </li>
               <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
           {% else %}
-              <li class="nav-item"><a class="nav-link" href="#">Manager homepage <span class="sr-only">(current)</span></a></li>
+              <a class="navbar-brand" href="/manager"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png" alt="dino logo"></a>
+              <li class="nav-item"><a class="nav-link" href="/manager">Manager homepage <span class="sr-only">(current)</span></a></li>
               <li class="nav-item"><a class="nav-link" href="/managerCreateEmployee">Create new employee</a></li>
               <li class="nav-item"><a class="nav-link" href="/managerEmployeeSearch">Edit existing employee</a></li>
               <li class="nav-item"><a class="nav-link" href="/GuestUsers">Guest Booking</a></li>

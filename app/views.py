@@ -816,7 +816,7 @@ def generalUserHelp():
                                         user=current_user)
                 db.session.add(userFeedback)
                 db.session.commit()
-                message = 'Your General feedback has been send succesfully. Thank you '
+                message = 'Your General feedback has been sent successfully. Thank you '
                 return render_template('userGeneralHelp.html', form=form, message=message)
         return render_template('userGeneralHelp.html', form=form)
     else:
@@ -864,7 +864,7 @@ def helpUser():
 # Manger needs to see all high priority feedbacks  | backlog ID = 15
 @app.route('/manager/userFeedback', methods=['GET', 'POST'])
 @login_required
-def mangerHighPriority():
+def managerHighPriority():
     if current_user.account_type == 2:
         if not Feedback.query.all():
             return render_template("managerFeedbackManagement.html")
