@@ -9,12 +9,7 @@
 <!--all page share this base-->
 <div>
     <nav class="navbar navbar-expand-sm navbar-light bg-light">
-
-      {% if current_user.is_authenticated %}
-      <a class="navbar-brand" href="#"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png" alt="dino logo"></a>
-      {% else %}
-      <a class="navbar-brand" href="/"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png" alt="dino logo"></a>
-      {% endif %}
+      <a class="navbar-brand" href="/user"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png" alt="dino logo"></a>
 
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -34,6 +29,18 @@
                             <a href="/user/activeSessions">Manage Active Sessions</a>
                             <a href="/user/futureSessions">Manage Future Sessions</a>
                             <a href="/user/viewSessions">View Previous Sessions</a>
+
+                    </div>
+                </div>
+              </li>
+
+              <li class="nav-item">
+                <div class="dropdown">
+                    <button class = "btn btn-link" style="text-underline: none">Account Settings
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="/userChangeDetails">Change Account Details</a>
+                            <a href="/userChangePassword">Manage Future Sessions</a>
 
                     </div>
                 </div>

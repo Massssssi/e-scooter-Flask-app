@@ -80,11 +80,11 @@ form {
   }
 
   .overdue{
-      background-color: red;
+      background-color: rgba(255,116,87,0.71);
   }
 
   .on-time{
-      background-color: green;
+      background-color: rgba(151,255,88,0.71);
   }
   span {
     color: red;

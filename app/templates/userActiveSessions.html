@@ -12,7 +12,7 @@
         {% if sessions|length==0 %}
             <h1>You have no active sessions</h1>
         {% else %}
-            <h2>Active sessions:</h2>
+            <h2>Active sessions</h2>
             <table>
              <tr>
                 <th>Scooter ID</th>
@@ -20,9 +20,10 @@
                 <th>End date</th>
                 <th>Duration</th>
                 <th>Cost</th>
+                 <th>Status</th>
 
              </tr>
-            {% for s in activeSessions%}
+            {% for s in sessions%}
                 {% if time > s.end_date %}
                     <tr class = "overdue">
                 {% else %}
@@ -33,9 +34,12 @@
                     <td>{{s.end_date|strftime }}</td>
                     <td>{{(s.end_date - s.start_date)|strftime("half")}}</td>
                     <td>{{ "£{:,.2f}".format(s.cost)}}</td>
+                    {% if time > s.end_date %}
+                        <td>Overdue</td>
+                    {% else %}
+                        <td>Ongoing</td>
+                    {% endif %}
 
-
-                {% if s.returned == False %}
 
                     <td>
                         <form action="{{"returnScooter/" + s.id|string}}" name = "statusform" method="post">
@@ -50,7 +54,9 @@
                         <input type="submit" class="deletebutton" value="Extend Booking" name="extendButton"/>
                         </form>
                     </td>
-                {% endif %}
+
+
+
                 </tr>
 
             {% endfor %}

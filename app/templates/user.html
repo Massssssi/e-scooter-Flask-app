@@ -1,13 +1,41 @@
 <!-- the basic hompeage for regular users, once logged in of course -->
 {% extends "baseUser.html" %}
-  <button class="block_content">
     {% block content %}
 
         <h3>Hello, {{ user.forename }}!</h3>
 
-        <p>Welcome to our scooter hiring website.</p>
+        <p>Welcome to our scooter hiring website.
+            Look below to see all of your options, we think you'll find them RAWRsome!</p>
         <p>Click here to book a scooter: </p>
+
+        <table class = "userHomepageTable">
+            <tr class = "userHomepageHeaders">
+                <td>Book A Session</td>
+                <td>Manage Active Sessions</td>
+                <td>Manage Future Sessions</td>
+            </tr>
+            <tr class = "userHomepageImages">
+                <td><a href="/selectlocation"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png"
+                                         alt="dino logo"></a></td>
+                <td><a href="/user/activeSessions"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png"
+                                         alt="dino logo"></a></td>
+                <td><a href="/user/futureSessions"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png"
+                                         alt="dino logo"></a></td>
+            </tr>
+            <tr class = "userHomepageHeaders">
+                <td>View Previous Sessions</td>
+                <td>Account Settings</td>
+                <td>Help</td>
+            </tr>
+            <tr class = "userHomepageImages">
+                <td><a href="/user/viewSessions"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png"
+                                         alt="dino logo"></a></td>
+                <td><a href="/userAccountSettings"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png"
+                                         alt="dino logo"></a></td>
+                <td><a href="/help"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png"
+                                         alt="dino logo"></a></td>
+            </tr>
+        </table>
         <a class="nav-link" href="/selectlocation">Book a scooter</a>
 
     {% endblock %}
-  </div>
