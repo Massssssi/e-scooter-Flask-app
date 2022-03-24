@@ -40,10 +40,20 @@
               <li class="nav-item"><a class="nav-link" href="/addingScooter">Adding Scooters</a></li>
               <li class="nav-item"><a class="nav-link" href="/ScooterList">Scooter List</a></li>
               <li class="nav-item"><a class="nav-link" href="/manager/userFeedback">Feedback management</a></li>
-              <li class="nav-item"><a class="nav-link" href="/configureScooters">Configure Scooter Details</a></li>
-              <li class="nav-item"><a class="nav-link" href="/configureCost">Configure Scooter Cost</a></li>
+              <li class="nav-item"><a class="nav-link" href="/configureScooters">Configure Scooters</a></li>
+              <li class="nav-item"><a class="nav-link" href="/configureCost">Configure Cost</a></li>
               <li class="nav-item"><a class="nav-link" href="/incomeReports">Income reports</a></li>
-              <li class="nav-item"><a class="nav-link" href="/employeeAccountSettings">Account settings</a></li>
+              <li class="nav-item">
+                <div class="dropdown">
+                    <button class = "btn btn-link" style="text-underline: none">Account Settings
+                        </button>
+                        <div class="dropdown-content">
+                            <a href="/employeeChangeDetails">Change Account Details</a>
+                            <a href="/employeeChangePassword">Change Password</a>
+
+                    </div>
+                </div>
+              </li>
               <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
           {% endif %}
 

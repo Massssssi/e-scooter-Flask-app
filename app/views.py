@@ -662,13 +662,17 @@ def configureScooterCost():
             s += element
 
     if request.method == 'GET':
-        form.cost.data = float(s)
+        form.cost.data = "%.2f" % float(s)
 
     if request.method == 'POST':
         if form.validate_on_submit():
             scooter_cost.hourly_cost = form.cost.data
             db.session.add(scooter_cost)
             db.session.commit()
+            if current_user.account_type == 1:
+                return redirect("/employee")
+            else:
+                return redirect("/manager")
 
     return render_template('configureCost.html',
                            title='Configure Scooters',
@@ -692,6 +696,11 @@ def configureScooters():
 
             db.session.add(scooter)
             db.session.commit()
+
+            if current_user.account_type == 1:
+                return redirect("/employee")
+            else:
+                return redirect("/manager")
 
     return render_template('configureScooters.html',
                            title='Configure Scooters',
