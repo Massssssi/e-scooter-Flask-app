@@ -6,7 +6,7 @@ import dateutil
 
 from app import app, db, models, mail, admin
 import json
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 import folium
 import pandas as pd
 from flask import render_template, flash, request, redirect, url_for, session
@@ -130,7 +130,7 @@ def register():
                      discount=True)
                 db.session.add(p)
                 db.session.commit()
-            
+
             return redirect("/login")
     return render_template('register.html', title='Register', form=form)
 
@@ -526,15 +526,20 @@ def payment():
     #print(current_user.id)
     #print(discountRate.discount_rate)
     #print(Discount.discount)
+    today_year= date.today().year
+    choice = []
+    for i in range(6):
+        choice.append(today_year + i)
+    form.card_expiry_Year.choices = choice
+    form.card_expiry_Month.choices = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
     if c:
         if request.method == 'GET':
             form.card_holder.data = c.holder
             form.card_number.data = c.card_number
-            form.card_expiry_date.data = c.expiry_date
             form.card_cvv.data = c.cvv
 
     if form.validate_on_submit():
-        
+
         for n in  form.card_number.data:
             if n not in l:
                 checkcard = 0
@@ -568,10 +573,12 @@ def payment():
                 # Query a card object to check there exist already one for the user loged in.
 
                 if not c:
+                    expdate = str(form.card_expiry_Year.data)+"-"+str(form.card_expiry_Month.data)+"-01"
+                    date_time_obj = datetime.strptime(expdate, '%Y-%m-%d').date()
                     print("Card created")
                     card = Card(holder=form.card_holder.data,
                                 card_number=form.card_number.data,
-                                expiry_date=form.card_expiry_date.data,
+                                expiry_date=date_time_obj,
                                 cvv=form.card_cvv.data,
                                 user_id=current_user.id)
                     if form.save_card.data == True:
