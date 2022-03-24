@@ -1058,7 +1058,7 @@ def managerEmployeeSearch():
     form = EmployeeSearchForm()
 
     form.search_field.choices = [(employee.id, employee.surname + " , " + employee.forename) for employee in
-                                 models.User.query.filter(User.account_type != 0).all()]
+                                 models.User.query.filter(User.account_type == 1).all()] #Can only edit employees, not other managers
     if request.method == 'POST':
         if form.validate_on_submit():
             session['employee_id'] = form.search_field.data
