@@ -881,6 +881,11 @@ def managerHighPriority():
 @app.route('/userChangeDetails', methods=['GET', 'POST'])
 @login_required
 def userChangeDetails():
+    if current_user.account_type == 1:
+        redirect("/employee")
+    if current_user.account_type == 2:
+        redirect("/manager")
+
     form = UserChangeDetailsForm()
 
     if request.method == 'GET':
@@ -910,6 +915,9 @@ def userChangeDetails():
 @app.route('/employeeChangeDetails', methods=['GET', 'POST'])
 @login_required
 def employeeChangeDetails():
+    if current_user.account_type == 0:
+        redirect("/user")
+
     form = EmployeeChangeDetailsForm()
 
     if request.method == 'GET':
@@ -943,6 +951,11 @@ def employeeChangeDetails():
 @app.route('/userChangePassword', methods=['GET', 'POST'])
 @login_required
 def userChangePassword():
+    if current_user.account_type == 1:
+        redirect("/employee")
+    if current_user.account_type == 2:
+        redirect("/manager")
+
     form = UserChangePasswordForm()
 
     if request.method == 'POST':
@@ -964,6 +977,9 @@ def userChangePassword():
 @app.route('/employeeChangePassword', methods=['GET', 'POST'])
 @login_required
 def employeeChangePassword():
+    if current_user.account_type == 0:
+        redirect("/user")
+
     form = UserChangePasswordForm()
 
     if request.method == 'POST':
@@ -988,6 +1004,11 @@ def employeeChangePassword():
 @app.route('/managerCreateEmployee', methods=['GET', 'POST'])
 @login_required
 def managerCreateEmployee():
+    if current_user.account_type == 1:
+        redirect("/employee")
+    if current_user.account_type == 0:
+        redirect("/user")
+
     # need to add checks for failing uniqueness integrity before it gets to the db
     form = RegisterEmployeeForm()
 
@@ -1020,6 +1041,11 @@ def managerCreateEmployee():
 @app.route('/managerEmployeeSearch', methods=['GET', 'POST'])
 @login_required
 def managerEmployeeSearch():
+    if current_user.account_type == 1:
+        redirect("/employee")
+    if current_user.account_type == 0:
+        redirect("/user")
+
     form = EmployeeSearchForm()
 
     form.search_field.choices = [(employee.id, employee.surname + " , " + employee.forename) for employee in
@@ -1037,6 +1063,11 @@ def managerEmployeeSearch():
 @app.route('/managerEmployeeEdit', methods=['GET', 'POST'])
 @login_required
 def managerEmployeeEdit():
+    if current_user.account_type == 1:
+        redirect("/employee")
+    if current_user.account_type == 0:
+        redirect("/user")
+
     employee_id = session['employee_id']
 
     form = EditEmployeeForm()
