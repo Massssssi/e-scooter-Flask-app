@@ -9,54 +9,9 @@
   <div class="block_content">
 
     {% block content %}
-
-        {% if futureSessions|length==0 and activeSessions|length==0 %}
-            <p>You have no previous sessions, go get scooting!</p>
-        {% endif %}
-
-        {% if futureSessions|length !=0  %}
-            <h2>Future Sessions:</h2>
-            <table>
-            <thead style="display:table-header-group">
-             <tr>
-                <th class = "first">Scooter ID</th>
-                <th class = "second">Start Date</th>
-                <th class = "third">End date</th>
-                <th class = "fourth">Duration</th>
-                <th class = "fifth">Cost</th>
-
-             </tr>
-             </thead>
-            <tbody>
-            {% for s in futureSessions%}
-                    <td class = "first">{{ s.scooter_id}}</td>
-                    <td class = "second">{{ s.start_date|strftime }}</td>
-                    <td class = "third">{{s.end_date|strftime }}</td>
-                    <td class = "fourth">{{(s.end_date - s.start_date)|strftime("half")}}</td>
-                    <td class = "fifth">{{ "£{:,.2f}".format(s.cost)}}</td>
-
-                        <td>
-                         <form action="{{url_for('cancel')}}" name = "statusform" method="post">
-                          <input type="hidden" name="cancel" value="{{ s.id }}"/>
-                          <input type="submit" class="deletebutton" value="Cancel Booking" name="cancelButton"/>
-                        </form>
-                        </td>
-
-                    <td>
-                        <form action="{{'extendSession/' + s.id|string}}" name = "statusform" method="post">
-                        <input type="hidden" name="extend" value="{{ s.id }}"/>
-                        <input type="submit" class="deletebutton" value="Extend Booking" name="extendButton"/>
-                        </form>
-                    </td>
-
-            {% endfor %}
-            </tbody>
-            </table>
+        {% if sessions|length==0 %}
+            <h1>You have no active sessions</h1>
         {% else %}
-            <h1>You have no future sessions</h1>
-        {% endif %}
-
-        {% if activeSessions|length !=0  %}
             <h2>Active sessions:</h2>
             <table>
              <tr>
@@ -100,8 +55,6 @@
 
             {% endfor %}
             </table>
-        {% else %}
-            <h1>You have no future sessions</h1>
         {% endif %}
 
 

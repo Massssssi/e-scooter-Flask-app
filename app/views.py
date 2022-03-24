@@ -170,22 +170,34 @@ def userScooterViewing():
     return render_template('userPreviousSessions.html', title='Home', user=current_user, sessions=sessions)
 
 
-@app.route('/user/manageSessions', methods=['GET'])
+@app.route('/user/activeSessions', methods=['GET'])
 @login_required
 def userScooterManagement():
     user = User.query.get(current_user.id)
-    futureSessions = []
     activeSessions = []
 
     for session in user.session:
         if session.returned is False:
-            if session.start_date > datetime.now():  # future sessions
-                futureSessions.append(session)
-            else:
-                activeSessions.append(session)  # active sessions
+            if session.start_date <= datetime.now():
+                activeSessions.append(session)
 
-    return render_template('userManageSessions.html', title='Home',
-                           user=current_user, futureSessions=futureSessions, activeSessions=activeSessions,
+    return render_template('userActiveSessions.html', title='Home',
+                           user=current_user, sessions=activeSessions,
+                           time=datetime.utcnow())
+
+@app.route('/user/futureSessions', methods=['GET'])
+@login_required
+def userFutureManagement():
+    user = User.query.get(current_user.id)
+    activeSessions = []
+
+    for session in user.session:
+        if session.returned is False:
+            if session.start_date <= datetime.now():
+                activeSessions.append(session)
+
+    return render_template('userFutureSessions.html', title='Home',
+                           user=current_user, sessions=activeSessions,
                            time=datetime.utcnow())
 
 
