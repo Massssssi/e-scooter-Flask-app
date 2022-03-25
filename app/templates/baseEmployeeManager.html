@@ -27,15 +27,13 @@
               </li>
               <li class="nav-item"><a class="nav-link" href="/GuestUsers">Guest Booking</a></li>
               <li class="nav-item"><a class="nav-link" href="/ScooterList">Scooter List</a></li>
-              <li class="nav-item">
-                <div class="dropdown">
-                    <button class = "btn btn-link" style="text-underline: none">Account Settings
-                        </button>
-                        <div class="dropdown-content">
-                            <a href="/employeeChangeDetails">Change Account Details</a>
-                            <a href="/employeeChangePassword">Change Password</a>
-
-                    </div>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Account Settings
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="/employeeChangeDetails">Change Account Details</a>
+                  <a class="dropdown-item" href="/employeeChangePassword">Change Password</a>
                 </div>
               </li>
               <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
@@ -58,27 +56,24 @@
                 </div>
               </li>
               <li class="nav-item"><a class="nav-link" href="/incomeReports">Income reports</a></li>
-              <li class="nav-item">
-                <div class="dropdown">
-                    <button class = "btn btn-link" style="text-underline: none">Configure Scooters
-                        </button>
-                        <div class="dropdown-content">
-                            <a href="/configureScooters">Configure Location and Availability</a>
-                            <a href="/configureCost">Configure Cost</a>
-                    </div>
-                </div>
-
-              <li class="nav-item">
-                <div class="dropdown">
-                    <button class = "btn btn-link" style="text-underline: none">Account Settings
-                        </button>
-                        <div class="dropdown-content">
-                            <a href="/employeeChangeDetails">Change Account Details</a>
-                            <a href="/employeeChangePassword">Change Password</a>
-
-                    </div>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Configure Scooters
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="/configureScooters">Configure Location and Availability</a>
+                  <a class="dropdown-item" href="/configureCost">Configure Cost</a>
                 </div>
               </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    Account Settings
+                  </a>
+                  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                    <a class="dropdown-item" href="/employeeChangeDetails">Change Account Details</a>
+                    <a class="dropdown-item" href="/employeeChangePassword">Change Password</a>
+                  </div>
+                </li>
               <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
           {% endif %}
 
