@@ -217,9 +217,11 @@ def userFutureManagement():
 def cancel():
     session = Session.query.filter_by(
         id=request.form['cancel']).first_or_404()
+    scooter = Scooter.query.filter_by(id=session.scooter_id).first()
+    scooter.availability = True
     db.session.delete(session)
     db.session.commit()
-    return redirect("/user/manageSessions")
+    return redirect("/user")
 
 
 @app.template_filter('strftime')
