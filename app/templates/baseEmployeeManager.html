@@ -16,7 +16,15 @@
               <a class="navbar-brand" href="/employee"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png" alt="dino logo"></a>
               <li class="nav-item"><a class="nav-link" href="/employee">Employee homepage <span class="sr-only">(current)</span></a></li>
               <li class="nav-item"><a class="nav-link" href="/addingScooter">Adding Scooters</a></li>
-              <li class="nav-item"><a class="nav-link" href="/employee/userFeedback">Feedback management</a></li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Feedback Management
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="/employee/relatedToScooter">Scooter Related</a>
+                  <a class="dropdown-item" href="/employee/relatedToGeneral">General Feedback</a>
+                </div>
+              </li>
               <li class="nav-item"><a class="nav-link" href="/GuestUsers">Guest Booking</a></li>
               <li class="nav-item"><a class="nav-link" href="/ScooterList">Scooter List</a></li>
               <li class="nav-item">
@@ -39,7 +47,16 @@
               <li class="nav-item"><a class="nav-link" href="/GuestUsers">Guest Booking</a></li>
               <li class="nav-item"><a class="nav-link" href="/addingScooter">Adding Scooters</a></li>
               <li class="nav-item"><a class="nav-link" href="/ScooterList">Scooter List</a></li>
-              <li class="nav-item"><a class="nav-link" href="/manager/userFeedback">Feedback management</a></li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Feedback Management
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="/manager/completedFeedback">Completed high priority Feedback</a>
+                  <a class="dropdown-item" href="/manager/incompletedFeedback">Incompleted high priority Feedback</a>
+                  <div class="dropdown-divider"></div>
+                </div>
+              </li>
               <li class="nav-item"><a class="nav-link" href="/incomeReports">Income reports</a></li>
               <li class="nav-item">
                 <div class="dropdown">

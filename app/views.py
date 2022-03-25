@@ -1,4 +1,5 @@
 import copy
+from email import message
 import json
 from datetime import timedelta, datetime, date
 
@@ -840,47 +841,66 @@ def complete(id):
         if current_feedback:
             current_feedback.status = True
             db.session.commit()
-            return redirect("/employee/userFeedback")
+            if current_feedback.scooter_id != 0:
+                return redirect("/employee/relatedToScooter")
+            else:
+                return redirect("/employee/relatedToGeneral")
     # For the manager
     if current_user.account_type == 2:
         current_feedback = Feedback.query.filter_by(id=id).first()
         if current_feedback:
             current_feedback.status = True
             db.session.commit()
-            return redirect("/manager/userFeedback")
+            return redirect("/manager/incompletedFeedback")
+    else:
+        return "<h1>Page not found </h1>"
 
 
-@app.route('/employee/userFeedback', methods=['GET', 'POST'])
+@app.route('/employee/relatedToScooter', methods=['GET', 'POST'])
 @login_required
 def helpUser():
     if current_user.account_type == 1:
         if not Feedback.query.all():
-
-            return render_template("employeeFeedbackManagement.html")
+            # NEED TO BE DELETED return render_template("employeeFeedbackManagement.html")
+            return render_template("employeeScooterRelatedFeedback.html")
         else:
+            return render_template("employeeScooterRelatedFeedback.html", feedback=Feedback.query.all())
+    else:
+        return "<h1>Page not found </h1>"
 
-            form = employeeManagerFilterOption()
-            if form.validate_on_submit:
-                print("in here")
-                return render_template("employeeFeedbackManagement.html", form=form, feedback=Feedback.query.all())
-            else:
-                return "<h1>Page not found </h1>"
+@app.route('/employee/relatedToGeneral', methods=['GET', 'POST'])
+@login_required
+def helpUserWithGeneral():
+    if current_user.account_type == 1:
+        if not Feedback.query.all():
+            return render_template("employeeGeneralRelatedFeedback.html")
+        else:
+            return render_template("employeeGeneralRelatedFeedback.html", feedback=Feedback.query.all())
     else:
         return "<h1>Page not found </h1>"
 
 
 # Manger needs to see all high priority feedbacks  | backlog ID = 15
-@app.route('/manager/userFeedback', methods=['GET', 'POST'])
+@app.route('/manager/completedFeedback', methods=['GET', 'POST'])
 @login_required
 def managerHighPriority():
     if current_user.account_type == 2:
         if not Feedback.query.all():
-            return render_template("managerFeedbackManagement.html")
+            return render_template("managerFeedbackManagementRelatedToCompletedFeedback.html")
         else:
-            form = employeeManagerFilterOption()
-            form.filter.choices = [(1, "Completed Feedback"), (2, "Non-completed Feedback")]
-            if form.validate_on_submit:
-                return render_template("managerFeedbackManagement.html", form=form,
+            return render_template("managerFeedbackManagementRelatedToCompletedFeedback.html",
+                                       feedback=Feedback.query.filter_by(priority=1))
+    else:
+        return "<h1>Page not found </h1>"
+
+@app.route('/manager/incompletedFeedback', methods=['GET', 'POST'])
+@login_required
+def managerHighPriorityIncompleted():
+    if current_user.account_type == 2:
+        if not Feedback.query.all():
+            return render_template("managerFeedbackManagementRelatedToIncompletedFeedback.html")
+        else:
+            return render_template("managerFeedbackManagementRelatedToIncompletedFeedback.html",
                                        feedback=Feedback.query.filter_by(priority=1))
     else:
         return "<h1>Page not found </h1>"
