@@ -1,28 +1,34 @@
 <!-- This is where the user looks at available scooters and books them -->
 {% extends "baseUser.html" %}
-<div class="block_content">
-  {% block content %}  
-  <form method = "POST">
-    {{form.csrf_token}}
-    <body class = "sl">
-    <fieldset class="form-group">
-      <div  class="form-group  mx-sm-5 mb-2" style="margin-top:2%;">
-        <h2> Scooter location  </h2>
-        {{ form.location_id(class_ = "form-control form-control-sm")}}
-      </div>
-    </fieldset>
-    <button type="submit" class="btn btn-primary mb-2 btn-block">Confirm and Send</button>
-</form>
-<body>
-  <div class="map">
-  <h1>Available locations</h1>
-  <iframe class="map", src="/map" width="500" height="500"></iframe>
-  <h3><b style="background-color: rgb(255, 255, 255); color: rgb(0, 255, 255);">
-  </b></h3>
-</div>
-</body>
-</body>
 
+  {% block content %}  
+  <body class = "sl">
+    <div class="flex-container">
+      <div class="location-form">
+        <div class="discription">
+          <p style="text-align: center;font-family: 'georgia', serif;">
+            Please choose an option <br> from the following locations</p>
+        </div>  
+        <form method = "POST">
+                {{form.csrf_token}}
+                <fieldset class="form-group">
+                  <div  class="form-group  mx-sm-5 mb-2 locations">
+                    <h2> Scooter location  </h2>
+                    {{ form.location_id(class_ = "form-control form-control-sm col-10")}}
+                  </div>
+                </fieldset>
+                <button type="submit" class="btn btn-primary mb-2 btn-block select-scooter-btn">Confirm and Send</button>
+          </form>
+        </div>
+      <div class="map-container">
+            
+                <iframe class="map", src="/map" style="width: 100%; height: 100%;"></iframe>
+                <h3><b style="background-color: rgb(255, 255, 255); color: rgb(0, 255, 255);">
+                </b></h3>
+          
+    </div>
+  </div>
+</body>
   {% endblock %}
-</div>
+
 
