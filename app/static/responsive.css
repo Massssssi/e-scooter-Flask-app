@@ -1,0 +1,25 @@
+@media screen and (max-width: 800px) {
+    .flex-container{
+        display:block;
+        height: 50vh;
+    }
+    .location-form{
+        background-color:rgba(248, 248, 248, 0);
+        box-shadow: none;
+
+      }
+    .map-container{
+          margin: auto;
+          padding-top: 10%;
+          width: 500px;
+          height: 500px;
+      }
+    .discription{
+       
+    }
+    .locations{
+        color: rgb(15, 14, 14);
+        text-align: center;
+    }
+  
+}
