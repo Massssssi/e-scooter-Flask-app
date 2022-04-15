@@ -553,13 +553,10 @@ def payment():
 
     if(total_cost >= (scooter_cost.hourly_cost)*8 ):
         indice=True
-    
+
     print(total_cost)
 
-    # print(c)
-    # print(current_user.id)
-    # print(discountRate.discount_rate)
-    # print(Discount.discount)
+
     today_year = date.today().year
     choice = []
     for i in range(6):
@@ -570,99 +567,106 @@ def payment():
         if request.method == 'GET':
             form.card_holder.data = c.holder
             form.card_number.data = c.card_number
-            form.card_cvv.data = c.cvv
+
 
     if form.validate_on_submit():
-
-        for n in form.card_number.data:
-            if n not in l:
-                checkcard = 0
-                break
-        for n in form.card_cvv.data:
-            if n not in l:
-                checkcvv = 0
-        if checkcard == 1 and checkcvv == 1:
-            if typ == 0 and Discount.discount==False and indice==False:
-                a = Session(cost=Cost,
-                            start_date=f_start_date,
-                            scooter_id=f_scooter_data,
-                            user_id=us_id,
-                            end_date=f_time)
-                db.session.add(a)
-                db.session.commit()
-            elif typ == 0 and Discount.discount==False and indice == True:
-                a = Session(cost=Cost-(Cost*discountRate.discount_rate),
-                            start_date=f_start_date,
-                            scooter_id=f_scooter_data,
-                            user_id=us_id,
-                            end_date=f_time)
-                db.session.add(a)
-                db.session.commit()
-            elif typ == 0 and Discount.discount==True:
-                a = Session(cost=Cost-(Cost*discountRate.discount_rate),
-                            start_date=f_start_date,
-                            scooter_id=f_scooter_data,
-                            user_id=us_id,
-                            end_date=f_time)
-                db.session.add(a)
-                db.session.commit()
-
-                scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
-                if scooter:
-                    scooter.availability = False
-
-                # Query a card object to check there exist already one for the user loged in.
-
-                if not c:
-                    expdate = str(form.card_expiry_Year.data) + "-" + str(form.card_expiry_Month.data) + "-01"
-                    date_time_obj = datetime.strptime(expdate, '%Y-%m-%d').date()
-                    print("Card created")
-                    card = Card(holder=form.card_holder.data,
-                                card_number=form.card_number.data,
-                                expiry_date=date_time_obj,
-                                cvv=form.card_cvv.data,
-                                user_id=current_user.id)
-                    if form.save_card.data == True:
-                        print("saved")
-                        db.session.add(card)
-                db.session.commit()
-
-                # Sending the confirmation email to the user
-                Subject = 'Conformation Email | please do not reply'
-                msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
-                msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
-                mail.send(msg)
-
-                flash('The confirmation email has been send successfully')
-            elif typ == 1:
-                g = models.Guest.query.filter_by(id=usid).first()
-                print(g)
-                Subject = 'Conformation Email | please do not reply'
-                msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[g.email])
-                msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride. "
-                mail.send(msg)
-
-                flash('The confirmation email has been sent successfully')
-                a = Session(cost=Cost,
-                            start_date=f_start_date,
-                            scooter_id=f_scooter_data,
-                            guest_id=g_id,
-                            end_date=f_time)
-                db.session.add(a)
-
-                scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
-                if scooter:
-                    scooter.availability = False
-                db.session.commit()
-
-            if typ == 0:
-                return redirect("/")
-            elif typ == 1:
-                return redirect("/GuestUsers")
+        cc = models.Card.query.filter_by(card_number=form.card_number.data).first()
+        if cc and form.save_card.data==True:
+            return render_template('payment.html', title='Payment', form=form,
+                                error_message="This Card number has already been saved")
+        elif cc and check_password_hash(cc.cvv, form.card_cvv.data)==False:
+            return render_template('payment.html', title='Payment', form=form,
+                                error_message="Wrong card detail")
         else:
-            if checkcard == 0:
-                return render_template('payment.html', title='Payment', form=form,
-                                       error_message="Wrong card number or cvv")
+            for n in form.card_number.data:
+                if n not in l:
+                    checkcard = 0
+                    break
+            for n in form.card_cvv.data:
+                if n not in l:
+                    checkcvv = 0
+            if checkcard == 1 and checkcvv == 1:
+                if typ == 0 and Discount.discount==False and indice==False:
+                    a = Session(cost=Cost,
+                                start_date=f_start_date,
+                                scooter_id=f_scooter_data,
+                                user_id=us_id,
+                                end_date=f_time)
+                    db.session.add(a)
+                    db.session.commit()
+                elif typ == 0 and Discount.discount==False and indice == True:
+                    a = Session(cost=Cost-(Cost*discountRate.discount_rate),
+                                start_date=f_start_date,
+                                scooter_id=f_scooter_data,
+                                user_id=us_id,
+                                end_date=f_time)
+                    db.session.add(a)
+                    db.session.commit()
+                elif typ == 0 and Discount.discount==True:
+                    a = Session(cost=Cost-(Cost*discountRate.discount_rate),
+                                start_date=f_start_date,
+                                scooter_id=f_scooter_data,
+                                user_id=us_id,
+                                end_date=f_time)
+                    db.session.add(a)
+                    db.session.commit()
+
+                    scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
+                    if scooter:
+                        scooter.availability = False
+
+                    # Query a card object to check there exist already one for the user loged in.
+
+                    if not c:
+                        expdate = str(form.card_expiry_Year.data) + "-" + str(form.card_expiry_Month.data) + "-01"
+                        date_time_obj = datetime.strptime(expdate, '%Y-%m-%d').date()
+                        print("Card created")
+                        card = Card(holder=form.card_holder.data,
+                                    card_number=form.card_number.data,
+                                    expiry_date=date_time_obj,
+                                    cvv=generate_password_hash(form.card_cvv.data, method='sha256'),
+                                    user_id=current_user.id)
+                        if form.save_card.data == True:
+                            print("saved")
+                            db.session.add(card)
+                    db.session.commit()
+
+                    # Sending the confirmation email to the user
+                    Subject = 'Conformation Email | please do not reply'
+                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
+                    msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
+                    mail.send(msg)
+
+                    flash('The confirmation email has been send successfully')
+                elif typ == 1:
+                    g = models.Guest.query.filter_by(id=usid).first()
+                    print(g)
+                    Subject = 'Conformation Email | please do not reply'
+                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[g.email])
+                    msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride. "
+                    mail.send(msg)
+
+                    flash('The confirmation email has been sent successfully')
+                    a = Session(cost=Cost,
+                                start_date=f_start_date,
+                                scooter_id=f_scooter_data,
+                                guest_id=g_id,
+                                end_date=f_time)
+                    db.session.add(a)
+
+                    scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
+                    if scooter:
+                        scooter.availability = False
+                    db.session.commit()
+
+                if typ == 0:
+                    return redirect("/")
+                elif typ == 1:
+                    return redirect("/GuestUsers")
+            else:
+                if checkcard == 0:
+                    return render_template('payment.html', title='Payment', form=form,
+                                           error_message="Wrong card number or cvv")
 
     return render_template('payment.html', title='Payment', form=form)
 
