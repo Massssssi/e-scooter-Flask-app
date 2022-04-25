@@ -4,6 +4,15 @@
   <div class="block_content">
     {% block content %}
     <h1>Change details</h1>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+    {% for message in messages %}
+    <li>{{ message }} </li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
 <form method="post" , action="/userChangeDetails">
   {{ form.hidden_tag() }}
   <div class="form">

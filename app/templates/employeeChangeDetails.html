@@ -5,7 +5,15 @@
 <link rel="stylesheet" href="/static/forms.css">
   <div class="block_content">
     {% block content %}
-
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+    {% for message in messages %}
+    <li>{{ message }} </li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
 <form method="post" , action="/employeeChangeDetails">
   {{ form.hidden_tag() }}
   <div class="form">
