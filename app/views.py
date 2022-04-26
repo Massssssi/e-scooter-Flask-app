@@ -999,20 +999,24 @@ def employeeChangeDetails():  # need to fix bug where email/phone will always re
             email_exists = User.query.filter_by(email=form.email.data).first()
             phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
             nin_exists = User.query.filter_by(national_insurance_number=form.national_insurance_number.data).first()
+            valid_input = True
 
             if email_exists is not None and form.email.data != current_user.email:
                 flash("Error. That email already exists")
                 form.email.data = current_user.email
+                valid_input = False
 
             if phone_no_exists is not None and form.phone.data != current_user.phone:
                 flash("Error. That phone number already exists")
                 form.phone.data = current_user.phone
+                valid_input = False
 
             if nin_exists is not None and form.national_insurance_number.data != current_user.national_insurance_number:
                 flash("Error. That national insurance number is already in use")
                 form.national_insurance_number.data = current_user.national_insurance_number
+                valid_input = False
 
-            else:
+            if valid_input:
                 logged_in_employee = current_user
                 logged_in_employee.forename = form.forename.data
                 logged_in_employee.surname = form.surname.data
@@ -1094,28 +1098,46 @@ def managerCreateEmployee():
     if current_user.account_type == 0:
         redirect("/user")
 
-    # need to add checks for failing uniqueness integrity before it gets to the db
     form = RegisterEmployeeForm()
 
     if request.method == 'POST':
         if form.validate_on_submit():
-            employee = User()
 
-            if form.account_type.data == "Account Type: Manager":
-                employee.account_type = 2
-            else:
-                employee.account_type = 1
+            email_exists = User.query.filter_by(email=form.email.data).first()
+            phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
+            nin_exists = User.query.filter_by(national_insurance_number=form.national_insurance_number.data).first()
+            valid_input = True
 
-            employee.forename = form.forename.data
-            employee.surname = form.surname.data
-            employee.email = form.email.data
-            employee.phone = form.phone.data
-            employee.national_insurance_number = form.national_insurance_number.data
-            employee.password = generate_password_hash(form.password.data)
+            if email_exists is not None:
+                flash("Error. That email already exists")
+                valid_input = False
 
-            db.session.add(employee)
-            db.session.commit()
-            return redirect("/manager")
+            if phone_no_exists is not None:
+                flash("Error. That phone number already exists")
+                valid_input = False
+
+            if nin_exists is not None:
+                flash("Error. That national insurance number is already in use")
+                valid_input = False
+
+            if valid_input:
+                employee = User()
+
+                if form.account_type.data == "Account Type: Manager":
+                    employee.account_type = 2
+                else:
+                    employee.account_type = 1
+
+                employee.forename = form.forename.data
+                employee.surname = form.surname.data
+                employee.email = form.email.data
+                employee.phone = form.phone.data
+                employee.national_insurance_number = form.national_insurance_number.data
+                employee.password = generate_password_hash(form.password.data)
+
+                db.session.add(employee)
+                db.session.commit()
+                return redirect("/manager")
         else:
             flash("Invalid details entered")
 
@@ -1189,6 +1211,7 @@ def managerEmployeeEdit():  #
             if nin_exists is not None and form.national_insurance_number.data != employee_found.national_insurance_number:
                 flash("Error. That national insurance number is already in use")
                 form.national_insurance_number.data = employee_found.national_insurance_number
+
             employee_found.forename = form.forename.data
             employee_found.surname = form.surname.data
             employee_found.email = form.email.data

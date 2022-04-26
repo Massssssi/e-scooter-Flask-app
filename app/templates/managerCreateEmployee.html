@@ -4,7 +4,16 @@
 <link rel="stylesheet" href="/static/forms.css">
   <div class="block_content">
     {% block content %}
-    <h1>Search for an employee</h1>
+    <h1>Create a new employee</h1>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+    {% for message in messages %}
+    <li>{{ message }} </li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
     <form method="post" , action="/managerCreateEmployee">
   {{ form.hidden_tag() }}
   <div class="form">
