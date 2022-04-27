@@ -6,6 +6,15 @@
 
 <h1>Create a new account</h1>
 
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+    {% for message in messages %}
+    <li>{{ message }} </li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
 <form method="post", action="/register">
   {{ form.hidden_tag() }}
   <div class="form">

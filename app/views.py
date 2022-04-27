@@ -1,5 +1,4 @@
 import copy
-from email import message
 import json
 from datetime import timedelta, datetime, date
 
@@ -15,7 +14,7 @@ from app import app, db, models, mail, admin
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
     ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
     ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm, RegisterEmployeeForm, EditEmployeeForm, \
-    EmployeeSearchForm, EmployeeChangeDetailsForm, employeeManagerFilterOption
+    EmployeeSearchForm, EmployeeChangeDetailsForm
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
 
 # # Adds the ability to view all tables in Flask Admin
@@ -42,7 +41,7 @@ def main():
 
 
 @app.route('/addingScooter', methods=['GET', 'POST'])
-def AddScooter():
+def addScooter():
     form = ScooterForm()
     form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
     if form.validate_on_submit():
@@ -67,7 +66,6 @@ def user_login():
     if current_user.is_authenticated:
         # Finds out what account type current user is and redirects them to the correct page,
         # (purely for error checking)
-
         if current_user.account_type == 0:
             return redirect("/user")
         elif current_user.account_type == 1:
@@ -78,12 +76,15 @@ def user_login():
     form = LoginForm()
     if request.method == 'POST':
         if form.validate_on_submit():
+            # checks if the user exists and the password for that user is correct
             find_user = User.query.filter_by(email=form.email.data).first()
+
             if find_user is None or not find_user.check_password(form.password.data):
                 flash("Invalid email or password", "Error")
                 return redirect('/login')
 
             login_user(find_user, remember=form.rememberMe.data)
+
             if find_user.account_type == 0:
                 return redirect("/user")
             elif find_user.account_type == 1:
@@ -104,7 +105,7 @@ def register():
 
         user = User.query.filter_by(email=form.email.data).first()
         if user:
-            flash("This email had already sign up.")
+            flash("Error. This email already exists.")
         else:
             if not discount:
                 p = User(email=form.email.data,
@@ -141,13 +142,6 @@ def logout():
 @login_required
 def user():
     return render_template('user.html', title='Home', user=current_user)
-
-
-@app.route('/userAccountSettings')
-@login_required
-def userAccountSettings():
-    return render_template('userAccountSettings.html', title='User Account Settings', user=current_user)
-
 
 @app.route('/employeeAccountSettings')
 @login_required
@@ -280,12 +274,12 @@ def extend(session_id):
         discountRate = models.ScooterCost.query.filter_by(id=1).first()
 
         # works out the amount of hours and then multiplies this by the current rate
-        if Discount.discount == False:
+        if not Discount.discount:
             session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600)
 
             db.session.commit()
 
-        elif Discount.discount == True:
+        elif Discount.discount:
             session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600) - (
                     Cost * discountRate.discount_rate)
 
@@ -548,10 +542,10 @@ def payment():
     total_cost = 0
     scooter_cost = ScooterCost.query.filter_by(id=1).first()
     for user in models.Session.query.filter_by(user_id=current_user.id).all():
-        if (user.start_date >= datetime.today() - (timedelta(days=7))):
+        if user.start_date >= datetime.today() - (timedelta(days=7)):
             total_cost = total_cost + user.cost
 
-    if (total_cost >= (scooter_cost.hourly_cost) * 8):
+    if total_cost >= scooter_cost.hourly_cost * 8:
         indice = True
 
     print(total_cost)
@@ -613,7 +607,7 @@ def payment():
                     if scooter:
                         scooter.availability = False
 
-                    # Query a card object to check there exist already one for the user loged in.
+                    # Query a card object to check there exist already one for the user logged in.
 
                     if not c:
                         expdate = str(form.card_expiry_Year.data) + "-" + str(form.card_expiry_Month.data) + "-01"
@@ -675,17 +669,20 @@ def configureScooterCost():
     form = ConfigureScooterCostForm()
     scooter_cost = ScooterCost.query.first()
 
-    if scooter_cost is None:  # if no cost is declared in the database
+    if scooter_cost is None:  # if no cost is declared in the database, then a new cost entry will be made
         scooter_cost = ScooterCost()
-        scooter_cost.hourly_cost = 10.00  # default not done until entity actually in the database
+        scooter_cost.hourly_cost = 10.00  # this is the default value if there's no value in the database
         db.session.add(scooter_cost)
         db.session.commit()
 
+    # This section removes the "[" and "]" symbols from the cost that automatically is added when displaying
+    # the cost in the input box
     s = ""
     for element in str(scooter_cost.hourly_cost):
         if element != "[" and element != "]":
             s += element
 
+    # Adds 2 decimal places to the end
     if request.method == 'GET':
         form.cost.data = "%.2f" % float(s)
 
@@ -708,6 +705,8 @@ def configureScooterCost():
 @login_required
 def configureScooters():
     form = ConfigureScooterForm()
+
+    # Displays all the locations and all the scooter ids in the relevant dropdown menus
     form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
     form.id.choices = [scooter.id for scooter in models.Scooter.query.all()]
 
@@ -829,7 +828,7 @@ def userhelpWithScooter():
                     return render_template('userHelpWithScooter.html', form=form, message=message)
                 else:
                     message = 'Scooter number ' + form.scooter_id.data + ' could not be found. \nPlease try again. '
-                    return render_template('/userHelpWithScooter.html', form=form, error_message=message)
+                    return render_template('userHelpWithScooter.html', form=form, error_message=message)
         return render_template('userHelpWithScooter.html', form=form)
 
     else:
@@ -935,7 +934,7 @@ def managerHighPriorityIncompleted():
 
 @app.route('/userChangeDetails', methods=['GET', 'POST'])
 @login_required
-def userChangeDetails():  #
+def userChangeDetails():
     if current_user.account_type == 1:
         redirect("/employee")
     if current_user.account_type == 2:
@@ -951,6 +950,9 @@ def userChangeDetails():  #
 
     if request.method == 'POST':
         if form.validate_on_submit():
+            # Looks up if email / phone number exists in the database, and isn't the same
+            # as the user's current email / phone number. If it is then it's not valid and
+            # will reject it (avoids database integrity failures)
             email_exists = User.query.filter_by(email=form.email.data).first()
             phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
 
@@ -981,7 +983,7 @@ def userChangeDetails():  #
 
 @app.route('/employeeChangeDetails', methods=['GET', 'POST'])
 @login_required
-def employeeChangeDetails():  # need to fix bug where email/phone will always redirect instead of returning render template
+def employeeChangeDetails():
     if current_user.account_type == 0:
         redirect("/user")
 
@@ -996,10 +998,14 @@ def employeeChangeDetails():  # need to fix bug where email/phone will always re
 
     if request.method == 'POST':
         if form.validate_on_submit():
+            # Looks up if email / phone number /NIN exists in the database, and isn't the same
+            # as the user's current email / phone number / NIN. If it is then it's not valid and
+            # will reject it (avoids database integrity failures)
             email_exists = User.query.filter_by(email=form.email.data).first()
             phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
             nin_exists = User.query.filter_by(national_insurance_number=form.national_insurance_number.data).first()
-            valid_input = True
+            valid_input = True  # If it fails 1 or more of these checks then it will be changed to false, and
+            # won't be saved to the database
 
             if email_exists is not None and form.email.data != current_user.email:
                 flash("Error. That email already exists")
@@ -1102,11 +1108,14 @@ def managerCreateEmployee():
 
     if request.method == 'POST':
         if form.validate_on_submit():
-
+            # Looks up if email / phone number /NIN exists in the database, and isn't the same
+            # as the user's current email / phone number / NIN. If it is then it's not valid and
+            # will reject it (avoids database integrity failures)
             email_exists = User.query.filter_by(email=form.email.data).first()
             phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
             nin_exists = User.query.filter_by(national_insurance_number=form.national_insurance_number.data).first()
-            valid_input = True
+            valid_input = True  # If it fails 1 or more of these checks then it will be changed to false, and
+            # won't be saved to the database
 
             if email_exists is not None:
                 flash("Error. That email already exists")
@@ -1155,12 +1164,13 @@ def managerEmployeeSearch():
         redirect("/user")
 
     form = EmployeeSearchForm()
-
+    # Displays all employees in the database in the dropdown menu
     form.search_field.choices = [(employee.id, employee.surname + " , " + employee.forename) for employee in
                                  models.User.query.filter(
                                      User.account_type == 1).all()]  # Can only edit employees, not other managers
     if request.method == 'POST':
         if form.validate_on_submit():
+            # Keeps track of the employee ID chosen to retrieve their details in managerEmployeeEdit
             session['employee_id'] = form.search_field.data
             return redirect('/managerEmployeeEdit')
 
@@ -1171,15 +1181,17 @@ def managerEmployeeSearch():
 
 @app.route('/managerEmployeeEdit', methods=['GET', 'POST'])
 @login_required
-def managerEmployeeEdit():  #
+def managerEmployeeEdit():
     if current_user.account_type == 1:
         redirect("/employee")
     if current_user.account_type == 0:
         redirect("/user")
 
+    # Sets the session value saved in the previous function as the employee ID to retrieve all the other details
     employee_id = session['employee_id']
 
     form = EditEmployeeForm()
+    # Finds the employee matching that ID and retrieves all the other details related to that employee
     employee_found = User.query.filter_by(id=employee_id).first()
 
     if request.method == 'GET':
@@ -1199,6 +1211,9 @@ def managerEmployeeEdit():  #
             email_exists = User.query.filter_by(email=form.email.data).first()
             phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
             nin_exists = User.query.filter_by(national_insurance_number=form.national_insurance_number.data).first()
+            # Looks up if email / phone number /NIN exists in the database, and isn't the same
+            # as the user's current email / phone number / NIN. If it is then it's not valid and
+            # will reject it (avoids database integrity failures)
 
             if email_exists is not None and form.email.data != employee_found.email:
                 flash("Error. That email already exists")
@@ -1208,7 +1223,8 @@ def managerEmployeeEdit():  #
                 flash("Error. That phone number already exists")
                 form.phone.data = employee_found.phone
 
-            if nin_exists is not None and form.national_insurance_number.data != employee_found.national_insurance_number:
+            if nin_exists is not None and form.national_insurance_number.data \
+                    != employee_found.national_insurance_number:
                 flash("Error. That national insurance number is already in use")
                 form.national_insurance_number.data = employee_found.national_insurance_number
 
