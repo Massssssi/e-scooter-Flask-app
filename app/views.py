@@ -143,6 +143,7 @@ def logout():
 def user():
     return render_template('user.html', title='Home', user=current_user)
 
+
 @app.route('/employeeAccountSettings')
 @login_required
 def employeeAccountSettings():
@@ -452,7 +453,7 @@ def bookScooter():
     typ = session['typ']
 
     p = models.Location.query.filter_by(id=int(loc_id)).first()
-    m = models.Scooter.query.filter(Scooter.availability == True).first()
+    m = models.Scooter.query.filter(Scooter.availability is True).first()
     if m:
         form.scooter.choices = [scooter.id for scooter in
                                 Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
@@ -543,10 +544,10 @@ def payment():
     total_cost = 0
     scooter_cost = ScooterCost.query.filter_by(id=1).first()
     for user in models.Session.query.filter_by(user_id=current_user.id).all():
-        if (user.start_date >= datetime.today() - (timedelta(days=7))):
+        if user.start_date >= datetime.today() - (timedelta(days=7)):
             total_cost = total_cost + user.cost
 
-    if (total_cost >= (scooter_cost.hourly_cost) * 8):
+    if total_cost >= scooter_cost.hourly_cost * 8:
         indice = True
 
     print(total_cost)
@@ -564,10 +565,10 @@ def payment():
 
     if form.validate_on_submit():
         cc = models.Card.query.filter_by(card_number=form.card_number.data).first()
-        if cc and form.save_card.data == True:
+        if cc and form.save_card.data is True:
             return render_template('payment.html', title='Payment', form=form,
                                    error_message="This Card number has already been saved")
-        elif cc and check_password_hash(cc.cvv, form.card_cvv.data) == False:
+        elif cc and check_password_hash(cc.cvv, form.card_cvv.data) is False:
             return render_template('payment.html', title='Payment', form=form,
                                    error_message="Wrong card detail")
         else:
@@ -579,8 +580,8 @@ def payment():
                 if n not in l:
                     checkcvv = 0
             if checkcard == 1 and checkcvv == 1:
-                if typ==0:
-                    if Discount.discount == False and indice == False:
+                if typ == 0:
+                    if Discount.discount is False and indice is False:
                         a = Session(cost=Cost,
                                     start_date=f_start_date,
                                     scooter_id=f_scooter_data,
@@ -588,7 +589,7 @@ def payment():
                                     end_date=f_time)
                         db.session.add(a)
                         db.session.commit()
-                    elif Discount.discount == False and indice == True:
+                    elif Discount.discount is False and indice is True:
                         a = Session(cost=Cost - (Cost * discountRate.discount_rate),
                                     start_date=f_start_date,
                                     scooter_id=f_scooter_data,
@@ -596,7 +597,7 @@ def payment():
                                     end_date=f_time)
                         db.session.add(a)
                         db.session.commit()
-                    elif Discount.discount == True:
+                    elif Discount.discount:
                         a = Session(cost=Cost - (Cost * discountRate.discount_rate),
                                     start_date=f_start_date,
                                     scooter_id=f_scooter_data,
@@ -604,13 +605,12 @@ def payment():
                                     end_date=f_time)
                         db.session.add(a)
                         db.session.commit()
-
 
                     scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
                     if scooter:
                         scooter.availability = False
 
-                    # Query a card object to check there exist already one for the user loged in.
+                    # Query a card object to check there exist already one for the user logged in.
 
                     if not c:
                         expdate = str(form.card_expiry_Year.data) + "-" + str(form.card_expiry_Month.data) + "-01"
@@ -621,7 +621,7 @@ def payment():
                                     expiry_date=date_time_obj,
                                     cvv=generate_password_hash(form.card_cvv.data, method='sha256'),
                                     user_id=current_user.id)
-                        if form.save_card.data == True:
+                        if form.save_card.data:
                             print("saved")
                             db.session.add(card)
                     db.session.commit()
@@ -629,16 +629,16 @@ def payment():
                     # Sending the confirmation email to the user
                     Subject = 'Conformation Email | please do not reply'
                     msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
-                    msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your raid. "
+                    msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride."
                     mail.send(msg)
 
-                    flash('The confirmation email has been send successfully')
+                    flash('The confirmation email has been sent successfully')
                 elif typ == 1:
                     g = models.Guest.query.filter_by(id=usid).first()
                     print(g)
                     Subject = 'Conformation Email | please do not reply'
                     msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[g.email])
-                    msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride. "
+                    msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride."
                     mail.send(msg)
 
                     flash('The confirmation email has been sent successfully')
@@ -669,69 +669,77 @@ def payment():
 @app.route('/configureCost', methods=['GET', 'POST'])
 @login_required
 def configureScooterCost():
-    form = ConfigureScooterCostForm()
-    scooter_cost = ScooterCost.query.first()
+    if current_user.account_type == 2:
 
-    if scooter_cost is None:  # if no cost is declared in the database, then a new cost entry will be made
-        scooter_cost = ScooterCost()
-        scooter_cost.hourly_cost = 10.00  # this is the default value if there's no value in the database
-        db.session.add(scooter_cost)
-        db.session.commit()
+        form = ConfigureScooterCostForm()
+        scooter_cost = ScooterCost.query.first()
 
-    # This section removes the "[" and "]" symbols from the cost that automatically is added when displaying
-    # the cost in the input box
-    s = ""
-    for element in str(scooter_cost.hourly_cost):
-        if element != "[" and element != "]":
-            s += element
-
-    # Adds 2 decimal places to the end
-    if request.method == 'GET':
-        form.cost.data = "%.2f" % float(s)
-
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            scooter_cost.hourly_cost = form.cost.data
+        if scooter_cost is None:  # if no cost is declared in the database, then a new cost entry will be made
+            scooter_cost = ScooterCost()
+            scooter_cost.hourly_cost = 10.00  # this is the default value if there's no value in the database
             db.session.add(scooter_cost)
             db.session.commit()
-            if current_user.account_type == 1:
-                return redirect("/employee")
-            else:
-                return redirect("/manager")
 
-    return render_template('configureCost.html',
-                           title='Configure Scooters',
-                           form=form)
+        # This section removes the "[" and "]" symbols from the cost that automatically is added when displaying
+        # the cost in the input box
+        s = ""
+        for element in str(scooter_cost.hourly_cost):
+            if element != "[" and element != "]":
+                s += element
+
+        # Adds 2 decimal places to the end
+        if request.method == 'GET':
+            form.cost.data = "%.2f" % float(s)
+
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                scooter_cost.hourly_cost = form.cost.data
+                db.session.add(scooter_cost)
+                db.session.commit()
+                if current_user.account_type == 1:
+                    return redirect("/employee")
+                else:
+                    return redirect("/manager")
+
+        return render_template('configureCost.html',
+                               title='Configure Scooters',
+                               form=form)
+    else:
+        return "<h1> Page not found </h1>"
 
 
 @app.route('/configureScooters', methods=['GET', 'POST'])
 @login_required
 def configureScooters():
-    form = ConfigureScooterForm()
+    if current_user.account_type == 2:
 
-    # Displays all the locations and all the scooter ids in the relevant dropdown menus
-    form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
-    form.id.choices = [scooter.id for scooter in models.Scooter.query.all()]
+        form = ConfigureScooterForm()
 
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            scooter = Scooter.query.filter_by(id=form.id.data).first()
+        # Displays all the locations and all the scooter ids in the relevant dropdown menus
+        form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
+        form.id.choices = [scooter.id for scooter in models.Scooter.query.all()]
 
-            scooter.id = form.id.data
-            scooter.availability = form.availability.data
-            scooter.location_id = form.location.data
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                scooter = Scooter.query.filter_by(id=form.id.data).first()
 
-            db.session.add(scooter)
-            db.session.commit()
+                scooter.id = form.id.data
+                scooter.availability = form.availability.data
+                scooter.location_id = form.location.data
 
-            if current_user.account_type == 1:
-                return redirect("/employee")
-            else:
-                return redirect("/manager")
+                db.session.add(scooter)
+                db.session.commit()
 
-    return render_template('configureScooters.html',
-                           title='Configure Scooters',
-                           form=form)
+                if current_user.account_type == 1:
+                    return redirect("/employee")
+                else:
+                    return redirect("/manager")
+
+        return render_template('configureScooters.html',
+                               title='Configure Scooters',
+                               form=form)
+    else:
+        return "<h1> Page not found </h1>"
 
 
 @app.route('/ScooterList', methods=['GET', 'POST'])
@@ -774,6 +782,7 @@ def BookingGuestUser():
             session['guest'] = guest
             return redirect(url_for('.selectLocationguest', guest=guest))
     return render_template('GuestBooking.html', title='Guest Booking', form=form)
+
 
 @app.route('/selectlocationguest', methods=['GET', 'POST'])
 @login_required
@@ -939,311 +948,313 @@ def managerHighPriorityIncompleted():
 @app.route('/userChangeDetails', methods=['GET', 'POST'])
 @login_required
 def userChangeDetails():
-    if current_user.account_type == 1:
-        redirect("/employee")
-    if current_user.account_type == 2:
-        redirect("/manager")
+    if current_user.account_type == 0:
 
-    form = UserChangeDetailsForm()
+        form = UserChangeDetailsForm()
 
-    if request.method == 'GET':
-        form.forename.data = current_user.forename
-        form.surname.data = current_user.surname
-        form.email.data = current_user.email
-        form.phone.data = current_user.phone
+        if request.method == 'GET':
+            form.forename.data = current_user.forename
+            form.surname.data = current_user.surname
+            form.email.data = current_user.email
+            form.phone.data = current_user.phone
 
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            # Looks up if email / phone number exists in the database, and isn't the same
-            # as the user's current email / phone number. If it is then it's not valid and
-            # will reject it (avoids database integrity failures)
-            email_exists = User.query.filter_by(email=form.email.data).first()
-            phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                # Looks up if email / phone number exists in the database, and isn't the same
+                # as the user's current email / phone number. If it is then it's not valid and
+                # will reject it (avoids database integrity failures)
+                email_exists = User.query.filter_by(email=form.email.data).first()
+                phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
 
-            if email_exists is not None and form.email.data != current_user.email:
-                flash("Error. That email already exists")
-                form.email.data = current_user.email
+                if email_exists is not None and form.email.data != current_user.email:
+                    flash("Error. That email already exists")
+                    form.email.data = current_user.email
 
-            if phone_no_exists is not None and form.phone.data != current_user.phone:
-                flash("Error. That phone number already exists")
-                form.phone.data = current_user.phone
+                if phone_no_exists is not None and form.phone.data != current_user.phone:
+                    flash("Error. That phone number already exists")
+                    form.phone.data = current_user.phone
 
+                else:
+                    logged_in_user = current_user
+                    logged_in_user.forename = form.forename.data
+                    logged_in_user.surname = form.surname.data
+                    logged_in_user.email = form.email.data
+                    logged_in_user.phone = form.phone.data
+                    db.session.add(logged_in_user)
+                    db.session.commit()
+                    return redirect("/user")
             else:
-                logged_in_user = current_user
-                logged_in_user.forename = form.forename.data
-                logged_in_user.surname = form.surname.data
-                logged_in_user.email = form.email.data
-                logged_in_user.phone = form.phone.data
-                db.session.add(logged_in_user)
-                db.session.commit()
-                return redirect("/user")
-        else:
-            flash("Invalid details entered")
+                flash("Invalid details entered")
 
-    return render_template('userChangeDetails.html',
-                           title='Change details',
-                           form=form)
+        return render_template('userChangeDetails.html',
+                               title='Change details',
+                               form=form)
+
+    else:
+        return "<h1> Page not found </h1>"
 
 
 @app.route('/employeeChangeDetails', methods=['GET', 'POST'])
 @login_required
 def employeeChangeDetails():
-    if current_user.account_type == 0:
-        redirect("/user")
+    if current_user.account_type != 0:
 
-    form = EmployeeChangeDetailsForm()
+        form = EmployeeChangeDetailsForm()
 
-    if request.method == 'GET':
-        form.forename.data = current_user.forename
-        form.surname.data = current_user.surname
-        form.email.data = current_user.email
-        form.phone.data = current_user.phone
-        form.national_insurance_number.data = current_user.national_insurance_number
+        if request.method == 'GET':
+            form.forename.data = current_user.forename
+            form.surname.data = current_user.surname
+            form.email.data = current_user.email
+            form.phone.data = current_user.phone
+            form.national_insurance_number.data = current_user.national_insurance_number
 
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            # Looks up if email / phone number /NIN exists in the database, and isn't the same
-            # as the user's current email / phone number / NIN. If it is then it's not valid and
-            # will reject it (avoids database integrity failures)
-            email_exists = User.query.filter_by(email=form.email.data).first()
-            phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
-            nin_exists = User.query.filter_by(national_insurance_number=form.national_insurance_number.data).first()
-            valid_input = True  # If it fails 1 or more of these checks then it will be changed to false, and
-            # won't be saved to the database
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                # Looks up if email / phone number /NIN exists in the database, and isn't the same
+                # as the user's current email / phone number / NIN. If it is then it's not valid and
+                # will reject it (avoids database integrity failures)
+                email_exists = User.query.filter_by(email=form.email.data).first()
+                phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
+                nin_exists = User.query.filter_by(national_insurance_number=form.national_insurance_number.data).first()
+                valid_input = True  # If it fails 1 or more of these checks then it will be changed to false, and
+                # won't be saved to the database
 
-            if email_exists is not None and form.email.data != current_user.email:
-                flash("Error. That email already exists")
-                form.email.data = current_user.email
-                valid_input = False
+                if email_exists is not None and form.email.data != current_user.email:
+                    flash("Error. That email already exists")
+                    form.email.data = current_user.email
+                    valid_input = False
 
-            if phone_no_exists is not None and form.phone.data != current_user.phone:
-                flash("Error. That phone number already exists")
-                form.phone.data = current_user.phone
-                valid_input = False
+                if phone_no_exists is not None and form.phone.data != current_user.phone:
+                    flash("Error. That phone number already exists")
+                    form.phone.data = current_user.phone
+                    valid_input = False
 
-            if nin_exists is not None and form.national_insurance_number.data != current_user.national_insurance_number:
-                flash("Error. That national insurance number is already in use")
-                form.national_insurance_number.data = current_user.national_insurance_number
-                valid_input = False
+                if nin_exists is not None and \
+                        form.national_insurance_number.data != current_user.national_insurance_number:
+                    flash("Error. That national insurance number is already in use")
+                    form.national_insurance_number.data = current_user.national_insurance_number
+                    valid_input = False
 
-            if valid_input:
-                logged_in_employee = current_user
-                logged_in_employee.forename = form.forename.data
-                logged_in_employee.surname = form.surname.data
-                logged_in_employee.email = form.email.data
-                logged_in_employee.phone = form.phone.data
-                logged_in_employee.national_insurance_number = form.national_insurance_number.data
-                db.session.add(logged_in_employee)
-                db.session.commit()
-                if logged_in_employee.account_type == 1:
-                    return redirect("/employee")
-                else:
-                    return redirect("/manager")
-        else:
-            flash("Invalid details entered")
+                if valid_input:
+                    logged_in_employee = current_user
+                    logged_in_employee.forename = form.forename.data
+                    logged_in_employee.surname = form.surname.data
+                    logged_in_employee.email = form.email.data
+                    logged_in_employee.phone = form.phone.data
+                    logged_in_employee.national_insurance_number = form.national_insurance_number.data
+                    db.session.add(logged_in_employee)
+                    db.session.commit()
+                    if logged_in_employee.account_type == 1:
+                        return redirect("/employee")
+                    else:
+                        return redirect("/manager")
+            else:
+                flash("Invalid details entered")
 
-    return render_template('employeeChangeDetails.html',
-                           title='Change details',
-                           form=form)
+        return render_template('employeeChangeDetails.html',
+                               title='Change details',
+                               form=form)
+
+    else:
+        return "<h1> Page not found </h1>"
 
 
 @app.route('/userChangePassword', methods=['GET', 'POST'])
 @login_required
 def userChangePassword():
-    if current_user.account_type == 1:
-        redirect("/employee")
-    if current_user.account_type == 2:
-        redirect("/manager")
+    if current_user.account_type == 0:
+        form = UserChangePasswordForm()
 
-    form = UserChangePasswordForm()
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                logged_in_user = current_user
+                if check_password_hash(logged_in_user.password, form.password.data) is True:
+                    flash("Error, new password is the same as the old password")
+                else:
+                    logged_in_user.password = generate_password_hash(form.password.data)
+                    db.session.add(logged_in_user)
+                    db.session.commit()
+                    return redirect("/user")
 
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            logged_in_user = current_user
-            if check_password_hash(logged_in_user.password, form.password.data) is True:
-                flash("Error, new password is the same as the old password")
-            else:
-                logged_in_user.password = generate_password_hash(form.password.data)
-                db.session.add(logged_in_user)
-                db.session.commit()
-                return redirect("/user")
+        return render_template('userChangePassword.html',
+                               title='Change details',
+                               form=form)
 
-    return render_template('userChangePassword.html',
-                           title='Change details',
-                           form=form)
+    else:
+        return "<h1> Page not found </h1>"
 
 
 @app.route('/employeeChangePassword', methods=['GET', 'POST'])
 @login_required
 def employeeChangePassword():
-    if current_user.account_type == 0:
-        redirect("/user")
+    if current_user.account_type != 0:
 
-    form = UserChangePasswordForm()
+        form = UserChangePasswordForm()
 
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            logged_in_user = current_user
-            if check_password_hash(logged_in_user.password, form.password.data) is True:
-                flash("Error, new password is the same as the old password")
-            else:
-                logged_in_user.password = generate_password_hash(form.password.data)
-                db.session.add(logged_in_user)
-                db.session.commit()
-                if logged_in_user.account_type == 1:
-                    return redirect("/employee")
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                logged_in_user = current_user
+                if check_password_hash(logged_in_user.password, form.password.data) is True:
+                    flash("Error, new password is the same as the old password")
                 else:
-                    return redirect("/manager")
+                    logged_in_user.password = generate_password_hash(form.password.data)
+                    db.session.add(logged_in_user)
+                    db.session.commit()
+                    if logged_in_user.account_type == 1:
+                        return redirect("/employee")
+                    else:
+                        return redirect("/manager")
 
-    return render_template('employeeChangePassword.html',
-                           title='Change details',
-                           form=form)
+        return render_template('employeeChangePassword.html',
+                               title='Change details',
+                               form=form)
+
+    else:
+        return "<h1> Page not found </h1>"
 
 
 @app.route('/managerCreateEmployee', methods=['GET', 'POST'])
 @login_required
 def managerCreateEmployee():
-    if current_user.account_type == 1:
-        redirect("/employee")
-    if current_user.account_type == 0:
-        redirect("/user")
+    if current_user.account_type == 2:
 
-    form = RegisterEmployeeForm()
+        form = RegisterEmployeeForm()
 
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            # Looks up if email / phone number /NIN exists in the database, and isn't the same
-            # as the user's current email / phone number / NIN. If it is then it's not valid and
-            # will reject it (avoids database integrity failures)
-            email_exists = User.query.filter_by(email=form.email.data).first()
-            phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
-            nin_exists = User.query.filter_by(national_insurance_number=form.national_insurance_number.data).first()
-            valid_input = True  # If it fails 1 or more of these checks then it will be changed to false, and
-            # won't be saved to the database
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                # Looks up if email / phone number /NIN exists in the database, and isn't the same
+                # as the user's current email / phone number / NIN. If it is then it's not valid and
+                # will reject it (avoids database integrity failures)
+                email_exists = User.query.filter_by(email=form.email.data).first()
+                phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
+                nin_exists = User.query.filter_by(national_insurance_number=form.national_insurance_number.data).first()
+                valid_input = True  # If it fails 1 or more of these checks then it will be changed to false, and
+                # won't be saved to the database
 
-            if email_exists is not None:
-                flash("Error. That email already exists")
-                valid_input = False
+                if email_exists is not None:
+                    flash("Error. That email already exists")
+                    valid_input = False
 
-            if phone_no_exists is not None:
-                flash("Error. That phone number already exists")
-                valid_input = False
+                if phone_no_exists is not None:
+                    flash("Error. That phone number already exists")
+                    valid_input = False
 
-            if nin_exists is not None:
-                flash("Error. That national insurance number is already in use")
-                valid_input = False
+                if nin_exists is not None:
+                    flash("Error. That national insurance number is already in use")
+                    valid_input = False
 
-            if valid_input:
-                employee = User()
+                if valid_input:
+                    employee = User()
 
-                if form.account_type.data == "Account Type: Manager":
-                    employee.account_type = 2
-                else:
-                    employee.account_type = 1
+                    if form.account_type.data == "Account Type: Manager":
+                        employee.account_type = 2
+                    else:
+                        employee.account_type = 1
 
-                employee.forename = form.forename.data
-                employee.surname = form.surname.data
-                employee.email = form.email.data
-                employee.phone = form.phone.data
-                employee.national_insurance_number = form.national_insurance_number.data
-                employee.password = generate_password_hash(form.password.data)
+                    employee.forename = form.forename.data
+                    employee.surname = form.surname.data
+                    employee.email = form.email.data
+                    employee.phone = form.phone.data
+                    employee.national_insurance_number = form.national_insurance_number.data
+                    employee.password = generate_password_hash(form.password.data)
 
-                db.session.add(employee)
-                db.session.commit()
-                return redirect("/manager")
-        else:
-            flash("Invalid details entered")
+                    db.session.add(employee)
+                    db.session.commit()
+                    return redirect("/manager")
+            else:
+                flash("Invalid details entered")
 
-    return render_template('managerCreateEmployee.html',
-                           title='Create New Employee',
-                           form=form)
+        return render_template('managerCreateEmployee.html',
+                               title='Create New Employee',
+                               form=form)
+
+    else:
+        return "<h1> Page not found </h1>"
 
 
 @app.route('/managerEmployeeSearch', methods=['GET', 'POST'])
 @login_required
 def managerEmployeeSearch():
-    if current_user.account_type == 1:
-        redirect("/employee")
-    if current_user.account_type == 0:
-        redirect("/user")
+    if current_user.account_type == 2:
+        form = EmployeeSearchForm()
+        # Displays all employees in the database in the dropdown menu
+        form.search_field.choices = [(employee.id, employee.surname + " , " + employee.forename) for employee in
+                                     models.User.query.filter(
+                                         User.account_type == 1).all()]  # Can only edit employees, not other managers
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                # Keeps track of the employee ID chosen to retrieve their details in managerEmployeeEdit
+                session['employee_id'] = form.search_field.data
+                return redirect('/managerEmployeeEdit')
 
-    form = EmployeeSearchForm()
-    # Displays all employees in the database in the dropdown menu
-    form.search_field.choices = [(employee.id, employee.surname + " , " + employee.forename) for employee in
-                                 models.User.query.filter(
-                                     User.account_type == 1).all()]  # Can only edit employees, not other managers
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            # Keeps track of the employee ID chosen to retrieve their details in managerEmployeeEdit
-            session['employee_id'] = form.search_field.data
-            return redirect('/managerEmployeeEdit')
+        return render_template('managerEmployeeSearch.html',
+                               title='Change details',
+                               form=form)
 
-    return render_template('managerEmployeeSearch.html',
-                           title='Change details',
-                           form=form)
+    else:
+        return "<h1> Page not found </h1>"
 
 
 @app.route('/managerEmployeeEdit', methods=['GET', 'POST'])
 @login_required
 def managerEmployeeEdit():
-    if current_user.account_type == 1:
-        redirect("/employee")
-    if current_user.account_type == 0:
-        redirect("/user")
+    if current_user.account_type == 2:
+        # Sets the session value saved in the previous function as the employee ID to retrieve all the other details
+        employee_id = session['employee_id']
 
-    # Sets the session value saved in the previous function as the employee ID to retrieve all the other details
-    employee_id = session['employee_id']
+        form = EditEmployeeForm()
+        # Finds the employee matching that ID and retrieves all the other details related to that employee
+        employee_found = User.query.filter_by(id=employee_id).first()
 
-    form = EditEmployeeForm()
-    # Finds the employee matching that ID and retrieves all the other details related to that employee
-    employee_found = User.query.filter_by(id=employee_id).first()
+        if request.method == 'GET':
+            form.forename.data = employee_found.forename
+            form.surname.data = employee_found.surname
+            form.email.data = employee_found.email
+            form.phone.data = employee_found.phone
+            form.national_insurance_number.data = employee_found.national_insurance_number
 
-    if request.method == 'GET':
-        form.forename.data = employee_found.forename
-        form.surname.data = employee_found.surname
-        form.email.data = employee_found.email
-        form.phone.data = employee_found.phone
-        form.national_insurance_number.data = employee_found.national_insurance_number
-
-        if employee_found.account_type == 1:
-            form.account_type.choices = ["Account Type: Employee", "Account Type: Manager"]
-        else:
-            form.account_type.choices = ["Account Type: Manager", "Account Type: Employee"]
-
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            email_exists = User.query.filter_by(email=form.email.data).first()
-            phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
-            nin_exists = User.query.filter_by(national_insurance_number=form.national_insurance_number.data).first()
-            # Looks up if email / phone number /NIN exists in the database, and isn't the same
-            # as the user's current email / phone number / NIN. If it is then it's not valid and
-            # will reject it (avoids database integrity failures)
-
-            if email_exists is not None and form.email.data != employee_found.email:
-                flash("Error. That email already exists")
-                form.email.data = employee_found.email
-
-            if phone_no_exists is not None and form.phone.data != employee_found.phone:
-                flash("Error. That phone number already exists")
-                form.phone.data = employee_found.phone
-
-            if nin_exists is not None and form.national_insurance_number.data \
-                    != employee_found.national_insurance_number:
-                flash("Error. That national insurance number is already in use")
-                form.national_insurance_number.data = employee_found.national_insurance_number
-
-            employee_found.forename = form.forename.data
-            employee_found.surname = form.surname.data
-            employee_found.email = form.email.data
-            employee_found.phone = form.phone.data
-            employee_found.national_insurance_number = form.national_insurance_number.data
-            if form.account_type.data == "Account Type: Employee":
-                employee_found.account_type = 1
+            if employee_found.account_type == 1:
+                form.account_type.choices = ["Account Type: Employee", "Account Type: Manager"]
             else:
-                employee_found.account_type = 2
-            db.session.add(employee_found)
-            db.session.commit()
+                form.account_type.choices = ["Account Type: Manager", "Account Type: Employee"]
 
-    return render_template('managerEmployeeEdit.html',
-                           title='Change details',
-                           form=form)
+        if request.method == 'POST':
+            if form.validate_on_submit():
+                email_exists = User.query.filter_by(email=form.email.data).first()
+                phone_no_exists = User.query.filter_by(phone=form.phone.data).first()
+                nin_exists = User.query.filter_by(national_insurance_number=form.national_insurance_number.data).first()
+                # Looks up if email / phone number /NIN exists in the database, and isn't the same
+                # as the user's current email / phone number / NIN. If it is then it's not valid and
+                # will reject it (avoids database integrity failures)
+
+                if email_exists is not None and form.email.data != employee_found.email:
+                    flash("Error. That email already exists")
+                    form.email.data = employee_found.email
+
+                if phone_no_exists is not None and form.phone.data != employee_found.phone:
+                    flash("Error. That phone number already exists")
+                    form.phone.data = employee_found.phone
+
+                if nin_exists is not None and form.national_insurance_number.data \
+                        != employee_found.national_insurance_number:
+                    flash("Error. That national insurance number is already in use")
+                    form.national_insurance_number.data = employee_found.national_insurance_number
+
+                employee_found.forename = form.forename.data
+                employee_found.surname = form.surname.data
+                employee_found.email = form.email.data
+                employee_found.phone = form.phone.data
+                employee_found.national_insurance_number = form.national_insurance_number.data
+                if form.account_type.data == "Account Type: Employee":
+                    employee_found.account_type = 1
+                else:
+                    employee_found.account_type = 2
+                db.session.add(employee_found)
+                db.session.commit()
+
+        return render_template('managerEmployeeEdit.html',
+                               title='Change details',
+                               form=form)
+
+    else:
+        return "<h1> Page not found </h1>"
