@@ -759,7 +759,9 @@ def BookingGuestUser():
         if user:
             flash("This email had already sign up by another user.")
         elif guest:
-            flash("This email had already sign up by another guest.")
+            guest = guest.id
+            session['guest'] = guest
+            return redirect(url_for('.selectLocationguest', guest=guest))
         else:
             p = models.Guest(email=form.email.data,
                              phone=form.phone.data,
@@ -772,7 +774,6 @@ def BookingGuestUser():
             session['guest'] = guest
             return redirect(url_for('.selectLocationguest', guest=guest))
     return render_template('GuestBooking.html', title='Guest Booking', form=form)
-
 
 @app.route('/selectlocationguest', methods=['GET', 'POST'])
 @login_required
