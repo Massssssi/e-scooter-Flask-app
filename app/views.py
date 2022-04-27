@@ -538,14 +538,15 @@ def payment():
     Discount = models.User.query.filter_by(id=current_user.id).first()
     discountRate = models.ScooterCost.query.filter_by(id=1).first()
     c = models.Card.query.filter_by(user_id=current_user.id).first()
+    print("this is the card", c)
     indice = False
     total_cost = 0
     scooter_cost = ScooterCost.query.filter_by(id=1).first()
     for user in models.Session.query.filter_by(user_id=current_user.id).all():
-        if user.start_date >= datetime.today() - (timedelta(days=7)):
+        if (user.start_date >= datetime.today() - (timedelta(days=7))):
             total_cost = total_cost + user.cost
 
-    if total_cost >= scooter_cost.hourly_cost * 8:
+    if (total_cost >= (scooter_cost.hourly_cost) * 8):
         indice = True
 
     print(total_cost)
@@ -578,36 +579,38 @@ def payment():
                 if n not in l:
                     checkcvv = 0
             if checkcard == 1 and checkcvv == 1:
-                if typ == 0 and Discount.discount == False and indice == False:
-                    a = Session(cost=Cost,
-                                start_date=f_start_date,
-                                scooter_id=f_scooter_data,
-                                user_id=us_id,
-                                end_date=f_time)
-                    db.session.add(a)
-                    db.session.commit()
-                elif typ == 0 and Discount.discount == False and indice == True:
-                    a = Session(cost=Cost - (Cost * discountRate.discount_rate),
-                                start_date=f_start_date,
-                                scooter_id=f_scooter_data,
-                                user_id=us_id,
-                                end_date=f_time)
-                    db.session.add(a)
-                    db.session.commit()
-                elif typ == 0 and Discount.discount == True:
-                    a = Session(cost=Cost - (Cost * discountRate.discount_rate),
-                                start_date=f_start_date,
-                                scooter_id=f_scooter_data,
-                                user_id=us_id,
-                                end_date=f_time)
-                    db.session.add(a)
-                    db.session.commit()
+                if typ==0:
+                    if Discount.discount == False and indice == False:
+                        a = Session(cost=Cost,
+                                    start_date=f_start_date,
+                                    scooter_id=f_scooter_data,
+                                    user_id=us_id,
+                                    end_date=f_time)
+                        db.session.add(a)
+                        db.session.commit()
+                    elif Discount.discount == False and indice == True:
+                        a = Session(cost=Cost - (Cost * discountRate.discount_rate),
+                                    start_date=f_start_date,
+                                    scooter_id=f_scooter_data,
+                                    user_id=us_id,
+                                    end_date=f_time)
+                        db.session.add(a)
+                        db.session.commit()
+                    elif Discount.discount == True:
+                        a = Session(cost=Cost - (Cost * discountRate.discount_rate),
+                                    start_date=f_start_date,
+                                    scooter_id=f_scooter_data,
+                                    user_id=us_id,
+                                    end_date=f_time)
+                        db.session.add(a)
+                        db.session.commit()
+
 
                     scooter = models.Scooter.query.filter_by(id=f_scooter_data).first()
                     if scooter:
                         scooter.availability = False
 
-                    # Query a card object to check there exist already one for the user logged in.
+                    # Query a card object to check there exist already one for the user loged in.
 
                     if not c:
                         expdate = str(form.card_expiry_Year.data) + "-" + str(form.card_expiry_Month.data) + "-01"
