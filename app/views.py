@@ -42,23 +42,26 @@ def main():
 
 @app.route('/addingScooter', methods=['GET', 'POST'])
 def addScooter():
-    form = ScooterForm()
-    form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
-    if form.validate_on_submit():
-        flash('Successfully received from data. %s and %s' % (form.availability.data, form.location.data))
+    if current_user.account_type !=0:
+        form = ScooterForm()
+        form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
+        if form.validate_on_submit():
 
-        location = Location.query.get(form.location.data)
 
-        try:
-            for i in range(0, int(form.num_Scooter.data)):
-                scooter = models.Scooter(availability=form.availability.data, location_id=form.location.data)
-                db.session.add(scooter)
-                location.no_of_scooters += 1
+            location = Location.query.get(form.location.data)
 
-            db.session.commit()
-        except:
-            flash('ERROR WHILE UPDATING THE SCOOTER TABLE')
-    return render_template('scooterManagement.html', title='Add Scooter', form=form)
+            try:
+                for i in range(0, int(form.num_Scooter.data)):
+                    scooter = models.Scooter(availability=form.availability.data, location_id=form.location.data)
+                    db.session.add(scooter)
+                    location.no_of_scooters += 1
+
+                db.session.commit()
+            except:
+                flash('ERROR WHILE UPDATING THE SCOOTER TABLE')
+        return render_template('scooterManagement.html', title='Add Scooter', form=form)
+    else:
+        return "<h1>Page not found </h1>"
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -453,7 +456,7 @@ def bookScooter():
     typ = session['typ']
 
     p = models.Location.query.filter_by(id=int(loc_id)).first()
-    m = models.Scooter.query.filter(Scooter.availability is True).first()
+    m = models.Scooter.query.filter(Scooter.availability == True).first()
     if m:
         form.scooter.choices = [scooter.id for scooter in
                                 Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
@@ -553,11 +556,17 @@ def payment():
     print(total_cost)
 
     today_year = date.today().year
+    today_month = date.today().month
+
     choice = []
     for i in range(6):
         choice.append(today_year + i)
     form.card_expiry_Year.choices = choice
-    form.card_expiry_Month.choices = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12']
+
+    choice = []
+    for i in range(today_month, 13):
+        choice.append(i)
+    form.card_expiry_Month.choices = choice
     if c:
         if request.method == 'GET':
             form.card_holder.data = c.holder
@@ -615,14 +624,14 @@ def payment():
                     if not c:
                         expdate = str(form.card_expiry_Year.data) + "-" + str(form.card_expiry_Month.data) + "-01"
                         date_time_obj = datetime.strptime(expdate, '%Y-%m-%d').date()
-                        print("Card created")
+
                         card = Card(holder=form.card_holder.data,
                                     card_number=form.card_number.data,
                                     expiry_date=date_time_obj,
                                     cvv=generate_password_hash(form.card_cvv.data, method='sha256'),
                                     user_id=current_user.id)
                         if form.save_card.data:
-                            print("saved")
+
                             db.session.add(card)
                     db.session.commit()
 
@@ -760,28 +769,31 @@ def ScooterList():
 @app.route('/GuestUsers', methods=['GET', 'POST'])
 @login_required
 def BookingGuestUser():
-    form = BookingGuestUserForm()
-    if form.validate_on_submit():
-        user = User.query.filter_by(email=form.email.data).first()
-        guest = Guest.query.filter_by(email=form.email.data).first()
-        if user:
-            flash("This email had already sign up by another user.")
-        elif guest:
-            guest = guest.id
-            session['guest'] = guest
-            return redirect(url_for('.selectLocationguest', guest=guest))
-        else:
-            p = models.Guest(email=form.email.data,
-                             phone=form.phone.data,
-                             )
+    if current_user.account_type != 0:
+        form = BookingGuestUserForm()
+        if form.validate_on_submit():
+            user = User.query.filter_by(email=form.email.data).first()
+            guest = Guest.query.filter_by(email=form.email.data).first()
+            if user:
+                flash("This email had already sign up by another user.")
+            elif guest:
+                guest = guest.id
+                session['guest'] = guest
+                return redirect(url_for('.selectLocationguest', guest=guest))
+            else:
+                p = models.Guest(email=form.email.data,
+                                 phone=form.phone.data,
+                                 )
 
-            db.session.add(p)
-            db.session.commit()
-            p = models.Guest.query.filter_by(email=form.email.data).first()
-            guest = p.id
-            session['guest'] = guest
-            return redirect(url_for('.selectLocationguest', guest=guest))
-    return render_template('GuestBooking.html', title='Guest Booking', form=form)
+                db.session.add(p)
+                db.session.commit()
+                p = models.Guest.query.filter_by(email=form.email.data).first()
+                guest = p.id
+                session['guest'] = guest
+                return redirect(url_for('.selectLocationguest', guest=guest))
+        return render_template('GuestBooking.html', title='Guest Booking', form=form)
+    else:
+        return "<h1>Page not found </h1>"
 
 
 @app.route('/selectlocationguest', methods=['GET', 'POST'])
