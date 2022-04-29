@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SelectField, \
-    FloatField, DateTimeField
+    FloatField, DateTimeLocalField
 from wtforms.validators import DataRequired, EqualTo, Length
-
+import datetime
 
 class ConfigureScooterForm(FlaskForm):
     id = SelectField('location', choices=[])
@@ -113,8 +113,7 @@ class UserChangePasswordForm(FlaskForm):
 class BookScooterForm(FlaskForm):
     scooter = SelectField('scooter', choices=[], validators=[DataRequired()])
     hire_period = SelectField('hire_period', choices=["One hour", "Four hours", "One day", "One week"])
-    start_date = DateTimeField('datetime', format='%Y-%m-%d %H:%M:%S', validators=[DataRequired()])
-
+    start_date = DateTimeLocalField('datetime',format="%Y-%m-%dT%H:%M", default = datetime.datetime.utcnow())
 
 class selectLocationForm(FlaskForm):
     location_id = SelectField('location_id', choices=[])
