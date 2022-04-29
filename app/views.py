@@ -3,7 +3,6 @@ import json
 from datetime import timedelta, datetime, date
 
 import folium
-import phonenumbers
 import pandas as pd
 from flask import render_template, flash, request, redirect, url_for, session
 from flask_admin.contrib.sqla import ModelView
@@ -708,19 +707,23 @@ def payment():
                             db.session.add(card)
                     db.session.commit()
 
+                     #Quering by user in the session database, filtering by the selected id for the scooter by the current user
+                    #to get the most updated version of the session
+                    #The email contains the user surname, starting day of his booking, end date, and the scooter ID
+
+                    user_session = models.Session.query.filter_by(scooter_id = f_scooter_data).first()
                     # Sending the confirmation email to the user
                     Subject = 'Conformation Email | please do not reply'
                     msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
-                    msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride."
+                    msg.body = "Dear {},\n\nThank you for booking with us.\nYour start date will begin on the {}\nThe return time is {}.\nPlease keep in mind your scooter number is {}\n\nEnjoy your raid.\n".format( current_user.surname, user_session.start_date, user_session.end_date, user_session.scooter_id)
                     mail.send(msg)
 
                     flash('The confirmation email has been sent successfully')
                 elif typ == 1:
                     g = models.Guest.query.filter_by(id=usid).first()
-                    print(g)
                     Subject = 'Conformation Email | please do not reply'
-                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[g.email])
-                    msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride."
+                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
+                    msg.body = "Dear {},\n\nThank you for booking with us.\nYour start date will begin on the {}\nThe return time is {}.\nPlease keep in mind your scooter number is {}\n\nEnjoy your raid.\n".format( current_user.surname, user_session.start_date, user_session.end_date, user_session.scooter_id)
                     mail.send(msg)
 
                     flash('The confirmation email has been sent successfully')
