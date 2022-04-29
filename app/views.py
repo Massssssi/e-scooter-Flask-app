@@ -1,21 +1,20 @@
-import copy
-import json
+from app import app, db, models, mail, admin
 from datetime import timedelta, datetime, date
-
-import folium
-import pandas as pd
 from flask import render_template, flash, request, redirect, url_for, session
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
-
-from app import app, db, models, mail, admin
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
     ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
     ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm, RegisterEmployeeForm, EditEmployeeForm, \
     EmployeeSearchForm, EmployeeChangeDetailsForm
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
+import folium
+import pandas as pd
+import copy
+import json
+
 
 # # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Location, db.session))
@@ -26,7 +25,6 @@ admin.add_view(ModelView(Guest, db.session))
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Card, db.session))
 admin.add_view(ModelView(Feedback, db.session))
-
 
 @app.route('/')
 def main():
@@ -906,11 +904,13 @@ def generalHelp():
         return "<h1>Page not found </h1>"
 
 
+#Function that makes the user choose a scooter he hired before, and make give a feedback about it.
+#or Error displayed on the screen if something went wrong
+
 @app.route('/userHelp/related-to-scooter', methods=['GET', 'POST'])
 @login_required
 def userhelpWithScooter():
     if current_user.account_type == 0:
-
         form = userHelpForm()
         form.scooter_id.choices = [userScooter.scooter_id for userScooter in
                                    Session.query.filter_by(user_id=current_user.id)]
@@ -936,6 +936,9 @@ def userhelpWithScooter():
         return "<h1>Page not found </h1>"
 
 
+#Function that makes the user able to make a general feedback about the company, besides choosing a priority for that order.
+#or Error displayed on the screen if something went wrong
+
 @app.route('/userhelp/related-to-general', methods=['GET', 'POST'])
 @login_required
 def generalUserHelp():
@@ -957,7 +960,7 @@ def generalUserHelp():
         return "<h1>Page not found </h1>"
 
 
-# route for completed the feedback from the employee
+# route for completed feedback from the employee
 @app.route('/complete/<int:id>')
 def complete(id):
     # For the employee
@@ -981,12 +984,12 @@ def complete(id):
         return "<h1>Page not found </h1>"
 
 
+#This route is for employees to see all the feedbacks related to a scooter, so they can see users feedback and filter through them
 @app.route('/employee/relatedToScooter', methods=['GET', 'POST'])
 @login_required
 def helpUser():
     if current_user.account_type == 1:
         if not Feedback.query.all():
-            # NEED TO BE DELETED return render_template("employeeFeedbackManagement.html")
             return render_template("employeeScooterRelatedFeedback.html")
         else:
             return render_template("employeeScooterRelatedFeedback.html", feedback=Feedback.query.all())
@@ -994,6 +997,7 @@ def helpUser():
         return "<h1>Page not found </h1>"
 
 
+#This route is for employees to see all general feedback, so they can see users feedback and filter through them
 @app.route('/employee/relatedToGeneral', methods=['GET', 'POST'])
 @login_required
 def helpUserWithGeneral():
