@@ -54,6 +54,12 @@
     <div class="button">
         <input type="submit" class="button" value="Register">
     </div>
+
+    {% if error_message %}
+    <div class="alert alert-primary" role="alert">
+      {{error_message}}
+    </div>
+  {% endif%}
 </form>
 
 {% endblock %}

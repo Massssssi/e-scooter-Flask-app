@@ -42,11 +42,10 @@ def main():
 
 @app.route('/addingScooter', methods=['GET', 'POST'])
 def addScooter():
-    if current_user.account_type !=0:
+    if current_user.account_type != 0:
         form = ScooterForm()
         form.location.choices = [(location.id, location.address) for location in models.Location.query.all()]
         if form.validate_on_submit():
-
 
             location = Location.query.get(form.location.data)
 
@@ -100,6 +99,25 @@ def user_login():
                            form=form)
 
 
+# Used to ensure that the user's password has at least one capital letter
+# one lower case letter, one number and one special character and length >=4
+def passwordCheck(password):
+    if len(password) < 4:
+        return False
+
+    up = low = num = spec = False
+    for letter in password:
+        if letter.isupper():
+            up = True
+        elif letter.islower():
+            low = True
+        elif letter.isnumeric():
+            num = True
+        elif not letter.isalnum():
+            spec = True
+    return up and low and num and spec
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegisterForm()
@@ -109,6 +127,8 @@ def register():
         user = User.query.filter_by(email=form.email.data).first()
         if user:
             flash("Error. This email already exists.")
+        if not passwordCheck(form.password.data):
+            flash("Error. Password must contain uppercase and lowercase letters, a number and a special character.")
         else:
             if not discount:
                 p = User(email=form.email.data,
@@ -222,6 +242,7 @@ def cancel():
     return redirect("/user")
 
 
+# Formats dates and times to look nicer
 @app.template_filter('strftime')
 def _jinja2_filter_datetime(date, val="full"):
     if val == "half":
@@ -631,7 +652,6 @@ def payment():
                                     cvv=generate_password_hash(form.card_cvv.data, method='sha256'),
                                     user_id=current_user.id)
                         if form.save_card.data:
-
                             db.session.add(card)
                     db.session.commit()
 
