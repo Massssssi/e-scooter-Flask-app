@@ -175,7 +175,11 @@ def logout():
 @app.route('/user')
 @login_required
 def user():
-    return render_template('user.html', title='Home', user=current_user)
+    if current_user.account_type==0:
+        return render_template('user.html', title='Home', user=current_user)
+    else:
+        return "<h1> Page not found </h1>"
+
 
 
 @app.route('/employeeAccountSettings')
@@ -187,37 +191,44 @@ def employeeAccountSettings():
 @app.route('/user/booking')
 @login_required
 def userScooterBooking():
-    return render_template('userScooterBooking.html', title='Home', user=current_user)
-
+    if current_user.account_type==0:
+        return render_template('userScooterBooking.html', title='Home', user=current_user)
+    else:
+        return "<h1> Page not found </h1>"
 
 @app.route('/user/viewSessions', methods=['GET'])
 @login_required
 def userScooterViewing():
-    user = User.query.get(current_user.id)
-    sessions = []
+    if current_user.account_type == 0:
+        user = User.query.get(current_user.id)
+        sessions = []
 
-    for session in user.session:
-        if session.returned is True:
-            sessions.append(session)
+        for session in user.session:
+            if session.returned is True:
+                sessions.append(session)
 
-    return render_template('userPreviousSessions.html', title='Home', user=current_user, sessions=sessions)
+        return render_template('userPreviousSessions.html', title='Home', user=current_user, sessions=sessions)
+    else:
+        return "<h1> Page not found </h1>"
 
 
 @app.route('/user/activeSessions', methods=['GET'])
 @login_required
 def userScooterManagement():
-    user = User.query.get(current_user.id)
-    activeSessions = []
+    if current_user.account_type == 0:
+        user = User.query.get(current_user.id)
+        activeSessions = []
 
-    for session in user.session:
-        if session.returned is False and session.start_date < datetime.now():
-            activeSessions.append(session)
-    print("Active sessions", activeSessions)
+        for session in user.session:
+            if session.returned is False and session.start_date < datetime.now():
+                activeSessions.append(session)
+        print("Active sessions", activeSessions)
 
-    return render_template('userActiveSessions.html', title='Home',
-                           user=current_user, sessions=activeSessions,
-                           time=datetime.utcnow())
-
+        return render_template('userActiveSessions.html', title='Home',
+                               user=current_user, sessions=activeSessions,
+                               time=datetime.utcnow())
+    else:
+        return "<h1> Page not found </h1>"
 
 # for sorting the sessions into the correct order
 def sortByDate(session):
@@ -227,18 +238,23 @@ def sortByDate(session):
 @app.route('/user/futureSessions', methods=['GET'])
 @login_required
 def userFutureManagement():
-    user = User.query.get(current_user.id)
-    activeSessions = []
 
-    for session in user.session:
-        if session.start_date > datetime.now():
-            activeSessions.append(session)
+    if current_user.account_type == 0:
+        user = User.query.get(current_user.id)
+        activeSessions = []
 
-    activeSessions.sort(key=sortByDate)
-    print(activeSessions)
-    return render_template('userFutureSessions.html', title='Home',
-                           user=current_user, sessions=activeSessions,
-                           time=datetime.utcnow())
+        for session in user.session:
+            if session.start_date > datetime.now():
+                activeSessions.append(session)
+
+        activeSessions.sort(key=sortByDate)
+        print(activeSessions)
+        return render_template('userFutureSessions.html', title='Home',
+                               user=current_user, sessions=activeSessions,
+                               time=datetime.utcnow())
+    else:
+        return "<h1> Page not found </h1>"
+
 
 
 @app.route('/cancel', methods=['POST'])
@@ -268,73 +284,91 @@ def _jinja2_filter_datetime(date, val="full"):
 @app.route('/user/returnScooter/<session_id>', methods=['POST'])
 @login_required
 def returnScooter(session_id):
-    form = ReturnScooterForm()
-    form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
 
-    if form.validate_on_submit():
-        session = Session.query.filter_by(id=session_id).first()  # the session we're referring to
-        session.returned = True  # returned the scooter
-        scooter = Scooter.query.filter_by(id=session.scooter_id).first()
+    if current_user.account_type == 0:
+        form = ReturnScooterForm()
+        form.location_id.choices = [(location.id, location.address) for location in models.Location.query.all()]
 
-        scooter.location_id = form.location_id.data  # moves the scooter location
-        scooter.availability = True
+        if form.validate_on_submit():
+            session = Session.query.filter_by(id=session_id).first()  # the session we're referring to
+            session.returned = True  # returned the scooter
+            scooter = Scooter.query.filter_by(id=session.scooter_id).first()
 
-        if scooter:
+            scooter.location_id = form.location_id.data  # moves the scooter location
             scooter.availability = True
 
-        db.session.commit()
+            if scooter:
+                scooter.availability = True
 
-        return redirect(url_for('userScooterManagement'))
+            db.session.commit()
 
-    return render_template('returnScooter.html', user=current_user, form=form)
+            return redirect(url_for('userScooterManagement'))
+
+        return render_template('returnScooter.html', user=current_user, form=form)
+    else:
+        return "<h1> Page not found </h1>"
+
 
 
 @app.route('/user/extendSession/<session_id>', methods=['POST'])
 @login_required
 def extend(session_id):
-    session = Session.query.filter_by(id=session_id).first()  # the session
-    hourly_cost = ScooterCost.query.first().hourly_cost  # only one value in this table
 
-    form = ExtendScooterForm()
+    if current_user.account_type == 0:
+        session = Session.query.filter_by(id=session_id).first()  # the session
+        hourly_cost = ScooterCost.query.first().hourly_cost  # only one value in this table
 
-    key = {"One hour": timedelta(hours=1),
-           "Four hours": timedelta(hours=4),
-           "One day": timedelta(days=1),
-           "One week": timedelta(weeks=1)}
+        form = ExtendScooterForm()
 
-    if form.validate_on_submit():
-        extension_length = key[form.hire_period.data]
+        key = {"One hour": timedelta(hours=1),
+               "Four hours": timedelta(hours=4),
+               "One day": timedelta(days=1),
+               "One week": timedelta(weeks=1)}
 
-        session.end_date += key[form.hire_period.data]  # adds on the new period that they've paid for
-        Discount = models.User.query.filter_by(id=current_user.id).first()
-        discountRate = models.ScooterCost.query.filter_by(id=1).first()
+        if form.validate_on_submit():
+            extension_length = key[form.hire_period.data]
 
-        # works out the amount of hours and then multiplies this by the current rate
-        if not Discount.discount:
-            session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600)
+            session.end_date += key[form.hire_period.data]  # adds on the new period that they've paid for
+            Discount = models.User.query.filter_by(id=current_user.id).first()
+            discountRate = models.ScooterCost.query.filter_by(id=1).first()
 
-            db.session.commit()
+            # works out the amount of hours and then multiplies this by the current rate
+            if not Discount.discount:
+                session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600)
 
-        elif Discount.discount:
-            session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600) - (
-                    Cost * discountRate.discount_rate)
+                db.session.commit()
 
-            db.session.commit()
-        return redirect(url_for('userScooterManagement'))
+            elif Discount.discount:
+                session.cost += hourly_cost * (extension_length.days * 24 + extension_length.seconds // 3600) - (
+                        Cost * discountRate.discount_rate)
 
-    return render_template('extendSession.html', user=current_user, form=form, hourly_cost=hourly_cost)
+                db.session.commit()
+            return redirect(url_for('userScooterManagement'))
+
+        return render_template('extendSession.html', user=current_user, form=form, hourly_cost=hourly_cost)
+    else:
+        return "<h1> Page not found </h1>"
+
 
 
 @app.route('/employee')
 @login_required
 def employee():
-    return render_template('employee.html', title='Employee Home', user=current_user)
+    if current_user.account_type == 1:
+        return render_template('employee.html', title='Employee Home', user=current_user)
+    else:
+        return "<h1> Page not found </h1>"
+
 
 
 @app.route('/manager')
 @login_required
 def manager():
-    return render_template('manager.html', title='Manager Home', user=current_user)
+    if current_user.account_type == 2:
+        return render_template('manager.html', title='Manager Home', user=current_user)
+    else:
+        return "<h1> Page not found </h1>"
+
 
 
 def check_day(start_date, session):
@@ -348,82 +382,90 @@ def check_day(start_date, session):
 @app.route('/incomeReports', methods=['GET', 'POST'])
 @login_required
 def incomeReports():
-    form = DateForm()
-    if form.validate_on_submit():
-        date1 = datetime(form.date.data.year, form.date.data.month, form.date.data.day)
-        date2 = date1 + timedelta(days=7)
-        record = Session.query.all()
-        day = [[], [], [], [], [], [], []]
-        for i in day:
-            for j in range(5):
-                x = []
-                i.append(x)
-        for s in record:
-            if date1 < s.start_date < date2:
-                if s.end_date == s.start_date + timedelta(hours=1):
-                    d = check_day(date1, s)
-                    day[d][0].append(s)
-                elif s.end_date == s.start_date + timedelta(hours=4):
-                    d = check_day(date1, s)
-                    day[d][1].append(s)
-                elif s.end_date == s.start_date + timedelta(days=1):
-                    d = check_day(date1, s)
-                    day[d][2].append(s)
-                elif s.end_date == s.start_date + timedelta(days=7):
-                    d = check_day(date1, s)
-                    day[d][3].append(s)
-                else:
-                    d = check_day(date1, s)
-                    day[d][4].append(s)
+    # if current_user.account_type == 0:
+    #
+    # else:
+    #     return "<h1> Page not found </h1>"
+    if current_user.account_type == 2:
+        form = DateForm()
+        if form.validate_on_submit():
+            date1 = datetime(form.date.data.year, form.date.data.month, form.date.data.day)
+            date2 = date1 + timedelta(days=7)
+            record = Session.query.all()
+            day = [[], [], [], [], [], [], []]
+            for i in day:
+                for j in range(5):
+                    x = []
+                    i.append(x)
+            for s in record:
+                if date1 < s.start_date < date2:
+                    if s.end_date == s.start_date + timedelta(hours=1):
+                        d = check_day(date1, s)
+                        day[d][0].append(s)
+                    elif s.end_date == s.start_date + timedelta(hours=4):
+                        d = check_day(date1, s)
+                        day[d][1].append(s)
+                    elif s.end_date == s.start_date + timedelta(days=1):
+                        d = check_day(date1, s)
+                        day[d][2].append(s)
+                    elif s.end_date == s.start_date + timedelta(days=7):
+                        d = check_day(date1, s)
+                        day[d][3].append(s)
+                    else:
+                        d = check_day(date1, s)
+                        day[d][4].append(s)
 
-        # x-axis in the graph, dd/mm/yyyy
-        labels = []
-        for i in range(7):
-            labels.append(date1.strftime("%d/%m/%Y"))
-            date1 += timedelta(days=1)
-        date1 -= timedelta(days=7)
+            # x-axis in the graph, dd/mm/yyyy
+            labels = []
+            for i in range(7):
+                labels.append(date1.strftime("%d/%m/%Y"))
+                date1 += timedelta(days=1)
+            date1 -= timedelta(days=7)
 
-        # v0 - graph data    v1 - table 2 data
-        v0 = []
-        v1 = []
-        f_sorted = [0, 0, 0, 0, 0]
-        for d in day:
-            n = 0
-            for time in d:
-                income = 0
-                for sess in time:
-                    income += sess.cost
-                v0.append(income)
-                v1.append(len(time))
-                f_sorted[n] += len(time)
-                n += 1
-        # income - table income column
-        income = []
-        for i in range(5):
-            inc = 0
-            for j in range(7):
-                inc += v0[j * 5 + i]
-            income.append(inc)
+            # v0 - graph data    v1 - table 2 data
+            v0 = []
+            v1 = []
+            f_sorted = [0, 0, 0, 0, 0]
+            for d in day:
+                n = 0
+                for time in d:
+                    income = 0
+                    for sess in time:
+                        income += sess.cost
+                    v0.append(income)
+                    v1.append(len(time))
+                    f_sorted[n] += len(time)
+                    n += 1
+            # income - table income column
+            income = []
+            for i in range(5):
+                inc = 0
+                for j in range(7):
+                    inc += v0[j * 5 + i]
+                income.append(inc)
 
-        # freq - table 1 no. of session      rank - table 1 ranking
-        freq = copy.deepcopy(f_sorted)
-        f_sorted.sort()
-        f_sorted.reverse()
-        rank = []
-        for data in freq:
-            rank.append(f_sorted.index(data) + 1)
+            # freq - table 1 no. of session      rank - table 1 ranking
+            freq = copy.deepcopy(f_sorted)
+            f_sorted.sort()
+            f_sorted.reverse()
+            rank = []
+            for data in freq:
+                rank.append(f_sorted.index(data) + 1)
 
-        # wd - table 2 weekday column
-        wd = []
-        weekday = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN", "NONE"]
-        for i in range(7):
-            wd.append(weekday[date1.weekday()])
-            date1 += timedelta(days=1)
+            # wd - table 2 weekday column
+            wd = []
+            weekday = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN", "NONE"]
+            for i in range(7):
+                wd.append(weekday[date1.weekday()])
+                date1 += timedelta(days=1)
 
-        return render_template('managerIncomeReports.html', title='Income Report',
-                               form=form, income=income, freq=freq, rank=rank,
-                               max=max(v0), labels=labels, v0=v0, v1=v1, wd=wd)
-    return render_template('managerIncomeReports.html', title='Income Report', form=form)
+            return render_template('managerIncomeReports.html', title='Income Report',
+                                   form=form, income=income, freq=freq, rank=rank,
+                                   max=max(v0), labels=labels, v0=v0, v1=v1, wd=wd)
+        return render_template('managerIncomeReports.html', title='Income Report', form=form)
+    else:
+        return "<h1> Page not found </h1>"
+
 
 
 @app.route('/selectlocation', methods=['GET', 'POST'])
