@@ -3,6 +3,7 @@ import json
 from datetime import timedelta, datetime, date
 
 import folium
+import phonenumbers
 import pandas as pd
 from flask import render_template, flash, request, redirect, url_for, session
 from flask_admin.contrib.sqla import ModelView
@@ -123,6 +124,16 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
         discount = form.discount.data
+
+        try:
+            my_number = phonenumbers.parse(form.phone.data)
+            if not phonenumbers.is_possible_number(my_number):
+                flash("Invalid phone number, make sure to include your country code")
+                return render_template('register.html', title='Register', form=form)
+
+        except Exception as e:
+            flash("Invalid phone number, make sure to include your country code")
+            return render_template('register.html', title='Register', form=form)
 
         user = User.query.filter_by(email=form.email.data).first()
         if user:
