@@ -29,7 +29,6 @@ def create_app():
     #Initialising all needed objects
     app = Flask(__name__)
     db.init_app(app)
-    mail.init_app(app)
     migrate.init_app(app, db)
     admin = Admin(app, template_mode="bootstrap3")
     # admin.init_app(app)
@@ -43,6 +42,8 @@ def create_app():
     app.config['MAIL_USERNAME'] = 'software.project.0011@gmail.com'
     app.config['MAIL_PASSWORD'] = '123456789Ab'
     app.config['MAIL_USE_SSL'] = True
+
+    mail.init_app(app)
     
     #Handling Blueprints
     app.register_blueprint(main)

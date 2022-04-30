@@ -45,8 +45,6 @@ def user_login():
                            form=form)
 
 
-@authentication.route('/register', methods=['GET', 'POST'])
-
 # Used to ensure that the user's password has at least one capital letter
 # one lower case letter, one number and one special character and length >=4
 def passwordCheck(password):
@@ -64,6 +62,56 @@ def passwordCheck(password):
         elif not letter.isalnum():
             spec = True
     return up and low and num and spec
+
+@authentication.route('/register', methods=['GET', 'POST'])
+def register():
+    form = RegisterForm()
+    if form.validate_on_submit():
+        discount = form.discount.data
+
+        #try:
+            #my_number = phonenumbers.parse(form.phone.data)
+            #if not phonenumbers.is_possible_number(my_number):
+                #flash("Invalid phone number, make sure to include your country code")
+                #return render_template('register.html', title='Register', form=form)
+
+        #except Exception as e:
+            #flash("Invalid phone number, make sure to include your country code")
+            #return render_template('register.html', title='Register', form=form)
+
+        userEmail = User.query.filter_by(email=form.email.data).first()
+        userPhone = User.query.filter_by(phone=my_number).first()
+        if userEmail:
+            flash("Error. This email is already registered with an account.")
+        elif userPhone:
+            flash("Error. This phone number is already registered with an account.")
+        elif not passwordCheck(form.password.data):
+            flash("Error. Password must contain uppercase and lowercase letters, a number and a special character.")
+        else:
+            if not discount:
+                p = User(email=form.email.data,
+                         password=generate_password_hash(form.password.data, method='sha256'),
+                         phone=form.phone.data,
+                         forename=form.forename.data,
+                         surname=form.surname.data,
+                         discount=False)
+
+                db.session.add(p)
+                db.session.commit()
+            elif discount:
+                p = User(email=form.email.data,
+                         password=generate_password_hash(form.password.data, method='sha256'),
+                         phone=form.phone.data,
+                         forename=form.forename.data,
+                         surname=form.surname.data,
+                         discount=True)
+                db.session.add(p)
+                db.session.commit()
+
+            return redirect("/login")
+    return render_template('register.html', title='Register', form=form)
+
+
 
 
 def register():
