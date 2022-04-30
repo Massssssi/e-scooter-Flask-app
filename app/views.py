@@ -643,11 +643,19 @@ def payment():
     if form.validate_on_submit():
         cc = models.Card.query.filter_by(card_number=form.card_number.data).first()
         if cc and form.save_card.data is True:
-            return render_template('payment.html', title='Payment', form=form,
-                                   error_message="This Card number has already been saved")
+            if typ == 0:
+                return render_template('payment.html', title='Payment', form=form,
+                                    error_message="This Card number has already been saved")
+            else:
+                return render_template('PaymentGuest.html', title='Payment', form=form,
+                                    error_message="This Card number has already been saved")
         elif cc and check_password_hash(cc.cvv, form.card_cvv.data) is False:
-            return render_template('payment.html', title='Payment', form=form,
-                                   error_message="Wrong card detail")
+            if typ == 0:
+                return render_template('payment.html', title='Payment', form=form,
+                                    error_message="Wrong card detail")
+            else:
+                return render_template('PaymentGuest.html', title='Payment', form=form,
+                                    error_message="Wrong card detail")
         else:
             for n in form.card_number.data:
                 if n not in l:
@@ -713,15 +721,15 @@ def payment():
                     msg.body = "Dear {},\n\nThank you for booking with us.\nYour start date will begin on the {}\nThe return time is {}.\nPlease keep in mind your scooter number is {}\n\nEnjoy your raid.\n".format( current_user.surname, user_session.start_date, user_session.end_date, user_session.scooter_id)
                     mail.send(msg)
 
-                    flash('The confirmation email has been sent successfully')
+
                 elif typ == 1:
                     g = models.Guest.query.filter_by(id=usid).first()
                     Subject = 'Conformation Email | please do not reply'
-                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[g.email])
-                    msg.body = "Dear ,\n\nThank you for booking with us.\nYour have subscribed with as as a guest\n\nKind regards."
+                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
+                    msg.body = "Dear {},\n\nThank you for booking with us.\nYour start date will begin on the {}\nThe return time is {}.\nPlease keep in mind your scooter number is {}\n\nEnjoy your raid.\n".format( current_user.surname, user_session.start_date, user_session.end_date, user_session.scooter_id)
                     mail.send(msg)
 
-                    flash('The confirmation email has been sent successfully For the guest')
+
                     a = Session(cost=Cost,
                                 start_date=f_start_date,
                                 scooter_id=f_scooter_data,
@@ -740,10 +748,16 @@ def payment():
                     return redirect("/GuestUsers")
             else:
                 if checkcard == 0:
-                    return render_template('payment.html', title='Payment', form=form,
-                                           error_message="Wrong card number or cvv")
-
-    return render_template('payment.html', title='Payment', form=form)
+                    if typ == 0:
+                        return render_template('payment.html', title='Payment', form=form,
+                                            error_message="Wrong card number or cvv")
+                    else:
+                        return render_template('PaymentGuest.html', title='Payment', form=form,
+                                            error_message="Wrong card number or cvv")
+    if typ == 0:
+        return render_template('payment.html', title='Payment', form=form)
+    else:
+        return render_template('PaymentGuest.html', title='Payment', form=form)
 
 
 @app.route('/configureCost', methods=['GET', 'POST'])
@@ -888,7 +902,7 @@ def selectLocationguest():
 
         return redirect(url_for('.bookScooter', loc_id=loc_id, usid=usid, typ=typ))
 
-    return render_template('selectLocation.html', user=current_user, form=form)
+    return render_template('selectLocationGuest.html', user=current_user, form=form)
 
 
 # Render the user base page | he can choose between general or related feedback
