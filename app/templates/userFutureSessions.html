@@ -35,7 +35,7 @@
                 <td class = "fifth">{{ "£{:,.2f}".format(s.cost)}}</td>
 
                 <td>
-                 <form action="{{url_for('cancel')}}" name = "statusform" method="post">
+                 <form action="{{url_for('user.cancel')}}" name = "statusform" method="post">
                   <input type="hidden" name="cancel" value="{{ s.id }}"/>
                   <input type="submit" class="deletebutton" value="Cancel Booking" name="cancelButton"/>
                 </form>
