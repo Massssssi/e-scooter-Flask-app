@@ -720,11 +720,11 @@ def payment():
                 elif typ == 1:
                     g = models.Guest.query.filter_by(id=usid).first()
                     Subject = 'Conformation Email | please do not reply'
-                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
-                    msg.body = "Dear {},\n\nThank you for booking with us.\nYour start date will begin on the {}\nThe return time is {}.\nPlease keep in mind your scooter number is {}\n\nEnjoy your raid.\n".format( current_user.surname, user_session.start_date, user_session.end_date, user_session.scooter_id)
+                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[g.email])
+                    msg.body = "Dear ,\n\nThank you for booking with us.\nYour have subscribed with as as a guest\n\nKind regards."
                     mail.send(msg)
 
-                    flash('The confirmation email has been sent successfully')
+                    flash('The confirmation email has been sent successfully For the guest')
                     a = Session(cost=Cost,
                                 start_date=f_start_date,
                                 scooter_id=f_scooter_data,
