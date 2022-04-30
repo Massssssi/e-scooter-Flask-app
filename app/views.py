@@ -135,10 +135,13 @@ def register():
             flash("Invalid phone number, make sure to include your country code")
             return render_template('register.html', title='Register', form=form)
 
-        user = User.query.filter_by(email=form.email.data).first()
-        if user:
-            flash("Error. This email already exists.")
-        if not passwordCheck(form.password.data):
+        userEmail = User.query.filter_by(email=form.email.data).first()
+        userPhone = User.query.filter_by(phone=my_number).first()
+        if userEmail:
+            flash("Error. This email is already registered with an account.")
+        elif userPhone:
+            flash("Error. This phone number is already registered with an account.")
+        elif not passwordCheck(form.password.data):
             flash("Error. Password must contain uppercase and lowercase letters, a number and a special character.")
         else:
             if not discount:
