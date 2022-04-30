@@ -122,15 +122,15 @@ def register():
     if form.validate_on_submit():
         discount = form.discount.data
 
-        try:
-            my_number = phonenumbers.parse(form.phone.data)
-            if not phonenumbers.is_possible_number(my_number):
-                flash("Invalid phone number, make sure to include your country code")
-                return render_template('register.html', title='Register', form=form)
+        #try:
+            #my_number = phonenumbers.parse(form.phone.data)
+            #if not phonenumbers.is_possible_number(my_number):
+                #flash("Invalid phone number, make sure to include your country code")
+                #return render_template('register.html', title='Register', form=form)
 
-        except Exception as e:
-            flash("Invalid phone number, make sure to include your country code")
-            return render_template('register.html', title='Register', form=form)
+        #except Exception as e:
+            #flash("Invalid phone number, make sure to include your country code")
+            #return render_template('register.html', title='Register', form=form)
 
         user = User.query.filter_by(email=form.email.data).first()
         if user:
@@ -533,7 +533,6 @@ def bookScooter():
                                 Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
 
     if form.validate_on_submit():
-        print(form.start_date.data)
         c = models.ScooterCost.query.filter_by(id=1).first()
 
         a = form.hire_period.data
@@ -547,17 +546,15 @@ def bookScooter():
             n = 4
             N = n
         elif a == "One day":
-            cost = 24 * c.hourly_cost
+            cost = (24 * c.hourly_cost)*(c.discount_rate)
             n = 24
             N = n
         elif a == "One week":
-            cost = 168 * c.hourly_cost
+            cost = (168 * c.hourly_cost)*c.discount_rate
             n = 168
             N = n
 
         given_time = form.start_date.data
-        a = datetime.ctime
-        print(a)
         final_time = given_time + timedelta(hours=n)
         if typ == 0:
             global Cost
@@ -613,7 +610,6 @@ def payment():
     Discount = models.User.query.filter_by(id=current_user.id).first()
     discountRate = models.ScooterCost.query.filter_by(id=1).first()
     c = models.Card.query.filter_by(user_id=current_user.id).first()
-    print("this is the card", c)
     indice = False
     total_cost = 0
     scooter_cost = ScooterCost.query.filter_by(id=1).first()
@@ -623,8 +619,6 @@ def payment():
 
     if total_cost >= scooter_cost.hourly_cost * 8:
         indice = True
-
-    print(total_cost)
 
     today_year = date.today().year
     today_month = date.today().month
