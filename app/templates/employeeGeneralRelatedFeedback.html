@@ -1,0 +1,52 @@
+<!-- User feedback should be displayed and then be able to be escalated-->
+{% extends "baseEmployeeManager.html" %}
+{% block content %}
+<body class = "employeeBody">
+  {% if feedback %}
+    <!-- If there are feedback then : -->
+            <div id = "employee-tables">
+
+            <!-- Table for scooter feedback -->
+            <table class="table table-striped table-dark">
+                <thead>
+                  <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">User Id</th>
+                  <th scope="col">Feedback</th>
+                  <th scope="col">Priority</th>
+                  <th scope="col">Status</th>
+                  </tr>
+                </thead>
+              
+              <tbody>
+                {% for i in feedback  %}
+                  {% if i.scooter_id == 0 %}
+                      {% if i.status == False%}
+                          <tr>
+                            <td>General Feedback</td>
+                            <td>{{i.user_id}}</td>
+                            <td>{{i.feedback_text}}</td>
+                            <td>{{i.priority}}</td>
+                            <td><a href="/complete/{{i.id}}" class="link-dark">Complete</a></td>
+                      
+                          </tr>
+                      {% else %}
+                      <tr>
+                        <td>General Feedback</td>
+                        <td>{{i.user_id}}</td>
+                        <td>{{i.feedback_text}}</td>
+                        <td>{{i.priority}}</td>
+                        <td>Completed</td>
+                      </tr>
+
+                      {% endif %}
+                  {% endif %}
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+      {% else %}
+      <p id = "no-message">The database is empty <br> No feedback has been submitted</p>
+      {% endif %}
+  </body>
+  {% endblock %}

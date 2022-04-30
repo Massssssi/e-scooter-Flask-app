@@ -1,11 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, \
-    ValidationError, SelectField, FloatField, DateTimeField
-from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SubmitField, \
-    ValidationError, SelectField, FloatField
-# from wtforms.fields.html5 import DateField
-from wtforms.validators import DataRequired, EqualTo, Length, NumberRange, InputRequired
-
+from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SelectField, \
+    FloatField, DateTimeLocalField
+from wtforms.validators import DataRequired, EqualTo, Length
+import datetime
 
 class ConfigureScooterForm(FlaskForm):
     id = SelectField('location', choices=[])
@@ -31,38 +28,59 @@ class LoginForm(FlaskForm):
 
 
 class RegisterForm(FlaskForm):
-    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
-    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
-    email = StringField('email', validators=[DataRequired("Please enter an email address")])
-    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
-    password = PasswordField('password', validators=[DataRequired("Please enter your password")])
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")],
+                           render_kw={"placeholder": "Enter forename"})
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")],
+                          render_kw={"placeholder": "Enter surname"})
+    email = StringField('email', validators=[DataRequired("Please enter an email address")],
+                        render_kw={"placeholder": "Enter email"})
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")],
+                        render_kw={"placeholder": "Enter phone number"})
+    password = PasswordField('password', validators=[DataRequired("Please enter your password")],
+                             render_kw={"placeholder": "Enter password"})
+    discount = BooleanField('discount')
 
 
 class RegisterEmployeeForm(FlaskForm):  # Used by managers to create or edit employees
-    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
-    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
-    email = StringField('email', validators=[DataRequired("Please enter an email address")])
-    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
-    password = PasswordField('password', validators=[DataRequired("Please enter your password")])
-    account_type = SelectField('account_type', choices=["Employee", "Manager"])
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")],
+                           render_kw={"placeholder": "Enter forename"})
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")],
+                          render_kw={"placeholder": "Enter surname"})
+    email = StringField('email', validators=[DataRequired("Please enter an email address")],
+                        render_kw={"placeholder": "Enter email"})
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")],
+                        render_kw={"placeholder": "Enter phone number"})
+    password = PasswordField('password', validators=[DataRequired("Please enter your password")],
+                             render_kw={"placeholder": "Enter password"})
+    account_type = SelectField('account_type', choices=["Account Type: Employee", "Account Type: Manager"])
     national_insurance_number = StringField('national_insurance_number', validators=[DataRequired(), Length(9, 9,
-                                                                                                            "Error, National insurance number must be exactly 9 characters")])
+                                                                                                            "Error, National insurance number must be exactly 9 characters")],
+                                            render_kw={"placeholder": "Enter national insurance number"})
 
 
 class UserChangeDetailsForm(FlaskForm):
-    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
-    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
-    email = StringField('email', validators=[DataRequired("Please enter an email address")])
-    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")],
+                           render_kw={"placeholder": "Enter forename"})
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")],
+                          render_kw={"placeholder": "Enter surname"})
+    email = StringField('email', validators=[DataRequired("Please enter an email address")],
+                        render_kw={"placeholder": "Enter email"})
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")],
+                        render_kw={"placeholder": "Enter phone number"})
 
 
-class EmployeeChangeDetailsForm(FlaskForm):  # Form for changing details for both employees and managers
-    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
-    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
-    email = StringField('email', validators=[DataRequired("Please enter an email address")])
-    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
+class EmployeeChangeDetailsForm(FlaskForm):  # Used by employees to change their own details
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")],
+                           render_kw={"placeholder": "Enter forename"})
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")],
+                          render_kw={"placeholder": "Enter surname"})
+    email = StringField('email', validators=[DataRequired("Please enter an email address")],
+                        render_kw={"placeholder": "Enter email"})
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")],
+                        render_kw={"placeholder": "Enter phone number"})
     national_insurance_number = StringField('national_insurance_number', validators=[DataRequired(), Length(9, 9,
-                                                                                                            "Error, National insurance number must be exactly 9 characters")])
+                                                                                                            "Error, National insurance number must be exactly 9 characters")],
+                                            render_kw={"placeholder": "Enter national insurance number"})
 
 
 class EmployeeSearchForm(FlaskForm):
@@ -70,13 +88,18 @@ class EmployeeSearchForm(FlaskForm):
 
 
 class EditEmployeeForm(FlaskForm):  # Used by managers to edit employees
-    forename = StringField('forename', validators=[DataRequired("Please enter your forename")])
-    surname = StringField('surname', validators=[DataRequired("Please enter your surname")])
-    email = StringField('email', validators=[DataRequired("Please enter an email address")])
-    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")])
-    account_type = SelectField('account_type', choices=["Employee", "Manager"])
+    forename = StringField('forename', validators=[DataRequired("Please enter your forename")],
+                           render_kw={"placeholder": "Enter forename"})
+    surname = StringField('surname', validators=[DataRequired("Please enter your surname")],
+                          render_kw={"placeholder": "Enter surname"})
+    email = StringField('email', validators=[DataRequired("Please enter an email address")],
+                        render_kw={"placeholder": "Enter email"})
+    phone = StringField('phone', validators=[DataRequired("Please enter a phone number")],
+                        render_kw={"placeholder": "Enter phone number"})
+    account_type = SelectField('account_type', choices=["Account Type: Employee", "Account Type: Manager"])
     national_insurance_number = StringField('national_insurance_number', validators=[DataRequired(), Length(9, 9,
-                                                                                                            "Error, National insurance number must be exactly 9 characters")])
+                                                                                                            "Error, National insurance number must be exactly 9 characters")],
+                                            render_kw={"placeholder": "Enter national insurance number"})
 
 
 class UserChangePasswordForm(FlaskForm):
@@ -89,9 +112,8 @@ class UserChangePasswordForm(FlaskForm):
 
 class BookScooterForm(FlaskForm):
     scooter = SelectField('scooter', choices=[], validators=[DataRequired()])
-    hire_period = SelectField('hire_period', choices=["One hour", "four hours", "One day", "one week"])
-    start_date = DateTimeField('datetime', format='%Y-%m-%d %H:%M:%S')
-
+    hire_period = SelectField('hire_period', choices=["One hour", "Four hours", "One day", "One week"])
+    start_date = DateTimeLocalField('datetime',format="%Y-%m-%dT%H:%M", default = datetime.datetime.utcnow())
 
 class selectLocationForm(FlaskForm):
     location_id = SelectField('location_id', choices=[])
@@ -105,7 +127,8 @@ class CardForm(FlaskForm):
     card_holder = StringField('Card Holder', validators=[DataRequired("Please enter the card holder")])
     card_number = StringField('Card Number', validators=[DataRequired("Please enter the card number"),
                                                          Length(min=16, max=16, message="Not a valid card number")])
-    card_expiry_date = DateField('Expiry Date')
+    card_expiry_Year = SelectField('Expiry Year', choices=[], validators=[DataRequired()])
+    card_expiry_Month = SelectField('Expiry Month', choices=[], validators=[DataRequired()])
     card_cvv = StringField('cvv', validators=[DataRequired("Please enter card cvv"),
                                               Length(min=3, max=4, message="Not a valid cvv")])
     save_card = BooleanField('saveCard')  # Asking the user to save his card details.
@@ -122,8 +145,14 @@ class ReturnScooterForm(FlaskForm):
 
 class userHelpForm(FlaskForm):
     scooter_id = SelectField('Scooter number', choices=[])
-    feedback_text = TextAreaField('Feedback text')
+    feedback_text = TextAreaField('Feedback text', validators=[DataRequired()],
+                                  render_kw={"placeholder": "Please write your Feedback here.."})
     priority = SelectField('priority', choices=[(1, "High priority"), (2, "Medium priority"), (3, "Low priority")])
+
+
+class employeeManagerFilterOption(FlaskForm):
+    filter = SelectField('Filter by',
+                         choices=[(1, "Scooter feedback"), (0, "General feedback"), (2, "Completed feedback")])
 
 
 class DateForm(FlaskForm):

@@ -1,22 +1,35 @@
 <!-- This is where the manager can see the list of scooters and their availability -->
-<h1>List of Scooters</h1>
+
 
 {% extends "baseEmployeeManager.html" %}
   <div class="block_content">
     {% block content %}
-    <ul>
-      {% for scooter in ListS%}
-      <li><h3>Scooter {{scooter.id}}:</h3></li>
-      <h4>availability: {{scooter.availability}}</h4>
-      {% for location in ListL%}
-      {%if scooter.location_id == location.id %}
-      <h5>Location: {{location.address}}</h5>
-      {% endif %}
-      {% endfor %}
-      <hr>
-      {% endfor %}
-    </ul>
+    <div class="ListScoot">
 
+    <h1>List of Scooters</h1>
+  <table class ="ListScootTable">
+
+  <tr>
+    <th>Scooter id</th>
+    <th>Location</th>
+    <th>Availability</th>
+  </tr>
+  {% for scooter in ListS%}
+  <tr>
+    <td>{{scooter.id}}</td>
+  {% for location in ListL%}
+  {%if scooter.location_id == location.id %}
+    <td>{{location.address}}</td>
+  {% endif %}
+  {% endfor %}
+    <td>{{scooter.availability}}</td>
+  </tr>
+  {% endfor %}
+</table>
+
+
+
+</div>
 
     {% endblock %}
   </div>

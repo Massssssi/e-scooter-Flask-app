@@ -1,13 +1,12 @@
-from app import db, login_manager
-from email.policy import default
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from app import db
+from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class Location(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     address = db.Column(db.String(50), nullable=False)
-    # max capacity isn't in the spec so we don't need it
+    # max capacity isn't in the spec, so we don't need it
     no_of_scooters = db.Column(db.Integer, nullable=True, default=0)  # Amount of scooters at location
     scooters = db.relationship('Scooter', backref='location')
 
@@ -23,6 +22,7 @@ class Scooter(db.Model):
 class ScooterCost(db.Model):  # A table that only stores the cost of all scooters, as they are all identical
     id = db.Column(db.Integer, primary_key=True)
     hourly_cost = db.Column(db.Float, nullable=False, default=10.00)
+    discount_rate = db.Column(db.Float, nullable=False, default=0.1)
 
 
 class Session(db.Model):
@@ -58,6 +58,7 @@ class User(UserMixin, db.Model):
     card = db.relationship('Card', backref='user')
     feedback = db.relationship('Feedback', backref='user')
     session = db.relationship('Session', backref='user')
+    discount = db.Column(db.Boolean)
 
     def get_id(self):
         return self.id
@@ -87,6 +88,6 @@ class Feedback(db.Model):
 
     priority = db.Column(db.Integer, default=3)
     feedback_text = db.Column(db.String(5000), nullable=False)
-    #true if the feedback is compeleted
-    status = db.Column(db.Boolean, default = False)
+    # true if the feedback is completed
+    status = db.Column(db.Boolean, default=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)

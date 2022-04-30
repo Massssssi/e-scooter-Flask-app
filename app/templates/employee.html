@@ -1,6 +1,41 @@
 <!-- Basic homepage for employees -->
 
 {% extends "baseEmployeeManager.html" %}
-  <div class="block_content">
-    {% block content %}{% endblock %}
-  </div>
+    {% block content %}
+
+        <h3>Hello, {{ user.forename }}!</h3>
+
+        <p>This is your employee portal. Call 0800 1111 if you have any IT issues</p>
+        <br>
+
+        <table id = "userHomepageTable">
+            <tr class = "userHomepageHeaders">
+                <td>Add New Scooters</td>
+                <td>Manage Feedback</td>
+                <td>Guest Booking</td>
+            </tr>
+            <tr class = "userHomepageImages">
+                <td><a href="/addingScooter"><img  src="https://i01.appmifile.com/webfile/globalimg/zhouyuxin/mi-electric-scooter-1S-800.png"
+                                         alt="add new scooters"></a></td>
+                <td><a href="/employee/relatedToScooter"><img  src="https://infra-cloudfront-talkdeskcom.svc.talkdeskapp.com/talkdesk_com/2015/08/24055156/effective-feedback.png"
+                                         alt="manage user feedback" style="width: 400px; height:auto;"></a></td>
+                <td><a href="/GuestUsers"><img  src="https://icon-library.com/images/cashier-icon/cashier-icon-11.jpg"
+                                         alt="book for guest users"></a></td>
+            </tr>
+            <tr class = "userHomepageHeaders">
+                <td>List Scooters</td>
+                <td>Account Settings</td>
+                <td>Log Out</td>
+            </tr>
+            <tr class = "userHomepageImages">
+                <td><a href="/ScooterList"><img  src="https://miro.medium.com/max/983/1*XHR5lHay6yIzd3LFnU5OnQ.png"
+                                         alt="list all scooters and their info"></a></td>
+                <td><a href="/employeeAccountSettings"><img  src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Windows_Settings_app_icon.png/640px-Windows_Settings_app_icon.png"
+                                         alt="account settings"></a></td>
+                <td><a href="/logout"><img  src="https://dejpknyizje2n.cloudfront.net/svgcustom/clipart/preview/phone-emoji-sticker-sleepy-32216-300x300.png"
+                                         alt="log out"></a></td>
+            </tr>
+        </table>
+
+    {% endblock %}
+

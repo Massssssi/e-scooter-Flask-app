@@ -12,9 +12,7 @@
     </ul>
   {% endif %}
 {% endwith %}
-
-<h1>Payment</h1>
-
+<body class = "user-HelpPage-body">
 <form method="post", action="/payment">
   {{ form.hidden_tag() }}
   {% for field, errors in form.errors.items() %}
@@ -23,33 +21,42 @@
  </small>
 {% endfor %}
 
-    Card Holder: {{ form.card_holder(class_='form-control', type = 'card_holder') }}
-    {% for error in form.card_holder.errors %}
-    <span class="warning">[{{ error }}]</span>
-    {% endfor %}<br>
+<fieldset class="form-group">
+  <legend class= "TT"> <bold>Payment</bold></legend>
+    <div class="form-group mx-sm-5 mb-2">
+      <label> Card Holder</label>
+      {{ form.card_holder(class_ = "form-control form-control-lg")}}
+    </div>
+
+    <div class="form-group  mx-sm-5 mb-2">
+      <label> Card Number </label>
+      {{ form.card_number(class_ = "form-control form-control-lg")}}
+    </div>
+
+    <div class="form-group  mx-sm-5 mb-2 ">
+     <label> Expiry Year</label>
+      {{form.card_expiry_Year(class_='form-control form-control-lg')}}
+    </div>
+
+    <div class="form-group  mx-sm-5 mb-2 ">
+     <label> Expiry Month</label>
+      {{form.card_expiry_Month(class_='form-control form-control-lg')}}
+    </div>
+
+    <div class="form-group  mx-sm-5 mb-2 ">
+     <label> CVV </label>
+      {{form.card_cvv(class_='form-control form-control-lg')}}
+    </div>
+
+    <div class="form-group  mx-sm-5 mb-2 ">
+     <label> Save details </label>
+      {{form.save_card(class_='form-control form-control-lg')}}
+    </div>
+</fieldset>
+
+<button type="submit" class="btn btn-primary mb-2 btn-block">Confirm Payment</button>
 
 
-    Card Number: {{ form.card_number(class_='form-control') }}
-    {% for error in form.card_holder.errors %}
-    <span class="warning">[{{ error }}]</span>
-    {% endfor %}<br>
-
-    Expiry Date: {{ form.card_expiry_date(class_='form-control') }}
-    {% for error in form.card_expiry_date.errors %}
-    <span class="warning">[{{ error }}]</span>
-    {% endfor %}<br>
-
-    CVV: {{ form.card_cvv(class_='form-control') }}
-    {% for error in form.card_cvv.errors %}
-    <span class="warning">[{{ error }}]</span>
-    {% endfor %}<br>
-
-    <div style="height: 20px; width: 20px;">{{ form.save_card(class_='form-control') }}</div><br>
-    <p>Save details</p>
-
-
-
-    <input type="submit" class="button" value="Confirm Payment">
 
     {% if error_message %}
     <div class="alert alert-primary" role="alert">
@@ -57,5 +64,5 @@
     </div>
   {% endif%}
 </form>
-
+</body>
 {% endblock %}

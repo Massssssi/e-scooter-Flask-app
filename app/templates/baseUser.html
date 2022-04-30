@@ -3,16 +3,13 @@
 
 {% include "base.html" %}
 
+{# bring in more css if needed #}
+{% block css %} {% endblock css %}
 <!--navigation bar-->
 <!--all page share this base-->
 <div>
     <nav class="navbar navbar-expand-sm navbar-light bg-light">
-
-      {% if current_user.is_authenticated %}
-      <a class="navbar-brand" href="#">Scooters!</a>
-      {% else %}
-      <a class="navbar-brand" href="/">Scooters!</a>
-      {% endif %}
+      <a class="navbar-brand" href="/user"><img id = "dino" src="https://images.fineartamerica.com/images/artworkimages/medium/2/dinosaur-rides-pedalscooter-mister-tee-transparent.png" alt="dino logo"></a>
 
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -23,10 +20,26 @@
           {% if current_user.is_authenticated %}
               <li class="nav-item"><a class="nav-link" href="/user">User homepage<span class="sr-only">(current)</span></a></li>
               <li class="nav-item"><a class="nav-link" href="/selectlocation">Book a scooter</a></li>
-              <li class="nav-item"><a class="nav-link" href="/user/manageSessions">Manage active sessions</a></li>
-              <li class="nav-item"><a class="nav-link" href="/user/viewSessions">View previous sessions</a></li>
-              <li class="nav-item"><a class="nav-link" href="/userChangeDetails">Change details</a></li>
-              <li class="nav-item"><a class="nav-link" href="/userChangePassword">Change password</a></li>
+
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Sessions
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="/user/activeSessions">Manage Active Sessioons</a>
+                  <a class="dropdown-item" href="/user/futureSessions">Manage Future Sessions</a>
+                  <a class="dropdown-item" href="/user/viewSessions">View Previous Sessions</a>
+                </div>
+              </li>
+              <li class="nav-item dropdown">
+                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Account Settings
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                  <a class="dropdown-item" href="/userChangeDetails">Change Account Details</a>
+                  <a class="dropdown-item" href="/userChangePassword">Change Password</a>
+                </div>
+              </li>
               <li class="nav-item"><a class="nav-link" href="/help">Help</a></li>
               <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
           {% else %}
@@ -38,7 +51,7 @@
     </nav>
 
   <!--main content of the page-->
-  <body>
+  <body class="sl">
     {% block content %}
     {% endblock %}
   </body>

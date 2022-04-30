@@ -4,6 +4,10 @@
 
 {% extends "baseUser.html" %}
 
+{% block css %}
+    <link rel="stylesheet" href="/static/login.css">
+{% endblock %}
+
 {% block content %}
 
 <h1>Login</h1>
@@ -14,9 +18,10 @@
     {% endif %}
 {% endwith %}
 
-<form method="post", action="/login">
+<form method="post" , action="/login" name="login_form">
   {{ form.hidden_tag() }}
 
+    <div class="form">
     Email: {{ form.email(class_='form-control', type = 'email') }}
     {% for error in form.email.errors %}
     <span class="warning">[{{ error }}]</span>
@@ -26,11 +31,18 @@
     {% for error in form.password.errors %}
     <span class="warning">[{{ error }}]</span>
     {% endfor %}<br>
+    </div>
+    <div class="subheading">
+        Remember me
+    </div>
+    <br>
+    <div class="rememberme" , style="height: 20px; width: 20px;">{{ form.rememberMe(class_='checkbox') }}
+    </div><br>
+    <br>
 
-    <div style="height: 20px; width: 20px;">{{ form.rememberMe(class_='form-control') }}</div><br>
-    <p>Remember me</p>
-
-    <input type="submit" class="button" value="Login">
+    <div class="button">
+        <input type="submit" class="button" value="Login">
+    </div>
 </form>
 
 {% endblock %}
