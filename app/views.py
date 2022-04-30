@@ -1,22 +1,20 @@
-import copy
-import json
+from app import app, db, models, mail, admin
 from datetime import timedelta, datetime, date
-
-import folium
-import phonenumbers
-import pandas as pd
 from flask import render_template, flash, request, redirect, url_for, session
 from flask_admin.contrib.sqla import ModelView
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_mail import Message
 from werkzeug.security import generate_password_hash, check_password_hash
-
-from app import app, db, models, mail, admin
 from .forms import LoginForm, RegisterForm, ScooterForm, BookScooterForm, CardForm, ConfigureScooterForm, \
     ReturnScooterForm, ExtendScooterForm, selectLocationForm, BookingGuestUserForm, userHelpForm, DateForm, \
     ConfigureScooterCostForm, UserChangeDetailsForm, UserChangePasswordForm, RegisterEmployeeForm, EditEmployeeForm, \
     EmployeeSearchForm, EmployeeChangeDetailsForm
 from .models import Location, Scooter, Session, Guest, User, Card, Feedback, ScooterCost
+import folium
+import pandas as pd
+import copy
+import json
+
 
 # # Adds the ability to view all tables in Flask Admin
 admin.add_view(ModelView(Location, db.session))
@@ -27,7 +25,6 @@ admin.add_view(ModelView(Guest, db.session))
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Card, db.session))
 admin.add_view(ModelView(Feedback, db.session))
-
 
 @app.route('/')
 def main():
@@ -125,15 +122,15 @@ def register():
     if form.validate_on_submit():
         discount = form.discount.data
 
-        try:
-            my_number = phonenumbers.parse(form.phone.data)
-            if not phonenumbers.is_possible_number(my_number):
-                flash("Invalid phone number, make sure to include your country code")
-                return render_template('register.html', title='Register', form=form)
+        #try:
+            #my_number = phonenumbers.parse(form.phone.data)
+            #if not phonenumbers.is_possible_number(my_number):
+                #flash("Invalid phone number, make sure to include your country code")
+                #return render_template('register.html', title='Register', form=form)
 
-        except Exception as e:
-            flash("Invalid phone number, make sure to include your country code")
-            return render_template('register.html', title='Register', form=form)
+        #except Exception as e:
+            #flash("Invalid phone number, make sure to include your country code")
+            #return render_template('register.html', title='Register', form=form)
 
         userEmail = User.query.filter_by(email=form.email.data).first()
         userPhone = User.query.filter_by(phone=my_number).first()
@@ -539,7 +536,6 @@ def bookScooter():
                                 Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
 
     if form.validate_on_submit():
-        print(form.start_date.data)
         c = models.ScooterCost.query.filter_by(id=1).first()
 
         a = form.hire_period.data
@@ -553,17 +549,15 @@ def bookScooter():
             n = 4
             N = n
         elif a == "One day":
-            cost = 24 * c.hourly_cost
+            cost = (24 * c.hourly_cost)*(c.discount_rate)
             n = 24
             N = n
         elif a == "One week":
-            cost = 168 * c.hourly_cost
+            cost = (168 * c.hourly_cost)*c.discount_rate
             n = 168
             N = n
 
         given_time = form.start_date.data
-        a = datetime.ctime
-        print(a)
         final_time = given_time + timedelta(hours=n)
         if typ == 0:
             global Cost
@@ -619,7 +613,6 @@ def payment():
     Discount = models.User.query.filter_by(id=current_user.id).first()
     discountRate = models.ScooterCost.query.filter_by(id=1).first()
     c = models.Card.query.filter_by(user_id=current_user.id).first()
-    print("this is the card", c)
     indice = False
     total_cost = 0
     scooter_cost = ScooterCost.query.filter_by(id=1).first()
@@ -629,8 +622,6 @@ def payment():
 
     if total_cost >= scooter_cost.hourly_cost * 8:
         indice = True
-
-    print(total_cost)
 
     today_year = date.today().year
     today_month = date.today().month
@@ -711,19 +702,23 @@ def payment():
                             db.session.add(card)
                     db.session.commit()
 
+                     #Quering by user in the session database, filtering by the selected id for the scooter by the current user
+                    #to get the most updated version of the session
+                    #The email contains the user surname, starting day of his booking, end date, and the scooter ID
+
+                    user_session = models.Session.query.filter_by(scooter_id = f_scooter_data).first()
                     # Sending the confirmation email to the user
                     Subject = 'Conformation Email | please do not reply'
                     msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
-                    msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride."
+                    msg.body = "Dear {},\n\nThank you for booking with us.\nYour start date will begin on the {}\nThe return time is {}.\nPlease keep in mind your scooter number is {}\n\nEnjoy your raid.\n".format( current_user.surname, user_session.start_date, user_session.end_date, user_session.scooter_id)
                     mail.send(msg)
 
                     flash('The confirmation email has been sent successfully')
                 elif typ == 1:
                     g = models.Guest.query.filter_by(id=usid).first()
-                    print(g)
                     Subject = 'Conformation Email | please do not reply'
-                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[g.email])
-                    msg.body = "Dear Client,\n\nThank you for booking with us. We will see you soon\n\nEnjoy your ride."
+                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
+                    msg.body = "Dear {},\n\nThank you for booking with us.\nYour start date will begin on the {}\nThe return time is {}.\nPlease keep in mind your scooter number is {}\n\nEnjoy your raid.\n".format( current_user.surname, user_session.start_date, user_session.end_date, user_session.scooter_id)
                     mail.send(msg)
 
                     flash('The confirmation email has been sent successfully')
@@ -906,11 +901,13 @@ def generalHelp():
         return "<h1>Page not found </h1>"
 
 
+#Function that makes the user choose a scooter he hired before, and make give a feedback about it.
+#or Error displayed on the screen if something went wrong
+
 @app.route('/userHelp/related-to-scooter', methods=['GET', 'POST'])
 @login_required
 def userhelpWithScooter():
     if current_user.account_type == 0:
-
         form = userHelpForm()
         form.scooter_id.choices = [userScooter.scooter_id for userScooter in
                                    Session.query.filter_by(user_id=current_user.id)]
@@ -936,6 +933,9 @@ def userhelpWithScooter():
         return "<h1>Page not found </h1>"
 
 
+#Function that makes the user able to make a general feedback about the company, besides choosing a priority for that order.
+#or Error displayed on the screen if something went wrong
+
 @app.route('/userhelp/related-to-general', methods=['GET', 'POST'])
 @login_required
 def generalUserHelp():
@@ -957,7 +957,7 @@ def generalUserHelp():
         return "<h1>Page not found </h1>"
 
 
-# route for completed the feedback from the employee
+# route for completed feedback from the employee
 @app.route('/complete/<int:id>')
 def complete(id):
     # For the employee
@@ -981,12 +981,12 @@ def complete(id):
         return "<h1>Page not found </h1>"
 
 
+#This route is for employees to see all the feedbacks related to a scooter, so they can see users feedback and filter through them
 @app.route('/employee/relatedToScooter', methods=['GET', 'POST'])
 @login_required
 def helpUser():
     if current_user.account_type == 1:
         if not Feedback.query.all():
-            # NEED TO BE DELETED return render_template("employeeFeedbackManagement.html")
             return render_template("employeeScooterRelatedFeedback.html")
         else:
             return render_template("employeeScooterRelatedFeedback.html", feedback=Feedback.query.all())
@@ -994,6 +994,7 @@ def helpUser():
         return "<h1>Page not found </h1>"
 
 
+#This route is for employees to see all general feedback, so they can see users feedback and filter through them
 @app.route('/employee/relatedToGeneral', methods=['GET', 'POST'])
 @login_required
 def helpUserWithGeneral():
