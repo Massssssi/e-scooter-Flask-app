@@ -4,7 +4,9 @@
 <link rel="stylesheet" href="/static/forms.css">
   <div class="block_content">
     {% block content %}
+        <div class="ListScoot">
         <h1>Search for an employee</h1>
+        </div>
     <form method="post" , action="/managerEmployeeSearch">
     {{ form.hidden_tag() }}
   <div class="form">
