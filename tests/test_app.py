@@ -1,7 +1,10 @@
-import email
 from flask_login import current_user, login_user
 from app import models
 
+
+def login(client):
+    client.post('/login', data = {'email':'try@gmail.com', 'password':'Try.123'})
+    pass
 
 # test the user registration form and redirect to the login page
 def test_register_user(client, session):
@@ -11,8 +14,8 @@ def test_register_user(client, session):
             'forename':'try',
             'surname':'try',
             'email':'try@gmail.com',
-            'phone':'12355',
-            'password':'123'
+            'phone':'+44 12355',
+            'password':'Try.123'
             
         }
 
@@ -27,7 +30,7 @@ def test_login_user(client):
     with client:
         data = {
             'email':'try@gmail.com',
-            'password':'123',
+            'password':'Try.123',
             'remember me' : True
         }
         url = '/login'
@@ -53,6 +56,7 @@ def test_logout_user(client, create_user):
 #test adding a scooter into the database
 def test_add_scooter(client, session, add_scooter):
     with client:
+        login(client)
         data = {
             'availability':True,
             'location_id': 'Merrion centre',
@@ -70,14 +74,39 @@ def test_add_location(client, session, add_location):
         assert session.query(models.Scooter).count() == 1
 
 
-def test_payment(client, session):
+#test the booking and payment
+def test_booking(client, session, hourly_cost):
     with client:
-        data = {'location_id': 1}
+        login(client)
+        loc_data = {'location_id': 1}
         url = '/selectlocation'
-        assert session.query(models.User).filter_by(email="test@testing.com").count() == 1
-        los = client.post('/login', data = {'email':'try@gmail.com', 'password':'123'})
-        res = client.post(url, data=data, follow_redirects=True)
+        
+        res = client.post(url, data=loc_data, follow_redirects=True)
         assert current_user.is_authenticated == True
         assert res.status_code == 200
         assert res.request.path == '/bookScooter'
+
+        data = {'scooter': 1,
+                    'hire_period': 'One hour',
+                    'start_date': '29-10-2022',
+                    }
+
+        res = client.post('/bookScooter?loc_id={}&usid={}&typ=0'.format(loc_data['location_id'], current_user.id), data=data, follow_redirects=True)
+        assert res.status_code == 200
+        assert session.query(models.Scooter).count()==1
+        
+        assert res.request.path == '/payment'
+
+        data = {
+            'card_holder': 'try',
+            'card_number': 1111111111111111,
+            'card_expiry_Year': 2040,
+            'card_expiry_month': 10,
+            'card_cvv': 999,
+            'save_card': True
+        }
+        url = '/payment?usid={}&typ={}'.format(current_user.id, current_user.account_type)
+        res = client.post(url, data=data, follow_redirects=True)
+        assert res.status_code == 200
+        assert session.query(models.ScooterCost).count() == 1
         

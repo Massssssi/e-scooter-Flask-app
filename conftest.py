@@ -1,16 +1,12 @@
-from flask_login import login_user
 import pytest
-from sqlalchemy import create_engine
 from app import app as _app, db as _db, models
-from werkzeug.wrappers import Response, Request
 
 
+# Define the application's configuration
 @pytest.fixture(scope='session')
 def app():
-
     app = _app
     app.config['TESTING'] = True
-    #app.config['LOGIN_DISABLED'] = True
     app.config['WTF_CSRF_ENABLED'] = False
     app.config['SECRET_KEY'] = 'Sofwtare-engineering-secret-key'
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///memory'
@@ -28,6 +24,7 @@ def runner(app):
     return app.test_cli_runner()
 
 
+# Create a mock database for the tests
 @pytest.fixture(scope='session')
 def db(app):
     with app.app_context():
@@ -36,19 +33,14 @@ def db(app):
         _db.drop_all
 
 
+# Connect to the db created for the session and revert all the transactions
 @pytest.fixture(scope='session')
 def session(db):
-    """Creates a new database session for a test."""
-    # connect to the database
     connection = _db.engine.connect()
-    # begin a non-ORM transaction
-    transaction = connection.begin()
 
-    # bind an individual session to the connection
+    transaction = connection.begin()
     options = dict(bind=connection, binds={})
     session = _db.create_scoped_session(options=options)
-
-    # overload the default session with the session above
     _db.session = session
 
     yield session
@@ -71,13 +63,6 @@ def create_user(session):
     yield user
 
 
-# @pytest.fixture(scope='session')
-# def login(client):
-#     with client:
-#         res = client.post('/login', data={'email': "test@testing.com", 'password':'testing'})
-#         return res
-
-
 @pytest.fixture(scope='session')
 def add_scooter(session):
     scooter = models.Scooter(availability=1, location_id=1)
@@ -93,11 +78,21 @@ def add_scooter(session):
 
 @pytest.fixture(scope='session')
 def add_location(session):
-    location = models.Location(address='Merrion Centre', no_of_scooters=1)
+    location = models.Location(address='Merrion Centre')
     try:           
         session.add(location)
         session.commit()
     except:
         print("ERROR WHILE ADDING LOCATION")
         session.rollback()
-        
+
+
+@pytest.fixture(scope='session')
+def hourly_cost(client, session):
+    cost = models.ScooterCost(hourly_cost=10.0, discount_rate=0.1)
+    try:
+        session.add(cost)
+        session.commit()
+    except:
+        print("ERROR WHILE ADDING A PRICE")
+        session.rollback()
