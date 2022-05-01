@@ -15,6 +15,7 @@ import folium
 import pandas as pd
 import copy
 import json
+import phonenumbers
 
 
 # # Adds the ability to view all tables in Flask Admin
@@ -123,15 +124,15 @@ def register():
     if form.validate_on_submit():
         discount = form.discount.data
 
-        #try:
-            #my_number = phonenumbers.parse(form.phone.data)
-            #if not phonenumbers.is_possible_number(my_number):
-                #flash("Invalid phone number, make sure to include your country code")
-                #return render_template('register.html', title='Register', form=form)
+        try:
+            my_number = phonenumbers.parse(form.phone.data)
+            if not phonenumbers.is_possible_number(my_number):
+                flash("Invalid phone number, make sure to include your country code")
+                return render_template('register.html', title='Register', form=form)
 
-        #except Exception as e:
-            #flash("Invalid phone number, make sure to include your country code")
-            #return render_template('register.html', title='Register', form=form)
+        except Exception as e:
+            flash("Invalid phone number, make sure to include your country code")
+            return render_template('register.html', title='Register', form=form)
 
         userEmail = User.query.filter_by(email=form.email.data).first()
         userPhone = User.query.filter_by(phone=form.phone.data).first()
@@ -600,7 +601,7 @@ def bookScooter():
             return render_template('userScooterBooking.html', user=current_user, form=form)
     else:
         return "<h1> Page not found </h1>"
-    
+
 
 
 @app.route('/payment', methods=['GET', 'POST'])
