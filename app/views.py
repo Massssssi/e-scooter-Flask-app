@@ -519,88 +519,85 @@ def map():
 @app.route('/bookScooter', methods=['GET', 'POST'])
 @login_required
 def bookScooter():
-    if current_user.account_type == 0:
-        n = 0
-        cost = 0
-        form = BookScooterForm()
-        loc_id = request.args['loc_id']
-        loc_id = session['loc_id']
+    n = 0
+    cost = 0
+    form = BookScooterForm()
+    loc_id = request.args['loc_id']
+    loc_id = session['loc_id']
 
-        usid = request.args['usid']
-        usid = session['usid']
+    usid = request.args['usid']
+    usid = session['usid']
 
-        typ = request.args['typ']
-        typ = session['typ']
+    typ = request.args['typ']
+    typ = session['typ']
 
-        p = models.Location.query.filter_by(id=int(loc_id)).first()
-        m = models.Scooter.query.filter(Scooter.availability == True).first()
-        if m:
-            form.scooter.choices = [scooter.id for scooter in
-                                    Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
+    p = models.Location.query.filter_by(id=int(loc_id)).first()
+    m = models.Scooter.query.filter(Scooter.availability == True).first()
+    if m:
+        form.scooter.choices = [scooter.id for scooter in
+                                Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
 
-        if form.validate_on_submit():
-            c = models.ScooterCost.query.filter_by(id=1).first()
+    if form.validate_on_submit():
+        c = models.ScooterCost.query.filter_by(id=1).first()
 
-            a = form.hire_period.data
-            global hire_periode
-            hire_periode=a
-            if a == "One hour":
-                cost = c.hourly_cost
-                n = 1
-                global N
-                N = n
-            elif a == "Four hours":
-                cost = 4 * c.hourly_cost
-                n = 4
-                N = n
-            elif a == "One day":
-                cost = (24 * c.hourly_cost)-((24 * c.hourly_cost)*(c.discount_rate))
-                n = 24
-                N = n
-            elif a == "One week":
-                cost = (168 * c.hourly_cost)-((168 * c.hourly_cost)*(c.discount_rate))
-                n = 168
-                N = n
+        a = form.hire_period.data
+        global hire_periode
+        hire_periode=a
+        if a == "One hour":
+            cost = c.hourly_cost
+            n = 1
+            global N
+            N = n
+        elif a == "Four hours":
+            cost = 4 * c.hourly_cost
+            n = 4
+            N = n
+        elif a == "One day":
+            cost = (24 * c.hourly_cost)-((24 * c.hourly_cost)*(c.discount_rate))
+            n = 24
+            N = n
+        elif a == "One week":
+            cost = (168 * c.hourly_cost)-((168 * c.hourly_cost)*(c.discount_rate))
+            n = 168
+            N = n
 
-            given_time = form.start_date.data
-            final_time = given_time + timedelta(hours=n)
-            if typ == 0:
-                global Cost
-                Cost = cost
-                global f_start_date
-                f_start_date = form.start_date.data
-                global f_scooter_data
-                f_scooter_data = form.scooter.data
-                global us_id
-                us_id = usid
-                global f_time
-                f_time = final_time
-                global g_time
-                g_time = given_time
+        given_time = form.start_date.data
+        final_time = given_time + timedelta(hours=n)
+        if typ == 0:
+            global Cost
+            Cost = cost
+            global f_start_date
+            f_start_date = form.start_date.data
+            global f_scooter_data
+            f_scooter_data = form.scooter.data
+            global us_id
+            us_id = usid
+            global f_time
+            f_time = final_time
+            global g_time
+            g_time = given_time
 
-            elif typ == 1:
-                Cost = cost
-                f_start_date = form.start_date.data
-                f_scooter_data = form.scooter.data
-                global g_id
-                g_id = usid
-                f_time = final_time
-                g_time = given_time
+        elif typ == 1:
+            Cost = cost
+            f_start_date = form.start_date.data
+            f_scooter_data = form.scooter.data
+            global g_id
+            g_id = usid
+            f_time = final_time
+            g_time = given_time
 
-            typ = typ
-            session['typ'] = typ
+        typ = typ
+        session['typ'] = typ
 
-            usid = usid
-            session['usid'] = usid
+        usid = usid
+        session['usid'] = usid
 
-        if request.method == 'POST':
-            return redirect(url_for('.payment', usid=usid, typ=typ))
-        if typ == 1:
-            return render_template('guestScooterBooking.html', user=current_user, form=form)
-        elif typ == 0:
-            return render_template('userScooterBooking.html', user=current_user, form=form)
-    else:
-        return "<h1> Page not found </h1>"
+    if request.method == 'POST':
+        return redirect(url_for('.payment', usid=usid, typ=typ))
+    if typ == 1:
+        return render_template('guestScooterBooking.html', user=current_user, form=form)
+    elif typ == 0:
+        return render_template('userScooterBooking.html', user=current_user, form=form)
 
 
 
@@ -734,8 +731,8 @@ def payment():
                 elif typ == 1:
                     g = models.Guest.query.filter_by(id=usid).first()
                     Subject = 'Conformation Email | please do not reply'
-                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[current_user.email])
-                    msg.body = "Dear {},\n\nThank you for booking with us.\nYour start date will begin on the {}\nThe return time is {}.\nPlease keep in mind your scooter number is {}\n\nEnjoy your raid.\n".format( current_user.surname, user_session.start_date, user_session.end_date, user_session.scooter_id)
+                    msg = Message(Subject, sender='software.project.0011@gmail.com', recipients=[g.email])
+                    msg.body = "Dear guest,\n\nThank you for booking with us.Enjoy your raid.\n"
                     mail.send(msg)
 
 

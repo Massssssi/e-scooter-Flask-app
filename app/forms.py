@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, DateField, TextAreaField, BooleanField, PasswordField, SelectField, \
     FloatField
 from wtforms.validators import DataRequired, EqualTo, Length
-from wtforms.fields import DateTimeLocalField
+from wtforms.fields.html5 import DateTimeLocalField
 import datetime
 
 class ConfigureScooterForm(FlaskForm):
