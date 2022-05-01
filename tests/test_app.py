@@ -44,7 +44,7 @@ def test_login_user(client):
 #test user logout
 def test_logout_user(client, create_user):
     with client:
-        login_user(create_user)
+        login(client)
         assert current_user.is_authenticated == True
         url = '/logout'
         res = client.get(url, follow_redirects=True)
