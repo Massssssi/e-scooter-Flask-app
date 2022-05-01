@@ -1,0 +1,68 @@
+<!-- This is where the user make the payment -->
+
+{% extends "baseEmployeeManager.html" %}
+
+{% block content %}
+{% with messages = get_flashed_messages() %}
+   {% if messages %}
+    <ul>
+     {% for message in messages %}
+       <li>{{ message }} </li>
+     {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+<body class = "user-HelpPage-body">
+<form method="post", action="/payment">
+  {{ form.hidden_tag() }}
+  {% for field, errors in form.errors.items() %}
+ <small class="form-text text-muted ">
+     {{ ', '.join(errors) }}
+ </small>
+{% endfor %}
+
+<fieldset class="form-group">
+  <legend class= "TT"> <bold>Payment</bold></legend>
+    <div class="form-group mx-sm-5 mb-2">
+      <label> Card Holder</label>
+      {{ form.card_holder(class_ = "form-control form-control-lg")}}
+    </div>
+
+    <div class="form-group  mx-sm-5 mb-2">
+      <label> Card Number </label>
+      {{ form.card_number(class_ = "form-control form-control-lg")}}
+    </div>
+
+    <div class="form-group  mx-sm-5 mb-2 ">
+     <label> Expiry Year</label>
+      {{form.card_expiry_Year(class_='form-control form-control-lg')}}
+    </div>
+
+    <div class="form-group  mx-sm-5 mb-2 ">
+     <label> Expiry Month</label>
+      {{form.card_expiry_Month(class_='form-control form-control-lg')}}
+    </div>
+
+    <div class="form-group  mx-sm-5 mb-2 ">
+     <label> CVV </label>
+      {{form.card_cvv(class_='form-control form-control-lg')}}
+    </div>
+
+    <div class="form-group  mx-sm-5 mb-2 ">
+     <label> Save details </label>
+      {{form.save_card(class_='form-control form-control-lg')}}
+    </div>
+</fieldset>
+
+<button type="submit" class="btn btn-primary mb-2 btn-block">Confirm Payment</button>
+
+
+
+    {% if error_message %}
+    <div class="alert alert-primary" role="alert">
+      {{error_message}}
+    </div>
+  {% endif%}
+</form>
+</body>
+{% endblock %}

@@ -1,3 +1,4 @@
+from ast import Global
 from app import app, db, models, mail, admin
 from datetime import timedelta, datetime, date
 from flask import render_template, flash, request, redirect, url_for, session
@@ -14,6 +15,7 @@ import folium
 import pandas as pd
 import copy
 import json
+import phonenumbers
 
 
 # # Adds the ability to view all tables in Flask Admin
@@ -122,20 +124,23 @@ def register():
     if form.validate_on_submit():
         discount = form.discount.data
 
-        #try:
-            #my_number = phonenumbers.parse(form.phone.data)
-            #if not phonenumbers.is_possible_number(my_number):
-                #flash("Invalid phone number, make sure to include your country code")
-                #return render_template('register.html', title='Register', form=form)
+        try:
+            my_number = phonenumbers.parse(form.phone.data)
+            if not phonenumbers.is_possible_number(my_number):
+                flash("Invalid phone number, make sure to include your country code")
+                return render_template('register.html', title='Register', form=form)
 
-        #except Exception as e:
-            #flash("Invalid phone number, make sure to include your country code")
-            #return render_template('register.html', title='Register', form=form)
+        except Exception as e:
+            flash("Invalid phone number, make sure to include your country code")
+            return render_template('register.html', title='Register', form=form)
 
-        user = User.query.filter_by(email=form.email.data).first()
-        if user:
-            flash("Error. This email already exists.")
-        if not passwordCheck(form.password.data):
+        userEmail = User.query.filter_by(email=form.email.data).first()
+        userPhone = User.query.filter_by(phone=form.phone.data).first()
+        if userEmail:
+            flash("Error. This email is already registered with an account.")
+        elif userPhone:
+            flash("Error. This phone number is already registered with an account.")
+        elif not passwordCheck(form.password.data):
             flash("Error. Password must contain uppercase and lowercase letters, a number and a special character.")
         else:
             if not discount:
@@ -514,83 +519,89 @@ def map():
 @app.route('/bookScooter', methods=['GET', 'POST'])
 @login_required
 def bookScooter():
-    n = 0
-    cost = 0
-    form = BookScooterForm()
-    loc_id = request.args['loc_id']
-    loc_id = session['loc_id']
+    if current_user.account_type == 0:
+        n = 0
+        cost = 0
+        form = BookScooterForm()
+        loc_id = request.args['loc_id']
+        loc_id = session['loc_id']
 
-    usid = request.args['usid']
-    usid = session['usid']
+        usid = request.args['usid']
+        usid = session['usid']
 
-    typ = request.args['typ']
-    typ = session['typ']
+        typ = request.args['typ']
+        typ = session['typ']
 
-    p = models.Location.query.filter_by(id=int(loc_id)).first()
-    m = models.Scooter.query.filter(Scooter.availability == True).first()
-    if m:
-        form.scooter.choices = [scooter.id for scooter in
-                                Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
+        p = models.Location.query.filter_by(id=int(loc_id)).first()
+        m = models.Scooter.query.filter(Scooter.availability == True).first()
+        if m:
+            form.scooter.choices = [scooter.id for scooter in
+                                    Scooter.query.filter_by(location_id=p.id, availability=m.availability).all()]
 
-    if form.validate_on_submit():
-        c = models.ScooterCost.query.filter_by(id=1).first()
+        if form.validate_on_submit():
+            c = models.ScooterCost.query.filter_by(id=1).first()
 
-        a = form.hire_period.data
-        if a == "One hour":
-            cost = c.hourly_cost
-            n = 1
-            global N
-            N = n
-        elif a == "Four hours":
-            cost = 4 * c.hourly_cost
-            n = 4
-            N = n
-        elif a == "One day":
-            cost = (24 * c.hourly_cost)*(c.discount_rate)
-            n = 24
-            N = n
-        elif a == "One week":
-            cost = (168 * c.hourly_cost)*c.discount_rate
-            n = 168
-            N = n
+            a = form.hire_period.data
+            global hire_periode
+            hire_periode=a
+            if a == "One hour":
+                cost = c.hourly_cost
+                n = 1
+                global N
+                N = n
+            elif a == "Four hours":
+                cost = 4 * c.hourly_cost
+                n = 4
+                N = n
+            elif a == "One day":
+                cost = (24 * c.hourly_cost)-((24 * c.hourly_cost)*(c.discount_rate))
+                n = 24
+                N = n
+            elif a == "One week":
+                cost = (168 * c.hourly_cost)-((168 * c.hourly_cost)*(c.discount_rate))
+                n = 168
+                N = n
 
-        given_time = form.start_date.data
-        final_time = given_time + timedelta(hours=n)
-        if typ == 0:
-            global Cost
-            Cost = cost
-            global f_start_date
-            f_start_date = form.start_date.data
-            global f_scooter_data
-            f_scooter_data = form.scooter.data
-            global us_id
-            us_id = usid
-            global f_time
-            f_time = final_time
-            global g_time
-            g_time = given_time
+            given_time = form.start_date.data
+            final_time = given_time + timedelta(hours=n)
+            if typ == 0:
+                global Cost
+                Cost = cost
+                global f_start_date
+                f_start_date = form.start_date.data
+                global f_scooter_data
+                f_scooter_data = form.scooter.data
+                global us_id
+                us_id = usid
+                global f_time
+                f_time = final_time
+                global g_time
+                g_time = given_time
 
-        elif typ == 1:
-            Cost = cost
-            f_start_date = form.start_date.data
-            f_scooter_data = form.scooter.data
-            global g_id
-            g_id = usid
-            f_time = final_time
-            g_time = given_time
+            elif typ == 1:
+                Cost = cost
+                f_start_date = form.start_date.data
+                f_scooter_data = form.scooter.data
+                global g_id
+                g_id = usid
+                f_time = final_time
+                g_time = given_time
 
-        typ = typ
-        session['typ'] = typ
+            typ = typ
+            session['typ'] = typ
 
-        usid = usid
-        session['usid'] = usid
+            usid = usid
+            session['usid'] = usid
 
-    if request.method == 'POST':
-        return redirect(url_for('.payment', usid=usid, typ=typ))
-    if typ == 1:
-        return render_template('guestScooterBooking.html', user=current_user, form=form)
-    elif typ == 0:
-        return render_template('userScooterBooking.html', user=current_user, form=form)
+        if request.method == 'POST':
+            return redirect(url_for('.payment', usid=usid, typ=typ))
+        if typ == 1:
+            return render_template('guestScooterBooking.html', user=current_user, form=form)
+        elif typ == 0:
+            return render_template('userScooterBooking.html', user=current_user, form=form)
+    else:
+        return "<h1> Page not found </h1>"
+
 
 
 @app.route('/payment', methods=['GET', 'POST'])
@@ -617,8 +628,9 @@ def payment():
         if user.start_date >= datetime.today() - (timedelta(days=7)):
             total_cost = total_cost + user.cost
 
-    if total_cost >= scooter_cost.hourly_cost * 8:
+    if total_cost >= scooter_cost.hourly_cost * 8 and hire_periode!="One day" and hire_periode!="One week":
         indice = True
+
 
     today_year = date.today().year
     today_month = date.today().month
@@ -640,11 +652,19 @@ def payment():
     if form.validate_on_submit():
         cc = models.Card.query.filter_by(card_number=form.card_number.data).first()
         if cc and form.save_card.data is True:
-            return render_template('payment.html', title='Payment', form=form,
-                                   error_message="This Card number has already been saved")
+            if typ == 0:
+                return render_template('payment.html', title='Payment', form=form,
+                                    error_message="This Card number has already been saved")
+            else:
+                return render_template('PaymentGuest.html', title='Payment', form=form,
+                                    error_message="This Card number has already been saved")
         elif cc and check_password_hash(cc.cvv, form.card_cvv.data) is False:
-            return render_template('payment.html', title='Payment', form=form,
-                                   error_message="Wrong card detail")
+            if typ == 0:
+                return render_template('payment.html', title='Payment', form=form,
+                                    error_message="Wrong card detail")
+            else:
+                return render_template('PaymentGuest.html', title='Payment', form=form,
+                                    error_message="Wrong card detail")
         else:
             for n in form.card_number.data:
                 if n not in l:
@@ -710,7 +730,7 @@ def payment():
                     msg.body = "Dear {},\n\nThank you for booking with us.\nYour start date will begin on the {}\nThe return time is {}.\nPlease keep in mind your scooter number is {}\n\nEnjoy your raid.\n".format( current_user.surname, user_session.start_date, user_session.end_date, user_session.scooter_id)
                     mail.send(msg)
 
-                    flash('The confirmation email has been sent successfully')
+
                 elif typ == 1:
                     g = models.Guest.query.filter_by(id=usid).first()
                     Subject = 'Conformation Email | please do not reply'
@@ -718,7 +738,7 @@ def payment():
                     msg.body = "Dear {},\n\nThank you for booking with us.\nYour start date will begin on the {}\nThe return time is {}.\nPlease keep in mind your scooter number is {}\n\nEnjoy your raid.\n".format( current_user.surname, user_session.start_date, user_session.end_date, user_session.scooter_id)
                     mail.send(msg)
 
-                    flash('The confirmation email has been sent successfully')
+
                     a = Session(cost=Cost,
                                 start_date=f_start_date,
                                 scooter_id=f_scooter_data,
@@ -737,10 +757,16 @@ def payment():
                     return redirect("/GuestUsers")
             else:
                 if checkcard == 0:
-                    return render_template('payment.html', title='Payment', form=form,
-                                           error_message="Wrong card number or cvv")
-
-    return render_template('payment.html', title='Payment', form=form)
+                    if typ == 0:
+                        return render_template('payment.html', title='Payment', form=form,
+                                            error_message="Wrong card number or cvv")
+                    else:
+                        return render_template('PaymentGuest.html', title='Payment', form=form,
+                                            error_message="Wrong card number or cvv")
+    if typ == 0:
+        return render_template('payment.html', title='Payment', form=form)
+    else:
+        return render_template('PaymentGuest.html', title='Payment', form=form)
 
 
 @app.route('/configureCost', methods=['GET', 'POST'])
@@ -885,7 +911,7 @@ def selectLocationguest():
 
         return redirect(url_for('.bookScooter', loc_id=loc_id, usid=usid, typ=typ))
 
-    return render_template('selectLocation.html', user=current_user, form=form)
+    return render_template('selectLocationGuest.html', user=current_user, form=form)
 
 
 # Render the user base page | he can choose between general or related feedback
