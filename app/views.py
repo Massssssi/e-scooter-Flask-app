@@ -134,11 +134,11 @@ def register():
             #return render_template('register.html', title='Register', form=form)
 
         userEmail = User.query.filter_by(email=form.email.data).first()
-        #userPhone = User.query.filter_by(phone=my_number).first()
+        userPhone = User.query.filter_by(phone=form.phone.data).first()
         if userEmail:
             flash("Error. This email is already registered with an account.")
-        #elif userPhone:
-            #flash("Error. This phone number is already registered with an account.")
+        elif userPhone:
+            flash("Error. This phone number is already registered with an account.")
         elif not passwordCheck(form.password.data):
             flash("Error. Password must contain uppercase and lowercase letters, a number and a special character.")
         else:
