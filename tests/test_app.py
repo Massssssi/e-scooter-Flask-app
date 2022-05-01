@@ -14,7 +14,7 @@ def test_register_user(client, session):
             'forename':'try',
             'surname':'try',
             'email':'try@gmail.com',
-            'phone':'12355',
+            'phone':'+44 12355',
             'password':'Try.123'
             
         }
